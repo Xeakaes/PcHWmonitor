@@ -7,6 +7,118 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 
 ---
 
+## English
+
+### Features
+
+- **Android** (Kotlin, Jetpack Compose, Material 3):
+  - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
+  - Live charts, 1-hour history (Room DB), light/dark theme, custom logo
+  - **Landscape mode: all cards in a compact scroll-free 2×2 grid on one screen**
+  - 14 languages (selectable in Settings)
+- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data.
+
+### Architecture
+
+```
+Windows PC
+  PcHwMonitor.exe (port 8765)
+    ├─ default: embedded LibreHardwareMonitorLib (in-process reading, --uac-admin manifest)
+    └─ or: LibreHardwareMonitor Remote Web Server (8085) → --source http
+        │ WebSocket ws://<pc-ip>:8765/ws  (one status message every second)
+Android app (same Wi-Fi)
+```
+
+The Android app only talks to the server; it never touches LibreHardwareMonitor directly.
+
+### Windows EXE (recommended path)
+
+1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature).
+2. On your phone, open the **Settings** tab, enter the PC's Wi-Fi IP (e.g. `192.168.1.50`) and port (`8765`), press **Save**. The dashboard connects automatically.
+3. The EXE sits in the system tray (next to the clock); right-click → **Kapat** (Close) shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
+
+To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
+
+### Server Setup (development)
+
+**Windows (real data):**
+
+```bash
+cd server
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt   # pythonnet via requirements-dev
+.venv\Scripts\python main.py
+```
+
+Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate`
+
+- `--source auto` (default): uses the embedded DLL if present (`lib`), falls back to the LHM web server.
+- `--source lib`: reads `LibreHardwareMonitorLib.dll` in-process (DLL path can be set via the `LHMDIR` env var).
+- `--source http`: reads the JSON API of an external LibreHardwareMonitor (Options → Remote Web Server, port 8085).
+
+**Simulation mode (for testing, any OS):**
+
+```bash
+cd server
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python main.py --simulate --port 8765
+```
+
+**Verify the server:**
+
+```bash
+curl http://localhost:8765/health          # {"ok":true,"source":"..."}
+.venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
+.venv/bin/python -m pytest tests -v        # 20 tests
+```
+
+### Android Setup
+
+```bash
+./gradlew :app:assembleDebug
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+Tests: `./gradlew :app:testDebugUnitTest`
+
+### WebSocket Protocol
+
+One `status` message per second from server to client; `welcome` comes first on connect:
+
+```json
+{"type":"welcome","intervalMs":1000,"serverName":"DESKTOP-ABC","source":"lhm-lib","pcName":"DESKTOP-ABC"}
+
+{"type":"status","timestamp":1754150000,
+ "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
+ "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
+        "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
+ "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
+         "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
+         "powerW":null,"fps":null},
+ "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600}}
+```
+
+Missing sensors arrive as `null` (the UI shows "—"). If the server cannot reach the hardware it broadcasts `"available": false` plus an `error`.
+
+### Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| "Bağlantı yok" (no connection) | Make sure both devices are on the same Wi-Fi; open port 8765 (TCP) in the Windows firewall. |
+| `available:false` (EXE) | Check `dist\pchw.log`; verify the DLLs in `server\vendor` are intact. |
+| `available:false` (`--source http`) | Is LHM running with Remote Web Server enabled? Is `--lhm-url` correct? |
+| CPU temperature "—" | Run the EXE as administrator (required by the manifest). |
+| Unknown IP | Run `ipconfig` (Windows) / `ip a` (Linux) on the PC. |
+
+### Notes
+
+- The FPS field exists in the protocol but is `null` for now; it may be filled via MSI Afterburner in the future.
+- History data is stored in a Room DB on the device for 1 hour and cleaned automatically.
+
+---
+
+
 ## Türkçe
 
 ### Özellikler
@@ -118,116 +230,6 @@ Eksik sensörler `null` gelir (UI "—" gösterir). Sunucu donanıma ulaşamazsa
 
 ---
 
-## English
-
-### Features
-
-- **Android** (Kotlin, Jetpack Compose, Material 3):
-  - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
-  - Live charts, 1-hour history (Room DB), light/dark theme, custom logo
-  - **Landscape mode: all cards in a compact scroll-free 2×2 grid on one screen**
-  - 14 languages (selectable in Settings)
-- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data.
-
-### Architecture
-
-```
-Windows PC
-  PcHwMonitor.exe (port 8765)
-    ├─ default: embedded LibreHardwareMonitorLib (in-process reading, --uac-admin manifest)
-    └─ or: LibreHardwareMonitor Remote Web Server (8085) → --source http
-        │ WebSocket ws://<pc-ip>:8765/ws  (one status message every second)
-Android app (same Wi-Fi)
-```
-
-The Android app only talks to the server; it never touches LibreHardwareMonitor directly.
-
-### Windows EXE (recommended path)
-
-1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature).
-2. On your phone, open the **Settings** tab, enter the PC's Wi-Fi IP (e.g. `192.168.1.50`) and port (`8765`), press **Save**. The dashboard connects automatically.
-3. The EXE sits in the system tray (next to the clock); right-click → **Kapat** (Close) shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
-
-To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
-
-### Server Setup (development)
-
-**Windows (real data):**
-
-```bash
-cd server
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt   # pythonnet via requirements-dev
-.venv\Scripts\python main.py
-```
-
-Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate`
-
-- `--source auto` (default): uses the embedded DLL if present (`lib`), falls back to the LHM web server.
-- `--source lib`: reads `LibreHardwareMonitorLib.dll` in-process (DLL path can be set via the `LHMDIR` env var).
-- `--source http`: reads the JSON API of an external LibreHardwareMonitor (Options → Remote Web Server, port 8085).
-
-**Simulation mode (for testing, any OS):**
-
-```bash
-cd server
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python main.py --simulate --port 8765
-```
-
-**Verify the server:**
-
-```bash
-curl http://localhost:8765/health          # {"ok":true,"source":"..."}
-.venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 20 tests
-```
-
-### Android Setup
-
-```bash
-./gradlew :app:assembleDebug
-adb install app/build/outputs/apk/debug/app-debug.apk
-```
-
-Tests: `./gradlew :app:testDebugUnitTest`
-
-### WebSocket Protocol
-
-One `status` message per second from server to client; `welcome` comes first on connect:
-
-```json
-{"type":"welcome","intervalMs":1000,"serverName":"DESKTOP-ABC","source":"lhm-lib","pcName":"DESKTOP-ABC"}
-
-{"type":"status","timestamp":1754150000,
- "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
- "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
-        "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
- "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
-         "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
-         "powerW":null,"fps":null},
- "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600}}
-```
-
-Missing sensors arrive as `null` (the UI shows "—"). If the server cannot reach the hardware it broadcasts `"available": false` plus an `error`.
-
-### Troubleshooting
-
-| Problem | Solution |
-|---|---|
-| "Bağlantı yok" (no connection) | Make sure both devices are on the same Wi-Fi; open port 8765 (TCP) in the Windows firewall. |
-| `available:false` (EXE) | Check `dist\pchw.log`; verify the DLLs in `server\vendor` are intact. |
-| `available:false` (`--source http`) | Is LHM running with Remote Web Server enabled? Is `--lhm-url` correct? |
-| CPU temperature "—" | Run the EXE as administrator (required by the manifest). |
-| Unknown IP | Run `ipconfig` (Windows) / `ip a` (Linux) on the PC. |
-
-### Notes
-
-- The FPS field exists in the protocol but is `null` for now; it may be filled via MSI Afterburner in the future.
-- History data is stored in a Room DB on the device for 1 hour and cleaned automatically.
-
----
 
 ## Lisans / License
 
