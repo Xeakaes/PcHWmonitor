@@ -28,6 +28,9 @@
     <string name="theme_dark">Dunkel</string>
     <string name="save">Speichern</string>
     <string name="saved">Einstellungen gespeichert</string>
+    <string name="support">Unterstützung</string>
+    <string name="support_description">Diese App ist kostenlos und Open Source. Wenn sie dir nützt, kannst du die Entwicklung auf Patreon unterstützen.</string>
+    <string name="support_patreon">Auf Patreon unterstützen</string>
     <string name="no_data">Keine Daten — verbinde dich über Einstellungen mit deinem PC-Server</string>
     <string name="history">Verlauf</string>
     <string name="last_hour">Letzte Stunde</string>

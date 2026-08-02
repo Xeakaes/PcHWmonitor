@@ -28,6 +28,9 @@
     <string name="theme_dark">Тёмная</string>
     <string name="save">Сохранить</string>
     <string name="saved">Настройки сохранены</string>
+    <string name="support">Поддержка</string>
+    <string name="support_description">Это приложение бесплатное и с открытым исходным кодом. Если оно полезно для вас, вы можете поддержать разработку на Patreon.</string>
+    <string name="support_patreon">Поддержать на Patreon</string>
     <string name="no_data">Нет данных — подключитесь к серверу ПК во вкладке Настройки</string>
     <string name="history">История</string>
     <string name="last_hour">Последний час</string>

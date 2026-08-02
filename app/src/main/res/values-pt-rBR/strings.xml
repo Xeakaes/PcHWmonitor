@@ -28,6 +28,9 @@
     <string name="theme_dark">Escuro</string>
     <string name="save">Salvar</string>
     <string name="saved">Configurações salvas</string>
+    <string name="support">Apoiar</string>
+    <string name="support_description">Esta aplicação é gratuita e de código aberto. Se for útil para você, pode apoiar o desenvolvimento no Patreon.</string>
+    <string name="support_patreon">Apoiar no Patreon</string>
     <string name="no_data">Sem dados — conecte-se ao servidor do seu PC em Configurações</string>
     <string name="history">Histórico</string>
     <string name="last_hour">Última hora</string>

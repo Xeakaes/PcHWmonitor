@@ -28,6 +28,9 @@
     <string name="theme_dark">Donker</string>
     <string name="save">Opslaan</string>
     <string name="saved">Instellingen opgeslagen</string>
+    <string name="support">Steun</string>
+    <string name="support_description">Deze app is gratis en open source. Als hij nuttig is, kun je de ontwikkeling steunen op Patreon.</string>
+    <string name="support_patreon">Steunen op Patreon</string>
     <string name="no_data">Geen gegevens — verbind via Instellingen met je pc-server</string>
     <string name="history">Geschiedenis</string>
     <string name="last_hour">Laatste uur</string>

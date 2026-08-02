@@ -28,6 +28,9 @@
     <string name="theme_dark">Scuro</string>
     <string name="save">Salva</string>
     <string name="saved">Impostazioni salvate</string>
+    <string name="support">Supporto</string>
+    <string name="support_description">Questa app è gratuita e open source. Se ti è utile, puoi sostenere lo sviluppo su Patreon.</string>
+    <string name="support_patreon">Sostieni su Patreon</string>
     <string name="no_data">Nessun dato — connettiti al server del tuo PC da Impostazioni</string>
     <string name="history">Cronologia</string>
     <string name="last_hour">Ultima ora</string>

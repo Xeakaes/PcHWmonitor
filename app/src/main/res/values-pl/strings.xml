@@ -28,6 +28,9 @@
     <string name="theme_dark">Ciemny</string>
     <string name="save">Zapisz</string>
     <string name="saved">Zapisano ustawienia</string>
+    <string name="support">Wsparcie</string>
+    <string name="support_description">Ta aplikacja jest darmowa i open source. Jeśli jest dla Ciebie przydatna, możesz wesprzeć rozwój na Patreon.</string>
+    <string name="support_patreon">Wesprzyj na Patreon</string>
     <string name="no_data">Brak danych — połącz się z serwerem PC w zakładce Ustawienia</string>
     <string name="history">Historia</string>
     <string name="last_hour">Ostatnia godzina</string>

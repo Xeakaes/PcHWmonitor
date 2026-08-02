@@ -28,6 +28,9 @@
     <string name="theme_dark">ダーク</string>
     <string name="save">保存</string>
     <string name="saved">設定を保存しました</string>
+    <string name="support">支援</string>
+    <string name="support_description">このアプリは無料のオープンソースです。役に立つと思ったら、Patreonで開発を支援できます。</string>
+    <string name="support_patreon">Patreonで支援する</string>
     <string name="no_data">データがありません — 設定タブから PC サーバーに接続してください</string>
     <string name="history">履歴</string>
     <string name="last_hour">直近 1 時間</string>
