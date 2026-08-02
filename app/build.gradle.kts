@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pchwmonitor"
+    namespace = "com.Obscrum.pchwmonitor"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.pchwmonitor"
+        applicationId = "com.Obscrum.pchwmonitor"
         minSdk = 24
         targetSdk = 37
         versionCode = 2
