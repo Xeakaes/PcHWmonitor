@@ -5,6 +5,9 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 
 **Lisansa / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
 
+**Support:** [Patreon](https://www.patreon.com/cw/Obscrum) — free software stays free thanks to supporters.
+**Destek:** [Patreon](https://www.patreon.com/cw/Obscrum) — ücretsiz yazılım, destekçiler sayesinde ücretsiz kalır.
+
 ---
 
 ## English
