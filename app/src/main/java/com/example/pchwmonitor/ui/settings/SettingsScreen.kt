@@ -20,6 +20,10 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import com.example.pchwmonitor.util.PATREON_URL
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,9 +58,13 @@ fun SettingsScreen(
     languages: List<Pair<String?, String>>,
     labelSave: String,
     labelSaved: String,
+    labelSupport: String,
+    labelSupportDescription: String,
+    labelSupportPatreon: String,
     modifier: Modifier = Modifier,
     onSave: (ip: String, port: Int, theme: ThemeMode, language: String?) -> Unit,
 ) {
+    val context = LocalContext.current
     var ip by remember { mutableStateOf(settings.serverIp) }
     var port by remember { mutableStateOf(settings.serverPort.toString()) }
     var theme by remember { mutableStateOf(settings.theme) }
@@ -178,6 +186,27 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
+        }
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = labelSupport,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = labelSupportDescription,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PATREON_URL)))
+            },
+        ) {
+            Text(labelSupportPatreon)
         }
         Spacer(modifier = Modifier.height(32.dp))
     }

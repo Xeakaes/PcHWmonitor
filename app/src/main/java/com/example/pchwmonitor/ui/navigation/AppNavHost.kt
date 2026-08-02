@@ -153,6 +153,9 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     ),
                     labelSave = stringResource(R.string.save),
                     labelSaved = stringResource(R.string.saved),
+                    labelSupport = stringResource(R.string.support),
+                    labelSupportDescription = stringResource(R.string.support_description),
+                    labelSupportPatreon = stringResource(R.string.support_patreon),
                     onSave = { ip, port, theme, language ->
                         viewModel.saveSettings(ip, port, theme, language)
                     },
