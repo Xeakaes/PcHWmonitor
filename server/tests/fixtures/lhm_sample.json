@@ -1,0 +1,71 @@
+{
+  "Identifier": "/lhm",
+  "Text": "LibreHardwareMonitor",
+  "Children": [
+    {
+      "Identifier": "/lhm/cpu/0",
+      "Text": "Intel Core i7-13700K",
+      "HardwareType": "Cpu",
+      "Children": [
+        { "Text": "CPU Package", "SensorType": "Temperature", "Value": 61.2, "Min": 30.0, "Max": 95.0 },
+        { "Text": "CPU Core Max", "SensorType": "Temperature", "Value": 63.8, "Min": 29.0, "Max": 99.0 },
+        { "Text": "CPU Total", "SensorType": "Load", "Value": 34.5, "Min": 1.0, "Max": 100.0 },
+        { "Text": "CPU Max Threads", "SensorType": "Load", "Value": 52.1, "Min": 0.0, "Max": 100.0 },
+        { "Text": "Core Max", "SensorType": "Clock", "Value": 5100.0, "Min": 800.0, "Max": 5500.0 },
+        { "Text": "CPU Package Power", "SensorType": "Power", "Value": 125.0, "Min": 8.0, "Max": 253.0 },
+        { "Text": "CPU Core #1", "SensorType": "Load", "Value": 12.3, "Min": 0.0, "Max": 100.0 },
+        { "Text": "CPU Core #2", "SensorType": "Load", "Value": 45.2, "Min": 0.0, "Max": 100.0 },
+        { "Text": "CPU Core #3", "SensorType": "Load", "Value": 33.1, "Min": 0.0, "Max": 100.0 },
+        { "Text": "CPU Core #4", "SensorType": "Load", "Value": 67.4, "Min": 0.0, "Max": 100.0 },
+        { "Text": "CPU Fan", "SensorType": "Fan", "Value": 1420.0, "Min": 0.0, "Max": 3000.0 },
+        { "Text": "CPU Voltage", "SensorType": "Voltage", "Value": 1.24, "Min": 0.7, "Max": 1.5 }
+      ]
+    },
+    {
+      "Identifier": "/lhm/gpu-nvidia/0",
+      "Text": "NVIDIA GeForce RTX 4070",
+      "HardwareType": "GpuNvidia",
+      "Children": [
+        { "Text": "GPU Core", "SensorType": "Temperature", "Value": 71.4, "Min": 30.0, "Max": 83.0 },
+        { "Text": "GPU Hot Spot", "SensorType": "Temperature", "Value": 84.1, "Min": 30.0, "Max": 100.0 },
+        { "Text": "GPU Memory Junction", "SensorType": "Temperature", "Value": 72.2, "Min": 30.0, "Max": 95.0 },
+        { "Text": "GPU Core", "SensorType": "Load", "Value": 78.3, "Min": 0.0, "Max": 100.0 },
+        { "Text": "GPU Memory Used", "SensorType": "SmallData", "Value": 6112.0, "Min": 100.0, "Max": 12288.0 },
+        { "Text": "GPU Memory Total", "SensorType": "SmallData", "Value": 12288.0, "Min": 12288.0, "Max": 12288.0 },
+        { "Text": "GPU Core Clock", "SensorType": "Clock", "Value": 2745.0, "Min": 210.0, "Max": 2805.0 },
+        { "Text": "GPU Memory Clock", "SensorType": "Clock", "Value": 10500.0, "Min": 405.0, "Max": 10501.0 },
+        { "Text": "GPU Total Power", "SensorType": "Power", "Value": 182.0, "Min": 8.0, "Max": 200.0 },
+        { "Text": "GPU Fan", "SensorType": "Fan", "Value": 1350.0, "Min": 0.0, "Max": 3000.0 }
+      ]
+    },
+    {
+      "Identifier": "/lhm/memory/0",
+      "Text": "G.Skill Trident Z5",
+      "HardwareType": "Memory",
+      "Children": [
+        { "Text": "Memory Used", "SensorType": "Data", "Value": 11.2, "Min": 2.1, "Max": 31.8 },
+        { "Text": "Memory Total", "SensorType": "Data", "Value": 32.0, "Min": 32.0, "Max": 32.0 },
+        { "Text": "Memory Utilization", "SensorType": "Load", "Value": 35.0, "Min": 3.0, "Max": 99.0 },
+        { "Text": "Memory Clock", "SensorType": "Clock", "Value": 3600.0, "Min": 2133.0, "Max": 3600.0 }
+      ]
+    },
+    {
+      "Identifier": "/lhm/storage/0",
+      "Text": "Samsung SSD 980 PRO",
+      "HardwareType": "Storage",
+      "Children": [
+        { "Text": "Storage Used Space", "SensorType": "Load", "Value": 61.0, "Min": 0.0, "Max": 100.0 },
+        { "Text": "Storage Temperature", "SensorType": "Temperature", "Value": 41.0, "Min": 25.0, "Max": 70.0 }
+      ]
+    },
+    {
+      "Identifier": "/lhm/motherboard/0",
+      "Text": "MSI MAG Z790 TOMAHAWK",
+      "HardwareType": "Motherboard",
+      "Children": [
+        { "Text": "Temperature Mainboard", "SensorType": "Temperature", "Value": 34.0, "Min": 20.0, "Max": 60.0 },
+        { "Text": "Fan System", "SensorType": "Fan", "Value": 800.0, "Min": 0.0, "Max": 2000.0 }
+      ]
+    }
+  ]
+}

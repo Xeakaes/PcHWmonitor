@@ -1,0 +1,1774 @@
+{
+  "Text": "Sensor",
+  "Children": [
+    {
+      "Text": "DESKTOP-GNPSCIB",
+      "Children": [
+        {
+          "id": 2,
+          "Text": "MSI MS-15K1",
+          "HardwareId": "/motherboard",
+          "Children": []
+        },
+        {
+          "id": 3,
+          "Text": "13th Gen Intel Core i7-13620H",
+          "HardwareId": "/intelcpu/0",
+          "Children": [
+            {
+              "Text": "Voltages",
+              "Children": [
+                {
+                  "Text": "CPU Core",
+                  "Type": "Voltage",
+                  "Value": "1,219 V"
+                },
+                {
+                  "Text": "P-Core #1",
+                  "Type": "Voltage",
+                  "Value": "1,219 V"
+                },
+                {
+                  "Text": "P-Core #2",
+                  "Type": "Voltage",
+                  "Value": "1,216 V"
+                },
+                {
+                  "Text": "P-Core #3",
+                  "Type": "Voltage",
+                  "Value": "1,196 V"
+                },
+                {
+                  "Text": "P-Core #4",
+                  "Type": "Voltage",
+                  "Value": "1,196 V"
+                },
+                {
+                  "Text": "P-Core #5",
+                  "Type": "Voltage",
+                  "Value": "1,196 V"
+                },
+                {
+                  "Text": "P-Core #6",
+                  "Type": "Voltage",
+                  "Value": "1,190 V"
+                },
+                {
+                  "Text": "E-Core #1",
+                  "Type": "Voltage",
+                  "Value": "1,211 V"
+                },
+                {
+                  "Text": "E-Core #2",
+                  "Type": "Voltage",
+                  "Value": "1,211 V"
+                },
+                {
+                  "Text": "E-Core #3",
+                  "Type": "Voltage",
+                  "Value": "1,211 V"
+                },
+                {
+                  "Text": "E-Core #4",
+                  "Type": "Voltage",
+                  "Value": "1,211 V"
+                }
+              ]
+            },
+            {
+              "Text": "Powers",
+              "Children": [
+                {
+                  "Text": "CPU Package",
+                  "Type": "Power",
+                  "Value": "32,8 W"
+                },
+                {
+                  "Text": "CPU Cores",
+                  "Type": "Power",
+                  "Value": "24,8 W"
+                },
+                {
+                  "Text": "CPU Memory",
+                  "Type": "Power",
+                  "Value": "0,0 W"
+                },
+                {
+                  "Text": "CPU Platform",
+                  "Type": "Power",
+                  "Value": "69,8 W"
+                }
+              ]
+            },
+            {
+              "Text": "Clocks",
+              "Children": [
+                {
+                  "Text": "Bus Speed",
+                  "Type": "Clock",
+                  "Value": "100,6 MHz"
+                },
+                {
+                  "Text": "P-Core #1",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "P-Core #2",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "P-Core #3",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "P-Core #4",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "P-Core #5",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "P-Core #6",
+                  "Type": "Clock",
+                  "Value": "4729,8 MHz"
+                },
+                {
+                  "Text": "E-Core #1",
+                  "Type": "Clock",
+                  "Value": "3622,8 MHz"
+                },
+                {
+                  "Text": "E-Core #2",
+                  "Type": "Clock",
+                  "Value": "3421,6 MHz"
+                },
+                {
+                  "Text": "E-Core #3",
+                  "Type": "Clock",
+                  "Value": "3622,8 MHz"
+                },
+                {
+                  "Text": "E-Core #4",
+                  "Type": "Clock",
+                  "Value": "3622,8 MHz"
+                }
+              ]
+            },
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "Core Max",
+                  "Type": "Temperature",
+                  "Value": "71,0 °C"
+                },
+                {
+                  "Text": "Core Average",
+                  "Type": "Temperature",
+                  "Value": "63,7 °C"
+                },
+                {
+                  "Text": "P-Core #1",
+                  "Type": "Temperature",
+                  "Value": "60,0 °C"
+                },
+                {
+                  "Text": "P-Core #2",
+                  "Type": "Temperature",
+                  "Value": "59,0 °C"
+                },
+                {
+                  "Text": "P-Core #3",
+                  "Type": "Temperature",
+                  "Value": "70,0 °C"
+                },
+                {
+                  "Text": "P-Core #4",
+                  "Type": "Temperature",
+                  "Value": "68,0 °C"
+                },
+                {
+                  "Text": "P-Core #5",
+                  "Type": "Temperature",
+                  "Value": "65,0 °C"
+                },
+                {
+                  "Text": "P-Core #6",
+                  "Type": "Temperature",
+                  "Value": "71,0 °C"
+                },
+                {
+                  "Text": "E-Core #1",
+                  "Type": "Temperature",
+                  "Value": "61,0 °C"
+                },
+                {
+                  "Text": "E-Core #2",
+                  "Type": "Temperature",
+                  "Value": "61,0 °C"
+                },
+                {
+                  "Text": "E-Core #3",
+                  "Type": "Temperature",
+                  "Value": "61,0 °C"
+                },
+                {
+                  "Text": "E-Core #4",
+                  "Type": "Temperature",
+                  "Value": "61,0 °C"
+                },
+                {
+                  "Text": "CPU Package",
+                  "Type": "Temperature",
+                  "Value": "71,0 °C"
+                },
+                {
+                  "Text": "P-Core #1 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "40,0 °C"
+                },
+                {
+                  "Text": "P-Core #2 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "41,0 °C"
+                },
+                {
+                  "Text": "P-Core #3 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "30,0 °C"
+                },
+                {
+                  "Text": "P-Core #4 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "32,0 °C"
+                },
+                {
+                  "Text": "P-Core #5 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "35,0 °C"
+                },
+                {
+                  "Text": "P-Core #6 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "29,0 °C"
+                },
+                {
+                  "Text": "E-Core #1 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "39,0 °C"
+                },
+                {
+                  "Text": "E-Core #2 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "39,0 °C"
+                },
+                {
+                  "Text": "E-Core #3 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "39,0 °C"
+                },
+                {
+                  "Text": "E-Core #4 Distance to TjMax",
+                  "Type": "Temperature",
+                  "Value": "39,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "CPU Total",
+                  "Type": "Load",
+                  "Value": "11,8 %"
+                },
+                {
+                  "Text": "CPU Core Max",
+                  "Type": "Load",
+                  "Value": "40,0 %"
+                },
+                {
+                  "Text": "CPU Core #1 Thread #1",
+                  "Type": "Load",
+                  "Value": "20,0 %"
+                },
+                {
+                  "Text": "CPU Core #1 Thread #2",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #2 Thread #1",
+                  "Type": "Load",
+                  "Value": "11,3 %"
+                },
+                {
+                  "Text": "CPU Core #2 Thread #2",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #3 Thread #1",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #3 Thread #2",
+                  "Type": "Load",
+                  "Value": "40,0 %"
+                },
+                {
+                  "Text": "CPU Core #4 Thread #1",
+                  "Type": "Load",
+                  "Value": "40,0 %"
+                },
+                {
+                  "Text": "CPU Core #4 Thread #2",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #5 Thread #1",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #5 Thread #2",
+                  "Type": "Load",
+                  "Value": "27,7 %"
+                },
+                {
+                  "Text": "CPU Core #6 Thread #1",
+                  "Type": "Load",
+                  "Value": "21,5 %"
+                },
+                {
+                  "Text": "CPU Core #6 Thread #2",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #7",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "CPU Core #8",
+                  "Type": "Load",
+                  "Value": "15,6 %"
+                },
+                {
+                  "Text": "CPU Core #9",
+                  "Type": "Load",
+                  "Value": "6,4 %"
+                },
+                {
+                  "Text": "CPU Core #10",
+                  "Type": "Load",
+                  "Value": "6,4 %"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 76,
+          "Text": "Virtual Memory",
+          "HardwareId": "/vram",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Memory",
+                  "Type": "Load",
+                  "Value": "80,7 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Memory Used",
+                  "Type": "Data",
+                  "Value": "25,2 GB"
+                },
+                {
+                  "Text": "Memory Available",
+                  "Type": "Data",
+                  "Value": "6,0 GB"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 82,
+          "Text": "Total Memory",
+          "HardwareId": "/ram",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Memory",
+                  "Type": "Load",
+                  "Value": "93,8 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Memory Used",
+                  "Type": "Data",
+                  "Value": "14,7 GB"
+                },
+                {
+                  "Text": "Memory Available",
+                  "Type": "Data",
+                  "Value": "1,0 GB"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 88,
+          "Text": "Samsung - M425R1GB4PB0-CWMOL (#0)",
+          "HardwareId": "/memory/dimm/0",
+          "Children": [
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "DIMM #0",
+                  "Type": "Temperature",
+                  "Value": "53,0 °C"
+                },
+                {
+                  "Text": "Temperature Sensor Resolution",
+                  "Type": "Temperature",
+                  "Value": "0,3 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Low Limit",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor High Limit",
+                  "Type": "Temperature",
+                  "Value": "55,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Critical Low Limit",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Critical High Limit",
+                  "Type": "Temperature",
+                  "Value": "85,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Capacity",
+                  "Type": "Data",
+                  "Value": "16,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Timings",
+              "Children": [
+                {
+                  "Text": "tCKAVGmin (Minimum Cycle Time)",
+                  "Type": "Timing",
+                  "Value": "0,357 ns"
+                },
+                {
+                  "Text": "tCKAVGmax (Maximum Cycle Time)",
+                  "Type": "Timing",
+                  "Value": "1,010 ns"
+                },
+                {
+                  "Text": "tAA (CAS Latency Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRCD (RAS to CAS Delay Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRP (Row Precharge Delay Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRAS (Active to Precharge Delay Time)",
+                  "Type": "Timing",
+                  "Value": "32,000 ns"
+                },
+                {
+                  "Text": "tRC (Active to Active/Refresh Delay Time)",
+                  "Type": "Timing",
+                  "Value": "48,000 ns"
+                },
+                {
+                  "Text": "tWR (Write Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "30,000 ns"
+                },
+                {
+                  "Text": "tRFC1 (Normal Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "295,000 ns"
+                },
+                {
+                  "Text": "tRFC2 (Fine Granularity Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "160,000 ns"
+                },
+                {
+                  "Text": "tRFCsb (Same Bank Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "130,000 ns"
+                },
+                {
+                  "Text": "tRFC1_dlr (Normal Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                },
+                {
+                  "Text": "tRFC2_dlr (Fine Granularity Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                },
+                {
+                  "Text": "tRFCsb_dlr (Same Bank Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 113,
+          "Text": "Samsung - M425R1GB4PB0-CWMOL\u0000\u0000\u0000?>?>?>\u0000} (#2)",
+          "HardwareId": "/memory/dimm/2",
+          "Children": [
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "DIMM #2",
+                  "Type": "Temperature",
+                  "Value": "50,3 °C"
+                },
+                {
+                  "Text": "Temperature Sensor Resolution",
+                  "Type": "Temperature",
+                  "Value": "0,3 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Low Limit",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor High Limit",
+                  "Type": "Temperature",
+                  "Value": "55,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Critical Low Limit",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Thermal Sensor Critical High Limit",
+                  "Type": "Temperature",
+                  "Value": "85,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Capacity",
+                  "Type": "Data",
+                  "Value": "16,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Timings",
+              "Children": [
+                {
+                  "Text": "tCKAVGmin (Minimum Cycle Time)",
+                  "Type": "Timing",
+                  "Value": "0,357 ns"
+                },
+                {
+                  "Text": "tCKAVGmax (Maximum Cycle Time)",
+                  "Type": "Timing",
+                  "Value": "1,010 ns"
+                },
+                {
+                  "Text": "tAA (CAS Latency Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRCD (RAS to CAS Delay Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRP (Row Precharge Delay Time)",
+                  "Type": "Timing",
+                  "Value": "16,000 ns"
+                },
+                {
+                  "Text": "tRAS (Active to Precharge Delay Time)",
+                  "Type": "Timing",
+                  "Value": "32,000 ns"
+                },
+                {
+                  "Text": "tRC (Active to Active/Refresh Delay Time)",
+                  "Type": "Timing",
+                  "Value": "48,000 ns"
+                },
+                {
+                  "Text": "tWR (Write Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "30,000 ns"
+                },
+                {
+                  "Text": "tRFC1 (Normal Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "295,000 ns"
+                },
+                {
+                  "Text": "tRFC2 (Fine Granularity Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "160,000 ns"
+                },
+                {
+                  "Text": "tRFCsb (Same Bank Refresh Recovery Time)",
+                  "Type": "Timing",
+                  "Value": "130,000 ns"
+                },
+                {
+                  "Text": "tRFC1_dlr (Normal Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                },
+                {
+                  "Text": "tRFC2_dlr (Fine Granularity Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                },
+                {
+                  "Text": "tRFCsb_dlr (Same Bank Refresh Recovery Time 3DS)",
+                  "Type": "Timing",
+                  "Value": "0,000 ns"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 138,
+          "Text": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "HardwareId": "/gpu-nvidia/0",
+          "Children": [
+            {
+              "Text": "Voltages",
+              "Children": [
+                {
+                  "Text": "GPU Core Voltage",
+                  "Type": "Voltage",
+                  "Value": "0,675 V"
+                }
+              ]
+            },
+            {
+              "Text": "Powers",
+              "Children": [
+                {
+                  "Text": "GPU Package",
+                  "Type": "Power",
+                  "Value": "9,0 W"
+                }
+              ]
+            },
+            {
+              "Text": "Clocks",
+              "Children": [
+                {
+                  "Text": "GPU Core",
+                  "Type": "Clock",
+                  "Value": "1470,0 MHz"
+                },
+                {
+                  "Text": "GPU Memory",
+                  "Type": "Clock",
+                  "Value": "7001,0 MHz"
+                }
+              ]
+            },
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "GPU Core",
+                  "Type": "Temperature",
+                  "Value": "55,0 °C"
+                },
+                {
+                  "Text": "GPU Hot Spot",
+                  "Type": "Temperature",
+                  "Value": "62,9 °C"
+                },
+                {
+                  "Text": "GPU Memory Junction",
+                  "Type": "Temperature",
+                  "Value": "60,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "GPU Core",
+                  "Type": "Load",
+                  "Value": "7,0 %"
+                },
+                {
+                  "Text": "GPU Memory Controller",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "GPU Video Engine",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "GPU Memory",
+                  "Type": "Load",
+                  "Value": "14,0 %"
+                },
+                {
+                  "Text": "GPU Bus",
+                  "Type": "Load",
+                  "Value": "4,0 %"
+                },
+                {
+                  "Text": "D3D 3D",
+                  "Type": "Load",
+                  "Value": "2,2 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "4,2 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Optical Flow Accelerator 0",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Overlay",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Security",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Video Decode",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Video Encode",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D VR",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "GPU Memory Free",
+                  "Type": "SmallData",
+                  "Value": "7041,0 MB"
+                },
+                {
+                  "Text": "GPU Memory Used",
+                  "Type": "SmallData",
+                  "Value": "1146,0 MB"
+                },
+                {
+                  "Text": "GPU Memory Total",
+                  "Type": "SmallData",
+                  "Value": "8188,0 MB"
+                },
+                {
+                  "Text": "D3D Dedicated Memory Used",
+                  "Type": "SmallData",
+                  "Value": "921,1 MB"
+                },
+                {
+                  "Text": "D3D Shared Memory Used",
+                  "Type": "SmallData",
+                  "Value": "220,4 MB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "GPU PCIe Rx",
+                  "Type": "Throughput",
+                  "Value": "97,0 KB/s"
+                },
+                {
+                  "Text": "GPU PCIe Tx",
+                  "Type": "Throughput",
+                  "Value": "390,4 MB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 178,
+          "Text": "Intel(R) UHD Graphics",
+          "HardwareId": "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_A7A8%26SUBSYS_13B91462%26REV_04%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D",
+          "Children": [
+            {
+              "Text": "Voltages",
+              "Children": [
+                {
+                  "Text": "GPU Core",
+                  "Type": "Voltage",
+                  "Value": "0,220 V"
+                }
+              ]
+            },
+            {
+              "Text": "Powers",
+              "Children": [
+                {
+                  "Text": "GPU Power",
+                  "Type": "Power",
+                  "Value": "0,0 W"
+                }
+              ]
+            },
+            {
+              "Text": "Clocks",
+              "Children": [
+                {
+                  "Text": "GPU Core",
+                  "Type": "Clock",
+                  "Value": "300,0 MHz"
+                }
+              ]
+            },
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D ",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D 3D",
+                  "Type": "Load",
+                  "Value": "5,6 %"
+                },
+                {
+                  "Text": "D3D Copy",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Overlay",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Video Decode",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "D3D Video Processing",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "D3D Shared Memory Used",
+                  "Type": "SmallData",
+                  "Value": "581,3 MB"
+                },
+                {
+                  "Text": "D3D Shared Memory Free",
+                  "Type": "SmallData",
+                  "Value": "7462,4 MB"
+                },
+                {
+                  "Text": "D3D Shared Memory Total",
+                  "Type": "SmallData",
+                  "Value": "8043,7 MB"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 203,
+          "Text": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+          "HardwareId": "/nvme/0",
+          "Children": [
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "Composite Temperature",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Warning Temperature",
+                  "Type": "Temperature",
+                  "Value": "69,0 °C"
+                },
+                {
+                  "Text": "Critical Temperature",
+                  "Type": "Temperature",
+                  "Value": "74,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Used Space",
+                  "Type": "Load",
+                  "Value": "92,7 %"
+                },
+                {
+                  "Text": "Read Activity",
+                  "Type": "Load",
+                  "Value": "3,6 %"
+                },
+                {
+                  "Text": "Write Activity",
+                  "Type": "Load",
+                  "Value": "0,4 %"
+                },
+                {
+                  "Text": "Total Activity",
+                  "Type": "Load",
+                  "Value": "3,8 %"
+                }
+              ]
+            },
+            {
+              "Text": "Levels",
+              "Children": [
+                {
+                  "Text": "Life",
+                  "Type": "Level",
+                  "Value": "101,0 %"
+                },
+                {
+                  "Text": "Available Spare",
+                  "Type": "Level",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "Available Spare Threshold",
+                  "Type": "Level",
+                  "Value": "255,0 %"
+                },
+                {
+                  "Text": "Percentage Used",
+                  "Type": "Level",
+                  "Value": "255,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Factors",
+              "Children": [
+                {
+                  "Text": "Power On Count",
+                  "Type": "Factor",
+                  "Value": "0,000"
+                },
+                {
+                  "Text": "Power On Hours",
+                  "Type": "Factor",
+                  "Value": "0,000"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Read",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Written",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Free Space",
+                  "Type": "Data",
+                  "Value": "37,4 GB"
+                },
+                {
+                  "Text": "Total Space",
+                  "Type": "Data",
+                  "Value": "512,1 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Read Rate",
+                  "Type": "Throughput",
+                  "Value": "173,8 KB/s"
+                },
+                {
+                  "Text": "Write Rate",
+                  "Type": "Throughput",
+                  "Value": "112,7 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 229,
+          "Text": "CT1000X9SSD9\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+          "HardwareId": "/nvme/1",
+          "Children": [
+            {
+              "Text": "Temperatures",
+              "Children": [
+                {
+                  "Text": "Composite Temperature",
+                  "Type": "Temperature",
+                  "Value": "0,0 °C"
+                },
+                {
+                  "Text": "Warning Temperature",
+                  "Type": "Temperature",
+                  "Value": "69,0 °C"
+                },
+                {
+                  "Text": "Critical Temperature",
+                  "Type": "Temperature",
+                  "Value": "74,0 °C"
+                }
+              ]
+            },
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Used Space",
+                  "Type": "Load",
+                  "Value": "69,9 %"
+                },
+                {
+                  "Text": "Read Activity",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "Write Activity",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                },
+                {
+                  "Text": "Total Activity",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Levels",
+              "Children": [
+                {
+                  "Text": "Life",
+                  "Type": "Level",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Factors",
+              "Children": [
+                {
+                  "Text": "Power On Count",
+                  "Type": "Factor",
+                  "Value": "0,000"
+                },
+                {
+                  "Text": "Power On Hours",
+                  "Type": "Factor",
+                  "Value": "0,000"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Read",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Written",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Free Space",
+                  "Type": "Data",
+                  "Value": "300,6 GB"
+                },
+                {
+                  "Text": "Total Space",
+                  "Type": "Data",
+                  "Value": "1000,2 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Read Rate",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Write Rate",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 252,
+          "Text": "Bluetooth Ağ Bağlantısı",
+          "HardwareId": "/nic/%7B1354FFC3-25AD-4DAC-9723-F2FAD0BBBAC6%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 261,
+          "Text": "Ethernet",
+          "HardwareId": "/nic/%7B95F9C6A0-7CB5-4348-930D-612CD8E8069D%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 270,
+          "Text": "Hamachi",
+          "HardwareId": "/nic/%7BB53E6E63-C563-421E-A7A3-277AF9D2963C%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 279,
+          "Text": "vEthernet (Default Switch)",
+          "HardwareId": "/nic/%7BF3F985F2-4D82-4714-89C2-EA9F0D7C1436%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 288,
+          "Text": "vEthernet (WSL (Hyper-V firewall))",
+          "HardwareId": "/nic/%7BAB0B53F3-E869-4C06-81E0-D87FEFE7328C%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "1,4 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,1 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "57,6 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "6,9 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 297,
+          "Text": "VirtualBox Host-Only Network",
+          "HardwareId": "/nic/%7BEE085FD3-7BEB-4C01-BF26-54A71606C91F%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 306,
+          "Text": "Wi-Fi",
+          "HardwareId": "/nic/%7B229F2177-E718-45DC-979B-B66B89BE28CA%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,1 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,2 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "2,6 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "9,7 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "69,7 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 315,
+          "Text": "Yerel Ağ Bağlantısı* 11",
+          "HardwareId": "/nic/%7B15E34F2E-3355-47C7-87BC-4D270A0C6B5B%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 324,
+          "Text": "Yerel Ağ Bağlantısı* 12",
+          "HardwareId": "/nic/%7B6D6E3049-17A7-4917-A000-E790A538EC1D%7D",
+          "Children": [
+            {
+              "Text": "Load",
+              "Children": [
+                {
+                  "Text": "Network Utilization",
+                  "Type": "Load",
+                  "Value": "0,0 %"
+                }
+              ]
+            },
+            {
+              "Text": "Data",
+              "Children": [
+                {
+                  "Text": "Data Uploaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                },
+                {
+                  "Text": "Data Downloaded",
+                  "Type": "Data",
+                  "Value": "0,0 GB"
+                }
+              ]
+            },
+            {
+              "Text": "Throughput",
+              "Children": [
+                {
+                  "Text": "Upload Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                },
+                {
+                  "Text": "Download Speed",
+                  "Type": "Throughput",
+                  "Value": "0,0 KB/s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 333,
+          "Text": "BIF0_9",
+          "HardwareId": "/battery/BIF0_9_1",
+          "Children": [
+            {
+              "Text": "Voltages",
+              "Children": [
+                {
+                  "Text": "Voltage",
+                  "Type": "Voltage",
+                  "Value": "12,589 V"
+                }
+              ]
+            },
+            {
+              "Text": "Currents",
+              "Children": [
+                {
+                  "Text": "Charge/Discharge Current",
+                  "Type": "Current",
+                  "Value": "0,000 A"
+                }
+              ]
+            },
+            {
+              "Text": "Powers",
+              "Children": [
+                {
+                  "Text": "Charge/Discharge Rate",
+                  "Type": "Power",
+                  "Value": "0,0 W"
+                }
+              ]
+            },
+            {
+              "Text": "Levels",
+              "Children": [
+                {
+                  "Text": "Charge Level",
+                  "Type": "Level",
+                  "Value": "92,5 %"
+                },
+                {
+                  "Text": "Degradation Level",
+                  "Type": "Level",
+                  "Value": "9,8 %"
+                }
+              ]
+            },
+            {
+              "Text": "Capacities",
+              "Children": [
+                {
+                  "Text": "Designed Capacity",
+                  "Type": "Energy",
+                  "Value": "52007 mWh"
+                },
+                {
+                  "Text": "Fully-Charged Capacity",
+                  "Type": "Energy",
+                  "Value": "46922 mWh"
+                },
+                {
+                  "Text": "Remaining Capacity",
+                  "Type": "Energy",
+                  "Value": "43423 mWh"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
