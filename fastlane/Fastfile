@@ -1,0 +1,8 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build the app"
+  lane :build do
+    gradle(task: "assembleDebug")
+  end
+end

@@ -1,0 +1,21 @@
+PC HW Monitor shows your PC's real-time hardware statistics on your phone over local Wi-Fi.
+
+## Features
+
+- CPU, GPU, iGPU and RAM cards with temperatures, usage, clock speeds, power, VRAM/RAM and per-core loads
+- Live charts and 1-hour history (stored locally on the device)
+- Light and dark theme
+- Landscape mode: all cards in a compact scroll-free 2x2 grid on one screen
+- 14 languages, selectable in Settings
+
+## How it works
+
+Run the bundled single-file Windows server (no installation needed) on your PC. It reads hardware data from LibreHardwareMonitor and streams it over WebSocket to the app once per second. The app only talks to the server over your local Wi-Fi; no data leaves your network.
+
+No PC hardware available? Start the server with `--simulate` to generate realistic fake data.
+
+## License
+
+AGPL-3.0. The Windows server bundles LibreHardwareMonitor (AGPL-3.0).
+
+If this app is useful to you, consider supporting development on Patreon: https://www.patreon.com/cw/Obscrum
