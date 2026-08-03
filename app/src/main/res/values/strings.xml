@@ -45,6 +45,7 @@
     <string name="label_integrated_gpu">Integrated GPU</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
+    <string name="language_en">English</string>
     <string name="language_fr">Français</string>
     <string name="language_de">Deutsch</string>
     <string name="language_es">Español</string>
