@@ -1,0 +1,1 @@
+Bilgisayarının anlık donanım verilerini (CPU, GPU, RAM) yerel Wi-Fi üzerinden telefonunda gösterir.

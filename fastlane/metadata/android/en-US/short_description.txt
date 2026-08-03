@@ -1,0 +1,1 @@
+Real-time PC hardware stats (CPU, GPU, RAM) on your phone over local Wi-Fi.
