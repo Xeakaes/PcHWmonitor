@@ -44,6 +44,7 @@
     <string name="metric_ram_usage">内存使用率</string>
     <string name="settings_language">语言</string>
     <string name="settings_language_system">系统默认</string>
+    <string name="language_en">English</string>
     <string name="language_fr">Français</string>
     <string name="language_de">Deutsch</string>
     <string name="language_es">Español</string>

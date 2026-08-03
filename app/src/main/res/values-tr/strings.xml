@@ -44,6 +44,7 @@
     <string name="metric_ram_usage">RAM kullanımı</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem (varsayılan)</string>
+    <string name="language_en">English</string>
     <string name="language_fr">Français</string>
     <string name="language_de">Deutsch</string>
     <string name="language_es">Español</string>
