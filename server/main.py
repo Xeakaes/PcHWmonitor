@@ -11,9 +11,11 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
+from adapters.fps import PresentMonFps
 from adapters.lhm import LhmAdapter
 from adapters.lhm_lib import LhmLibAdapter
 from adapters.simulator import Simulator
+from adapters.system import SystemAdapter
 from hub import Hub
 from schema import StatusMessage, WelcomeMessage
 
@@ -34,12 +36,25 @@ def _lib_available() -> bool:
         return False
 
 
+def _presentmon_path() -> str:
+    import sys
+    if getattr(sys, "frozen", False):
+        base = Path(sys._MEIPASS)
+    else:
+        base = Path(__file__).resolve().parent
+    candidate = base / "PresentMon64.exe"
+    if not candidate.exists():
+        candidate = base / "presentmon" / "PresentMon64.exe"
+    return str(candidate)
+
+
 def build_app(
     *,
     simulate: bool = False,
     lhm_url: str = "http://127.0.0.1:8085/data.json",
     interval_ms: int = 1000,
     source: str = "auto",
+    fps_process: str | None = None,
 ) -> FastAPI:
     if simulate:
         sample = Simulator().sample
@@ -64,9 +79,35 @@ def build_app(
             source_name = "librehardwaremonitor"
         pc_name = platform.node()
 
-    hub = Hub(sample=sample, interval_ms=interval_ms)
+    if simulate:
+        sim = Simulator()
+        system_adapter = None
+        fps_adapter = None
+        base_sample = sim.sample
+    else:
+        system_adapter = SystemAdapter()
+        exe_path = _presentmon_path()
+        fps_adapter = PresentMonFps(exe_path=exe_path, process_name=fps_process or None)
+        if not fps_adapter.start():
+            fps_adapter = None
+            logger.warning("PresentMon unavailable; FPS disabled")
+        base_sample = sample
+
+    def composite() -> StatusMessage:
+        message = base_sample()
+        if system_adapter is not None:
+            disk, net = system_adapter.sample()
+            message.disk = disk if message.disk is None else message.disk
+            message.net = net if message.net is None else message.net
+        if fps_adapter is not None:
+            message.fps = fps_adapter.sample()
+        return message
+
+    hub = Hub(sample=composite, interval_ms=interval_ms)
     app = FastAPI(title="PC HW Monitor bridge")
     app.state.hub = hub
+    app.state.fps_process = fps_process
+    app.state.fps_active = fps_adapter is not None
     app.state.welcome = WelcomeMessage(intervalMs=interval_ms, serverName=pc_name, source=source_name, pcName=pc_name)
 
     @app.get("/health")
@@ -157,9 +198,10 @@ def main() -> None:
     parser.add_argument("--source", choices=["auto", "http", "lib"], default="auto", help="data source: auto | http (LibreHardwareMonitor remote web server) | lib (embedded LibreHardwareMonitorLib)")
     parser.add_argument("--lhm-url", default="http://127.0.0.1:8085/data.json")
     parser.add_argument("--interval", type=int, default=1000, help="broadcast interval in ms")
+    parser.add_argument("--fps-process", default=None, help="process name to measure FPS for (empty = auto)")
     args = parser.parse_args()
 
-    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source)
+    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process)
     if args.simulate:
         logger.info("running in SIMULATION mode on 0.0.0.0:%d", args.port)
     else:
