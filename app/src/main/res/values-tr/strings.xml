@@ -59,4 +59,22 @@
     <string name="language_zh_tw">繁體中文</string>
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">İntegre GPU</string>
+    <string name="chart_window">Grafik penceresi</string>
+    <string name="chart_window_30s">30 sn</string>
+    <string name="chart_window_60s">60 sn</string>
+    <string name="chart_window_300s">300 sn</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Ort.</string>
+    <string name="fps_1pct_low">1% Low</string>
+    <string name="fps_details_title">FPS Detayları</string>
+    <string name="fps_hint" formatted="false">1% low, kare sürelerindeki en kötü %1\'in ortalamasıdır — takılma hissiyatını ölçer.</string>
+    <string name="fps_ok">Tamam</string>
+    <string name="disk_card_title">Disk</string>
+    <string name="disk_read">Okuma</string>
+    <string name="disk_write">Yazma</string>
+    <string name="disk_usage">Disk Kullanımı</string>
+    <string name="net_card_title">Ağ</string>
+    <string name="net_download">İndirme</string>
+    <string name="net_upload">Yükleme</string>
+    <string name="fan_card_title">Fan</string>
 </resources>

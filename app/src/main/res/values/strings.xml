@@ -63,4 +63,18 @@
     <string name="chart_window_30s">30 s</string>
     <string name="chart_window_60s">60 s</string>
     <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Avg</string>
+    <string name="fps_1pct_low">1% Low</string>
+    <string name="fps_details_title">FPS Details</string>
+    <string name="fps_hint" formatted="false">1% low is the average of the worst 1% of frame times — it measures stutter.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Disk</string>
+    <string name="disk_read">Read</string>
+    <string name="disk_write">Write</string>
+    <string name="disk_usage">Disk Usage</string>
+    <string name="net_card_title">Network</string>
+    <string name="net_download">Download</string>
+    <string name="net_upload">Upload</string>
+    <string name="fan_card_title">Fan</string>
 </resources>

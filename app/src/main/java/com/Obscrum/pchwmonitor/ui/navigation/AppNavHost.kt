@@ -101,6 +101,19 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     labelRam = stringResource(R.string.ram),
                     labelRamUsed = stringResource(R.string.ram_used),
                     labelNoData = stringResource(R.string.no_data),
+                    labelFps = stringResource(R.string.fps_card_title),
+                    labelFpsAvg = stringResource(R.string.fps_avg),
+                    labelFpsOnePercentLow = stringResource(R.string.fps_1pct_low),
+                    labelFpsDetails = stringResource(R.string.fps_details_title),
+                    labelFpsHint = stringResource(R.string.fps_hint),
+                    labelDisk = stringResource(R.string.disk_card_title),
+                    labelDiskRead = stringResource(R.string.disk_read),
+                    labelDiskWrite = stringResource(R.string.disk_write),
+                    labelDiskUsage = stringResource(R.string.disk_usage),
+                    labelNet = stringResource(R.string.net_card_title),
+                    labelNetDownload = stringResource(R.string.net_download),
+                    labelNetUpload = stringResource(R.string.net_upload),
+                    labelFan = stringResource(R.string.fan_card_title),
                 )
             }
             composable("history") {

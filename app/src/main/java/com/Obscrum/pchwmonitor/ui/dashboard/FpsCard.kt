@@ -3,9 +3,7 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -21,8 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.domain.model.FpsInfo
 import com.Obscrum.pchwmonitor.ui.components.LineChart
 import com.Obscrum.pchwmonitor.ui.components.MetricCard
@@ -38,6 +38,7 @@ fun FpsCard(
     modifier: Modifier = Modifier,
     compact: Boolean = false,
     chartPoints: Int = 60,
+    chartMax: Float = 360f,
 ) {
     MetricCard(title = labelTitle, modifier = modifier, compact = compact) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
@@ -70,7 +71,7 @@ fun FpsCard(
             )
         }
         if (!compact) {
-            LineChart(points = points, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
+            LineChart(points = points, color = MaterialTheme.colorScheme.primary, max = chartMax, modifier = Modifier.padding(top = 8.dp))
         }
         if (showHint) {
             AlertDialog(
@@ -78,7 +79,7 @@ fun FpsCard(
                 title = { Text(labelFpsDetails) },
                 text = { Text(labelFpsHint) },
                 confirmButton = {
-                    TextButton(onClick = { showHint = false }) { Text("OK") }
+                    TextButton(onClick = { showHint = false }) { Text(stringResource(R.string.fps_ok)) }
                 },
             )
         }
