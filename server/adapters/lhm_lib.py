@@ -123,7 +123,6 @@ class LhmLibAdapter:
                 or _find(sensors, ("Power",), "gpu power")
                 or _find(sensors, ("Power",), "gpu package")
             ),
-            fps=None,
         )
 
     def _parse_ram(self, node) -> RamInfo:
