@@ -1421,7 +1421,9 @@ git commit -m "feat(app): add disk, network and fan cards"
 
 - [ ] **Step 1: Update DashboardScreen**
 
-In portrait `LazyColumn`, after the `GpuCard` item (and after the iGPU card, before `RamCard`), add:
+Order (per the design spec, both branches): CPU → GPU → (iGPU) → FPS → RAM → Disk → Net → Fan.
+
+In portrait `LazyColumn`, after the `GpuCard` item (and after the iGPU card, BEFORE `RamCard`), add `FpsCard`:
 
 ```kotlin
                     if (status.fps != null) {
@@ -1438,6 +1440,11 @@ In portrait `LazyColumn`, after the `GpuCard` item (and after the iGPU card, bef
                             )
                         }
                     }
+```
+
+Then AFTER the `RamCard` item, add `DiskCard`, `NetCard` and `FanCard`:
+
+```kotlin
                     if (status.disk != null) {
                         item {
                             DiskCard(
@@ -1476,9 +1483,21 @@ In portrait `LazyColumn`, after the `GpuCard` item (and after the iGPU card, bef
 
 Do the same in `LandscapeDashboard`'s `LazyVerticalGrid`, with `compact = true` and `Modifier.fillMaxWidth()`. Add the new label parameters to both functions (same signature pattern as existing labels) and add `chartWindowSeconds: Int` to `DashboardScreen`'s parameter list, passing it through to both branches.
 
+> **FIX (Task 10/11 review findings I-1/I-2/I-3):** `LineChart` defaults to `min = 0f, max = 100f` (percentage scale), which clamps values above 100. Three cards suffer:
+> - `FpsCard`: FPS > 100 (144/165/240 Hz displays) flatlines. Add `chartMax: Float = 360f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> - `NetCard`: download throughput exceeds 100 MB/s on 1GbE+ (≈125 MB/s) and faster NICs. Add `chartMax: Float = 200f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> - `DiskCard`: its chart plots combined `readMbPerSec + writeMbPerSec` MB/s (NOT usage%), which exceeds 100 on any SSD. Add `chartMax: Float = 200f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> Thread `chartMax` from both `DashboardScreen` call sites for each. (Fixed ceilings are fine; dynamic max is optional. Do NOT change `LineChart.kt` itself — CPU/RAM cards rely on the 0–100 scale.) Applied in Task 12 (commits 2519581..82c6956).
+
+> **FIX (Task 10 review finding I-1 + Task 11 review findings I-2/I-3):** `LineChart` defaults to `min = 0f, max = 100f` (percentage scale), which clamps values above 100. Three cards suffer:
+> - `FpsCard`: FPS > 100 (144/165/240 Hz displays) flatlines. Add `chartMax: Float = 360f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> - `NetCard`: download throughput exceeds 100 MB/s on 1GbE+ (≈125 MB/s) and faster NICs. Add `chartMax: Float = 200f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> - `DiskCard`: its chart plots combined `readMbPerSec + writeMbPerSec` MB/s (NOT usage%), which exceeds 100 on any SSD. Add `chartMax: Float = 200f` param, pass `max = chartMax` into its `LineChart(...)` call.
+> Thread `chartMax` from both `DashboardScreen` call sites for each. (Fixed ceilings are fine; dynamic max is optional. Do NOT change `LineChart.kt` itself — CPU/RAM cards rely on the 0–100 scale.)
+
 - [ ] **Step 2: Add strings**
 
-Add to `app/src/main/res/values/strings.xml` and `app/src/main/res/values-tr/strings.xml` (English / Turkish translations, following the existing string naming style):
+Add to `app/src/main/res/values/strings.xml` and `app/src/main/res/values-tr/strings.xml` (English / Turkish translations, following the existing string naming style). NOTE: also translate the Task 8 chart-window strings (`chart_window` section labels) into `values-tr` here — they currently exist only in the default locale (deferred minor finding):
 
 ```xml
 <string name="fps_card_title">FPS</string>
