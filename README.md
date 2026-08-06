@@ -15,11 +15,12 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 ### Features
 
 - **Android** (Kotlin, Jetpack Compose, Material 3):
-  - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
-  - Live charts, 1-hour history (Room DB), light/dark theme, custom logo
-  - **Landscape mode: all cards in a compact scroll-free 2×2 grid on one screen**
-  - 14 languages (selectable in Settings)
-- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data.
+   - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
+   - Disk, Network, Fan, and FPS cards — disk usage & throughput, net up/down, fan RPM, game FPS with 1% low
+   - Live charts, configurable chart window (30s / 60s / 300s), 1-hour history (Room DB), light/dark theme, custom logo
+   - **Landscape mode: all cards in a compact scroll-free 2×2 grid on one screen**
+   - 14 languages (selectable in Settings)
+- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil`; packaged FPS support uses an embedded `PresentMon64.exe` (see Building the EXE).
 
 ### Architecture
 
@@ -29,6 +30,7 @@ Windows PC
     ├─ default: embedded LibreHardwareMonitorLib (in-process reading, --uac-admin manifest)
     └─ or: LibreHardwareMonitor Remote Web Server (8085) → --source http
         │ WebSocket ws://<pc-ip>:8765/ws  (one status message every second)
+        │ CPU/GPU/RAM/igpu from LHM; Disk/Network from psutil; FPS from PresentMon64
 Android app (same Wi-Fi)
 ```
 
@@ -42,6 +44,8 @@ The Android app only talks to the server; it never touches LibreHardwareMonitor 
 
 To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
 
+`psutil` (used for Disk and Network sensors) is listed in `server/requirements.txt`. Packaged FPS support additionally requires `server/presentmon/PresentMon64.exe`; `build_exe.bat` copies it into `dist/` when present and disables FPS otherwise.
+
 ### Server Setup (development)
 
 **Windows (real data):**
@@ -53,11 +57,12 @@ python -m venv .venv
 .venv\Scripts\python main.py
 ```
 
-Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate`
+Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>`
 
 - `--source auto` (default): uses the embedded DLL if present (`lib`), falls back to the LHM web server.
 - `--source lib`: reads `LibreHardwareMonitorLib.dll` in-process (DLL path can be set via the `LHMDIR` env var).
 - `--source http`: reads the JSON API of an external LibreHardwareMonitor (Options → Remote Web Server, port 8085).
+- `--fps-process <name>`: targets a specific process for frame capture (e.g. `--fps-process game.exe`). Omit it (or pass empty) and PresentMon auto-follows the active fullscreen process. Requires `server/presentmon/PresentMon64.exe`; if missing, FPS is disabled and `fps` comes back as `null`.
 
 **Simulation mode (for testing, any OS):**
 
@@ -73,7 +78,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 20 tests
+.venv/bin/python -m pytest tests -v        # 37 tests
 ```
 
 ### Android Setup
@@ -92,17 +97,21 @@ One `status` message per second from server to client; `welcome` comes first on 
 ```json
 {"type":"welcome","intervalMs":1000,"serverName":"DESKTOP-ABC","source":"lhm-lib","pcName":"DESKTOP-ABC"}
 
-{"type":"status","timestamp":1754150000,
- "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
- "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
-        "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
- "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
-         "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
-         "powerW":null,"fps":null},
- "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600}}
-```
+ {"type":"status","timestamp":1754150000,
+  "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
+  "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
+         "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
+  "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
+          "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
+          "powerW":null,"fps":null},
+  "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600},
+  "disk":{"usagePct":87.1,"readMbPerSec":124.5,"writeMbPerSec":82.0},
+  "net":{"downloadMbPerSec":21.4,"uploadMbPerSec":3.2},
+  "fans":[{"label":"CPU Fan","rpm":1350},{"label":"Case Fan","rpm":920}],
+  "fps":{"name":"game.exe","current":112.4,"avg":108.7,"onePercentLow":74.3}}
+ ```
 
-Missing sensors arrive as `null` (the UI shows "—"). If the server cannot reach the hardware it broadcasts `"available": false` plus an `error`.
+Missing sensors arrive as `null` (the UI shows "—"). Disk/Network/Fans/FPS fields are `null` (and their dashboard cards are hidden) when the server reports an old payload without them; this keeps the phone app compatible with older server builds. If the server cannot reach the hardware it broadcasts `"available": false` plus an `error`.
 
 ### Troubleshooting
 
@@ -116,7 +125,8 @@ Missing sensors arrive as `null` (the UI shows "—"). If the server cannot reac
 
 ### Notes
 
-- The FPS field exists in the protocol but is `null` for now; it may be filled via MSI Afterburner in the future.
+- **FPS card:** real-time frame capture via embedded `PresentMon64.exe` (built by `build_exe.bat`). The card shows current FPS, 30s average and 1% low (P99 frame time); tap a card for the min/avg/max summary. `--fps-process <name>` targets a game, or leave it empty to auto-follow the active fullscreen process. FPS is `null` if PresentMon is missing.
+- **Disk / Net / Fan:** read with `psutil` on the server; cards are hidden for old server payloads where the fields are `null`.
 - History data is stored in a Room DB on the device for 1 hour and cleaned automatically.
 
 ---
@@ -127,11 +137,12 @@ Missing sensors arrive as `null` (the UI shows "—"). If the server cannot reac
 ### Özellikler
 
 - **Android** (Kotlin, Jetpack Compose, Material 3):
-  - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
-  - Canlı grafikler, 1 saatlik geçmiş (Room DB), açık/koyu tema, özel logo
-  - **Yatay modda (landscape) tüm kartlar tek ekranda kompakt 2×2 ızgara** — kaydırmasız
-  - 14 dil (ayarlardan seçilebilir)
-- **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir.
+   - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
+   - Disk, Ağ, Fan ve FPS kartları — disk kullanımı ve aktarım, ağ gönderim/alan, fan RPM, oyun FPS'yi ve 1% düşük değeri (1% low)
+   - Canlı grafikler, grafik penceresi (30s / 60s / 300s), 1 saatlik geçmiş (Room DB), açık/koyu tema, özel logo
+   - **Yatay modda (landscape) tüm kartlar tek ekranda kompakt 2×2 ızgara** — kaydırmasız
+   - 14 dil (ayarlardan seçilebilir)
+- **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur; paketli FPS desteği gömülü `PresentMon64.exe`'e dayanır (bunu `build_exe.bat` inşa eder).
 
 ### Mimari
 
@@ -141,6 +152,7 @@ Windows PC
     ├─ varsayılan: gömülü LibreHardwareMonitorLib (işlem içi okuma, --uac-admin manifest)
     └─ veya: LibreHardwareMonitor Remote Web Server (8085) → --source http
         │ WebSocket ws://<pc-ip>:8765/ws  (her 1 sn status mesajı)
+        │ CPU/GPU/RAM/igpu LHM'den; Disk/Ağ psutil'den; FPS PresentMon64'ten
 Android uygulaması (aynı Wi-Fi)
 ```
 
@@ -154,6 +166,8 @@ Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması
 
 Yeniden derlemek için Windows'ta proje kökünde `build_exe.bat` (pythonnet + pyinstaller gerektirir; DLL'leri `server\vendor` içine kopyalar ve paketler). Paketli modda hata logu `dist\pchw.log` dosyasına yazılır.
 
+`psutil` (Disk ve Ağ sensörleri için) `server/requirements.txt`'de listelenir. Paketli FPS desteği ayrıca `server/presentmon/PresentMon64.exe` gerektirir; `build_exe.bat` bulursa `dist/` içine kopyalar, yoksa FPS devre dışı kalır.
+
 ### Sunucu Kurulumu (geliştirme)
 
 **Windows (gerçek veri):**
@@ -165,11 +179,12 @@ python -m venv .venv
 .venv\Scripts\python main.py
 ```
 
-Seçenekler: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate`
+Seçenekler: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>`
 
 - `--source auto` (varsayılan): gömülü DLL varsa `lib`, yoksa LHM web sunucusuna düşer.
 - `--source lib`: `LibreHardwareMonitorLib.dll`'yi süreç içinde okur (DLL yolu `LHMDIR` env değişkeniyle verilebilir).
 - `--source http`: harici LibreHardwareMonitor'un JSON API'sini okur (Options → Remote Web Server, port 8085).
+- `--fps-process <name>`: kare yakalama için belirli bir sürece hedefler (örn. `--fps-process game.exe`). Boş bırakılırsa veya verilmezse PresentMon aktif tam ekran süreceyi takip eder. `server/presentmon/PresentMon64.exe` gerektirir; eksikse FPS devre dışıdır ve `fps` `null` gelir.
 
 **Simülasyon modu (test için, herhangi bir OS):**
 
@@ -185,7 +200,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # welcome + 3 status mesajı doğrular
-.venv/bin/python -m pytest tests -v        # 20 test
+.venv/bin/python -m pytest tests -v        # 37 test
 ```
 
 ### Android Kurulumu
@@ -204,17 +219,21 @@ Sunucu → istemci, her saniye tek `status` mesajı; bağlantıda önce `welcome
 ```json
 {"type":"welcome","intervalMs":1000,"serverName":"DESKTOP-ABC","source":"lhm-lib","pcName":"DESKTOP-ABC"}
 
-{"type":"status","timestamp":1754150000,
- "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
- "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
-        "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
- "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
-         "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
-         "powerW":null,"fps":null},
- "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600}}
-```
+ {"type":"status","timestamp":1754150000,
+  "cpu":{"name":"...","usagePct":34.5,"tempC":61.2,"clockMhz":5100,"powerW":125,"loads":[12,45,33]},
+  "gpu":{"name":"...","usagePct":78.3,"tempC":71.4,"hotspotC":84.1,"vramUsedMb":6112,"vramTotalMb":12288,
+         "coreClockMhz":2745,"memClockMhz":10500,"powerW":182,"fps":null},
+  "igpu":{"name":"Intel(R) UHD Graphics","usagePct":5.2,"tempC":null,"hotspotC":null,
+          "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":300,"memClockMhz":null,
+          "powerW":null,"fps":null},
+  "ram":{"usedGb":11.2,"totalGb":32,"usagePct":35,"clockMhz":3600},
+  "disk":{"usagePct":87.1,"readMbPerSec":124.5,"writeMbPerSec":82.0},
+  "net":{"downloadMbPerSec":21.4,"uploadMbPerSec":3.2},
+  "fans":[{"label":"CPU Fan","rpm":1350},{"label":"Case Fan","rpm":920}],
+  "fps":{"name":"game.exe","current":112.4,"avg":108.7,"onePercentLow":74.3}}
+ ```
 
-Eksik sensörler `null` gelir (UI "—" gösterir). Sunucu donanıma ulaşamazsa `"available": false` + `error` yayınlar.
+Eksik sensörler `null` gelir (UI "—" gösterir). Disk/Ağ/Fan/FPS alanları eski sunucu payloadlarında `null` gelirse (ve o kartlar gizlenir); telefon uygulaması bu nedeniyle eski sunucu sürümleriyle uyumludur. Sunucu donanıma ulaşamazsa `"available": false` + `error` yayınlar.
 
 ### Sorun Giderme
 
@@ -228,7 +247,8 @@ Eksik sensörler `null` gelir (UI "—" gösterir). Sunucu donanıma ulaşamazsa
 
 ### Notlar
 
-- İlk sürümde FPS alanı protokolde hazır ama `null`; gelecekte MSI Afterburner üzerinden doldurulabilir.
+- **FPS kartı:** gömülü `PresentMon64.exe` ile (build_exe.bat inşa eder). Kart anlık FPS, 30s ortalama ve 1% düşük (1% low) değerini gösterir; min/avg/max özet için karta dokunun. `--fps-process <name>` bir oyuna hedefler, boş bırakılırsa aktif tam ekran süreceyi takip eder. PresentMon yoksa FPS `null`'dir.
+- **Disk / Ağ / Fan:** sunucuda `psutil` ile okunur; eski sunucu payloadlarında bu alanlar `null` ise kartlar gizlenir.
 - Geçmiş verileri cihazda Room DB'de 1 saat saklanır, otomatik temizlenir.
 
 ---
