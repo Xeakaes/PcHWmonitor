@@ -1,6 +1,8 @@
 import sys
+import threading
 import time
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -47,10 +49,29 @@ def test_compute_fps_math():
 
 class _FakeStdout:
     def __init__(self, lines):
-        self._lines = list(lines)
+        self._lines = lines
 
     def __iter__(self):
         return iter(self._lines)
+
+
+class _LiveStdout:
+    """Simulates a live pipe: yields lines, never EOFs until closed."""
+
+    def __init__(self, lines):
+        self._lines = list(lines)
+        self._done = False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            if self._lines:
+                return self._lines.pop(0)
+            if self._done:
+                raise StopIteration
+            time.sleep(0.005)
 
 
 class _FakeProc:
@@ -100,4 +121,37 @@ def test_sample_returns_none_after_stop_without_read():
     adapter._proc = _FakeProc([HEADER + "\n", "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.000\n"])
     adapter.stop()
     assert adapter._stop.is_set()
+    assert adapter.sample() is None
+
+
+def test_adapter_restorable_after_eof_and_failed_start():
+    lines = [
+        HEADER + "\n",
+        "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.000\n",
+        "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.100\n",
+    ]
+    adapter = PresentMonFps("presentmon.exe")
+
+    adapter._proc = _FakeProc(lines)
+    adapter._read()
+    assert adapter.sample() is None
+
+    with mock.patch("adapters.fps.subprocess.Popen", side_effect=OSError("no presentmon")):
+        assert adapter.start() is False
+    assert not adapter._stop.is_set()
+    assert adapter.sample() is None
+
+    live = _LiveStdout(lines)
+    adapter._proc = _FakeProc(live)
+    reader = threading.Thread(target=adapter._read, daemon=True)
+    reader.start()
+    deadline = time.monotonic() + 2.0
+    while len(adapter._entries) < 2 and time.monotonic() < deadline:
+        time.sleep(0.005)
+    info = adapter.sample()
+    assert info is not None
+    assert info.name == "game.exe"
+    assert info.current > 0
+    live._done = True
+    reader.join(timeout=2.0)
     assert adapter.sample() is None

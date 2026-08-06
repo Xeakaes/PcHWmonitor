@@ -55,6 +55,8 @@ class PresentMonFps:
         self._stop = threading.Event()
 
     def start(self) -> bool:
+        self._stop.clear()
+        self._entries.clear()
         cmd = [self._exe_path, "--output_stdout"]
         if self._process_name:
             cmd += ["--process_name", self._process_name]
