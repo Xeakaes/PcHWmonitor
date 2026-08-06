@@ -34,7 +34,6 @@ class StatusParserTest {
         assertEquals(listOf(12.3f, 45.2f, 33.1f), msg.status.cpu?.loads)
         assertEquals(84.1f, msg.status.gpu?.hotspotC!!, 0.001f)
         assertEquals(12288.0f, msg.status.gpu?.vramTotalMb!!, 0.001f)
-        assertNull(msg.status.gpu?.fps)
         assertEquals(11.2f, msg.status.ram?.usedGb!!, 0.001f)
     }
 
@@ -97,5 +96,34 @@ class StatusParserTest {
         val raw = """{"type":"status","timestamp":1,"gpu":{"name":"RTX"}}"""
         val status = (StatusParser.parse(raw) as WsMessage.Status).status
         assertNull(status.igpu)
+    }
+
+    @Test
+    fun parsesV13MetricsAndFps() {
+        val raw = """
+            {"type":"status","timestamp":1754150000,
+             "disk":{"usagePct":42.5,"readMbPerSec":180.2,"writeMbPerSec":64.1},
+             "net":{"downloadMbPerSec":12.4,"uploadMbPerSec":3.2},
+             "fans":[{"label":"CPU Fan","rpm":1150.0},{"label":"Case Fan","rpm":800.0}],
+             "fps":{"name":"game.exe","current":120.0,"avg":117.3,"onePercentLow":92.0}}
+        """.trimIndent()
+        val status = (StatusParser.parse(raw) as WsMessage.Status).status
+        assertEquals(42.5f, status.disk?.usagePct!!, 0.001f)
+        assertEquals(64.1f, status.disk?.writeMbPerSec!!, 0.001f)
+        assertEquals(12.4f, status.net?.downloadMbPerSec!!, 0.001f)
+        assertEquals(listOf("CPU Fan", "Case Fan"), status.fans?.map { it.label })
+        assertEquals(1150.0f, status.fans?.get(0)?.rpm!!, 0.001f)
+        assertEquals("game.exe", status.fps?.name)
+        assertEquals(92.0f, status.fps?.onePercentLow!!, 0.001f)
+    }
+
+    @Test
+    fun v13SectionsAbsentAreNull() {
+        val raw = """{"type":"status","timestamp":1}"""
+        val status = (StatusParser.parse(raw) as WsMessage.Status).status
+        assertNull(status.disk)
+        assertNull(status.net)
+        assertNull(status.fans)
+        assertNull(status.fps)
     }
 }
