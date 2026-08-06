@@ -110,7 +110,7 @@ In `server/tests/test_schema.py`:
 
 - [ ] **Step 5: Run full server test suite**
 
-Run: `cd server && python -m pytest -v`
+Run: `cd server && python -m pytest tests/ -v`
 Expected: PASS (all files, including the new tests)
 
 - [ ] **Step 6: Commit**
@@ -662,7 +662,7 @@ Expected: PASS
 
 - [ ] **Step 5: Run the whole server suite**
 
-Run: `cd server && python -m pytest -v`
+Run: `cd server && python -m pytest tests/ -v`
 Expected: PASS
 
 - [ ] **Step 6: Commit**
@@ -769,7 +769,7 @@ and pass `fps_process=args.fps_process` to `build_app`.
 
 - [ ] **Step 4: Run the tests**
 
-Run: `cd server && python -m pytest -v`
+Run: `cd server && python -m pytest tests/ -v`
 Expected: PASS (existing + new)
 
 - [ ] **Step 5: Bundle PresentMon into the exe build**
@@ -1519,7 +1519,7 @@ git commit -m "feat(app): place new cards on dashboard with labels"
 Run the server in simulation mode and verify the payload:
 
 ```bash
-cd server && python -m pytest -v
+cd server && python -m pytest tests/ -v
 cd server && python main.py --simulate --port 8765
 # from another terminal:
 curl -s http://127.0.0.1:8765/health
