@@ -15,7 +15,7 @@ def test_status_message_serializes_with_all_protocol_fields():
         pc=PcInfo(name="DESKTOP-ABC", os="Windows 11", source="librehardwaremonitor"),
         cpu=CpuInfo(name="Intel Core i7-13700K", usagePct=34.5, tempC=61.2, clockMhz=5100.0, powerW=125.0, loads=[12.0, 45.0]),
         gpu=GpuInfo(name="RTX 4070", usagePct=78.3, tempC=71.4, hotspotC=84.1, vramUsedMb=6112.0,
-                    vramTotalMb=12288.0, coreClockMhz=2745.0, memClockMhz=10500.0, powerW=182.0, fps=None),
+                    vramTotalMb=12288.0, coreClockMhz=2745.0, memClockMhz=10500.0, powerW=182.0),
         ram=RamInfo(usedGb=11.2, totalGb=32.0, usagePct=35.0, clockMhz=3600.0),
     )
     data = json.loads(msg.model_dump_json())
@@ -27,7 +27,6 @@ def test_status_message_serializes_with_all_protocol_fields():
     assert data["cpu"]["tempC"] == 61.2
     assert data["cpu"]["loads"] == [12.0, 45.0]
     assert data["gpu"]["hotspotC"] == 84.1
-    assert data["gpu"]["fps"] is None
     assert data["ram"]["usedGb"] == 11.2
 
 
@@ -52,4 +51,29 @@ def test_status_message_serializes_igpu_field():
     data = json.loads(msg.model_dump_json())
     assert data["igpu"] == {"name": "Intel UHD", "usagePct": 12.5, "tempC": None, "hotspotC": None,
                             "vramUsedMb": None, "vramTotalMb": None, "coreClockMhz": None,
-                            "memClockMhz": None, "powerW": None, "fps": None}
+                            "memClockMhz": None, "powerW": None}
+
+
+def test_status_message_serializes_new_v13_fields():
+    from schema import DiskInfo, FanInfo, FpsInfo, NetInfo
+
+    msg = StatusMessage(
+        timestamp=1754150000,
+        disk=DiskInfo(usagePct=42.5, readMbPerSec=180.2, writeMbPerSec=64.1),
+        net=NetInfo(downloadMbPerSec=12.4, uploadMbPerSec=3.2),
+        fans=[FanInfo(label="cpu fan", rpm=1150.0), FanInfo(label="case fan", rpm=800.0)],
+        fps=FpsInfo(name="game.exe", current=120.0, avg=117.3, onePercentLow=92.0),
+    )
+    data = json.loads(msg.model_dump_json())
+    assert data["disk"] == {"usagePct": 42.5, "readMbPerSec": 180.2, "writeMbPerSec": 64.1}
+    assert data["net"] == {"downloadMbPerSec": 12.4, "uploadMbPerSec": 3.2}
+    assert data["fans"][1]["rpm"] == 800.0
+    assert data["fps"]["onePercentLow"] == 92.0
+
+
+def test_status_message_v13_sections_null_by_default():
+    data = json.loads(StatusMessage(timestamp=1).model_dump_json())
+    assert data["disk"] is None
+    assert data["net"] is None
+    assert data["fans"] is None
+    assert data["fps"] is None
