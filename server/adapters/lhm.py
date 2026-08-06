@@ -4,7 +4,7 @@ import time
 
 import httpx
 
-from schema import CpuInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
+from schema import CpuInfo, FanInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
 
 _NUMBER = re.compile(r"[-+]?\d+(?:[.,]\d+)?")
 
@@ -143,7 +143,8 @@ class LhmAdapter:
             os_name = "macOS"
 
         pc = PcInfo(name=platform.node(), os=os_name, source="librehardwaremonitor")
-        return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram)
+        fans = self._parse_fans(nodes)
+        return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram, fans=fans)
 
     def _parse_cpu(self, node: dict) -> CpuInfo:
         sensors = _sensors(node)
@@ -189,3 +190,14 @@ class LhmAdapter:
             usagePct=_find(sensors, ("Load",), "memory utilization") or _find(sensors, ("Load",), "memory"),
             clockMhz=_find(sensors, ("Clock",), "memory clock"),
         )
+
+    def _parse_fans(self, nodes: list[dict]) -> list[FanInfo] | None:
+        fans: list[FanInfo] = []
+        for node in nodes:
+            for sensor in _sensors(node):
+                if _sensor_type(sensor) != "Fan":
+                    continue
+                rpm = _num(sensor.get("Value"))
+                if rpm is not None:
+                    fans.append(FanInfo(label=sensor.get("Text"), rpm=round(rpm, 1)))
+        return fans or None

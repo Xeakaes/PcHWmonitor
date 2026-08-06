@@ -1,7 +1,7 @@
 import httpx
 
 from schema import StatusMessage
-from adapters.lhm import LhmAdapter
+from adapters.lhm import LhmAdapter, _hardware_nodes
 
 FIXTURE = None
 
@@ -84,3 +84,42 @@ def test_lhm_handles_missing_sensors_gracefully():
     assert msg.cpu is not None
     assert msg.cpu.tempC == 63.8
     assert msg.cpu.usagePct == 34.5
+
+
+def test_parse_collects_fan_sensors():
+    from schema import FanInfo
+
+    adapter = LhmAdapter(lhm_url="http://x", http_client=object())
+    root = {
+        "Children": [
+            {
+                "HardwareId": "/mainboard",
+                "HardwareType": "Mainboard",
+                "Text": "B450 AORUS",
+                "Children": [
+                    {
+                        "SensorType": "Fan",
+                        "Text": "CPU Fan",
+                        "Value": 1120.0,
+                    },
+                    {
+                        "SensorType": "Fan",
+                        "Text": "Case Fan",
+                        "Value": "750 rpm",
+                    },
+                    {"SensorType": "Temperature", "Text": "System", "Value": 40.0},
+                ],
+            }
+        ]
+    }
+    fans = adapter._parse_fans(_hardware_nodes(root))
+    assert fans is not None
+    assert len(fans) == 2
+    assert fans[0] == FanInfo(label="CPU Fan", rpm=1120.0)
+    assert fans[1] == FanInfo(label="Case Fan", rpm=750.0)
+
+
+def test_parse_no_fans_returns_none():
+    adapter = LhmAdapter(lhm_url="http://x", http_client=object())
+    root = {"Children": [{"HardwareId": "/cpu", "Children": []}]}
+    assert adapter._parse_fans(_hardware_nodes(root)) is None
