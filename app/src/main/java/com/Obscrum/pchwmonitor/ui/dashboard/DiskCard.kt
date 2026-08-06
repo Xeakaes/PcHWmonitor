@@ -44,6 +44,11 @@ fun DiskCard(
 
         Column(verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 12.dp)) {
             Text(
+                text = labelUsage,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
                 text = "${(disk?.usagePct ?: 0f).toInt()} %",
                 style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
