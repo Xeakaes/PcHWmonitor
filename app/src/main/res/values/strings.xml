@@ -59,4 +59,8 @@
     <string name="language_zh">简体中文</string>
     <string name="language_zh_tw">繁體中文</string>
     <string name="language_ja">日本語</string>
+    <string name="chart_window">Chart window</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
 </resources>
