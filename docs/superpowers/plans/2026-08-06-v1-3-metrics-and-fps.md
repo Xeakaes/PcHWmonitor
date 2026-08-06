@@ -252,7 +252,7 @@ class SystemAdapter:
             self._last_time = now
             return None, None
 
-        dt = max(now - self._last_time, 0.05)
+        dt = max(now - self._last_time, self._interval)
         last_io, last_net = self._last
         self._last = (io, net)
         self._last_time = now
