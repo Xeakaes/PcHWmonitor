@@ -61,6 +61,26 @@ class SettingsStoreTest {
     }
 
     @Test
+    fun chartWindowDefaultIs60Seconds() = runTest {
+        val handle = store(createTempDir())
+        val settings = handle.store.settings.first()
+        assertEquals(60, settings.chartWindowSeconds)
+        handle.close()
+    }
+
+    @Test
+    fun chartWindowRoundTrip() = runTest {
+        val dir = createTempDir()
+        val first = store(dir)
+        first.store.setChartWindowSeconds(300)
+        first.close()
+
+        val second = store(dir)
+        assertEquals(300, second.store.settings.first().chartWindowSeconds)
+        second.close()
+    }
+
+    @Test
     fun languageRoundTrip() = runTest {
         val dir = createTempDir()
         val first = store(dir)

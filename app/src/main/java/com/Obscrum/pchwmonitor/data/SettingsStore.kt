@@ -15,6 +15,7 @@ data class AppSettings(
     val serverPort: Int = 8765,
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val language: String? = null,
+    val chartWindowSeconds: Int = 60,
 )
 
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
@@ -22,6 +23,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyPort = intPreferencesKey("server_port")
     private val keyTheme = stringPreferencesKey("theme")
     private val keyLanguage = stringPreferencesKey("language")
+    private val keyChartWindow = intPreferencesKey("chart_window_seconds")
 
     val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
         AppSettings(
@@ -29,6 +31,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             serverPort = prefs[keyPort] ?: 8765,
             theme = runCatching { ThemeMode.valueOf(prefs[keyTheme] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
             language = prefs[keyLanguage],
+            chartWindowSeconds = prefs[keyChartWindow] ?: 60,
         )
     }
 
@@ -48,5 +51,9 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { prefs ->
             if (value == null) prefs.remove(keyLanguage) else prefs[keyLanguage] = value
         }
+    }
+
+    suspend fun setChartWindowSeconds(value: Int) {
+        dataStore.edit { it[keyChartWindow] = value }
     }
 }

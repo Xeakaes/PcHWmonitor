@@ -50,12 +50,14 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun disconnect() = controller.disconnect()
 
-    fun saveSettings(ip: String, port: Int, theme: ThemeMode, language: String?) {
+    fun saveSettings(ip: String, port: Int, theme: ThemeMode, language: String?,
+                     chartWindowSeconds: Int) {
         viewModelScope.launch {
             settingsStore.setServerIp(ip)
             settingsStore.setServerPort(port)
             settingsStore.setTheme(theme)
             settingsStore.setLanguage(language)
+            settingsStore.setChartWindowSeconds(chartWindowSeconds)
         }
     }
 

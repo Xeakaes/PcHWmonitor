@@ -152,13 +152,17 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         "zh-TW" to stringResource(R.string.language_zh_tw),
                         "ja" to stringResource(R.string.language_ja),
                     ),
+                    labelChartWindow = stringResource(R.string.chart_window),
+                    labelChartWindow30s = stringResource(R.string.chart_window_30s),
+                    labelChartWindow60s = stringResource(R.string.chart_window_60s),
+                    labelChartWindow300s = stringResource(R.string.chart_window_300s),
                     labelSave = stringResource(R.string.save),
                     labelSaved = stringResource(R.string.saved),
                     labelSupport = stringResource(R.string.support),
                     labelSupportDescription = stringResource(R.string.support_description),
                     labelSupportPatreon = stringResource(R.string.support_patreon),
-                    onSave = { ip, port, theme, language ->
-                        viewModel.saveSettings(ip, port, theme, language)
+                    onSave = { ip, port, theme, language, chartWindowSeconds ->
+                        viewModel.saveSettings(ip, port, theme, language, chartWindowSeconds)
                     },
                 )
             }

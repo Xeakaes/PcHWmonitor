@@ -56,19 +56,24 @@ fun SettingsScreen(
     labelLanguage: String,
     labelLanguageSystem: String,
     languages: List<Pair<String?, String>>,
+    labelChartWindow: String,
+    labelChartWindow30s: String,
+    labelChartWindow60s: String,
+    labelChartWindow300s: String,
     labelSave: String,
     labelSaved: String,
     labelSupport: String,
     labelSupportDescription: String,
     labelSupportPatreon: String,
     modifier: Modifier = Modifier,
-    onSave: (ip: String, port: Int, theme: ThemeMode, language: String?) -> Unit,
+    onSave: (ip: String, port: Int, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
 ) {
     val context = LocalContext.current
     var ip by remember { mutableStateOf(settings.serverIp) }
     var port by remember { mutableStateOf(settings.serverPort.toString()) }
     var theme by remember { mutableStateOf(settings.theme) }
     var language by remember { mutableStateOf(settings.language) }
+    var chartWindowSeconds by remember { mutableStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
 
     Column(
@@ -134,6 +139,24 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
+            text = labelChartWindow,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        listOf(
+            30 to labelChartWindow30s,
+            60 to labelChartWindow60s,
+            300 to labelChartWindow300s,
+        ).forEach { (seconds, label) ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = chartWindowSeconds == seconds, onClick = { chartWindowSeconds = seconds })
+                Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
             text = labelLanguage,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
@@ -172,7 +195,7 @@ fun SettingsScreen(
                 onClick = {
                     val portInt = port.toIntOrNull() ?: 8765
                     saved = true
-                    onSave(ip.trim(), portInt, theme, language)
+                    onSave(ip.trim(), portInt, theme, language, chartWindowSeconds)
                 },
                 modifier = Modifier.weight(1f),
             ) {
