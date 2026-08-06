@@ -24,3 +24,8 @@ def test_build_app_lib_source_requests_dll():
 def test_build_app_simulate_uses_simulator():
     app = build_app(simulate=True)
     assert app.state.welcome.source == "simulator"
+
+
+def test_build_app_accepts_fps_process_arg():
+    app = build_app(simulate=True, fps_process="game.exe")
+    assert app.state.fps_process == "game.exe"

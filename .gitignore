@@ -22,6 +22,9 @@ server/dist/
 # LibreHardwareMonitor DLLs (copied into server/vendor/ by build_exe.bat)
 server/vendor/
 
+# PresentMon binary (bundled by build_exe.bat; intentionally not committed)
+server/presentmon/PresentMon64.exe
+
 # Logs
 *.log
 
