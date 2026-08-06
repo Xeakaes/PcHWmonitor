@@ -28,10 +28,11 @@ fun RamCard(
     labelClock: String,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
+    chartPoints: Int = 60,
 ) {
     MetricCard(title = labelUsage, modifier = modifier, compact = compact) {
         val color = TemperatureColor.forUsage(ram?.usagePct ?: 0f)
-        val spark = remember { RingBuffer() }
+        val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
         LaunchedEffect(ram?.usagePct) {
             ram?.usagePct?.let {
@@ -39,6 +40,8 @@ fun RamCard(
                 points = spark.snapshot()
             }
         }
+        LaunchedEffect(chartPoints) { spark.clearAndResize(chartPoints) }
+        val summary = minAvgMax(points)
 
         Column(verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 12.dp)) {
             StatRow(
@@ -61,6 +64,14 @@ fun RamCard(
                 color = color,
                 modifier = Modifier.padding(top = 8.dp),
             )
+            if (summary != null) {
+                Text(
+                    text = "min ${summary.first.toInt()} / ort. ${summary.second.toInt()} / max ${summary.third.toInt()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
     }
 }

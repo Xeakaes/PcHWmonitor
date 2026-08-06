@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,10 +35,11 @@ fun GpuCard(
     modifier: Modifier = Modifier,
     titleFallback: String = "GPU",
     compact: Boolean = false,
+    chartPoints: Int = 60,
 ) {
     MetricCard(title = gpu?.name ?: titleFallback, modifier = modifier, compact = compact) {
         val tempColor = TemperatureColor.forTemp(gpu?.tempC ?: 0f)
-        val spark = remember { RingBuffer() }
+        val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
         LaunchedEffect(gpu?.tempC) {
             gpu?.tempC?.let {
@@ -44,6 +47,8 @@ fun GpuCard(
                 points = spark.snapshot()
             }
         }
+        LaunchedEffect(chartPoints) { spark.clearAndResize(chartPoints) }
+        val summary = minAvgMax(points)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -110,6 +115,14 @@ fun GpuCard(
                 max = 100f,
                 modifier = Modifier.padding(top = 8.dp),
             )
+            if (summary != null) {
+                Text(
+                    text = "min ${summary.first.toInt()} / ort. ${summary.second.toInt()} / max ${summary.third.toInt()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
     }
 }

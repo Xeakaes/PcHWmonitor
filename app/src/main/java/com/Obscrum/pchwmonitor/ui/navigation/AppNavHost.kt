@@ -46,6 +46,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val status by viewModel.status.collectAsState()
     val connection by viewModel.connection.collectAsState()
+    val chartWindowSeconds by viewModel.chartWindowSeconds.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -81,6 +82,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                 DashboardScreen(
                     status = status,
                     connection = connection,
+                    chartWindowSeconds = chartWindowSeconds,
                     labelConnecting = stringResource(R.string.connecting),
                     labelConnected = stringResource(R.string.connected),
                     labelDisconnected = stringResource(R.string.disconnected),

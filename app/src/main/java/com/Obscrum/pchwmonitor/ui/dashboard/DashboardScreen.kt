@@ -47,6 +47,7 @@ fun DashboardScreen(
     labelRamUsed: String,
     labelNoData: String,
     modifier: Modifier = Modifier,
+    chartWindowSeconds: Int = 60,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val landscape = isLandscapeLayout(maxWidth = maxWidth, maxHeight = maxHeight)
@@ -72,6 +73,7 @@ fun DashboardScreen(
                 labelRam = labelRam,
                 labelRamUsed = labelRamUsed,
                 labelNoData = labelNoData,
+                chartWindowSeconds = chartWindowSeconds,
             )
         } else {
             LazyColumn(
@@ -119,6 +121,7 @@ fun DashboardScreen(
                             labelClock = labelClock,
                             labelPower = labelPower,
                             labelCores = labelCpu,
+                            chartPoints = chartWindowSeconds,
                             modifier = Modifier.padding(horizontal = 12.dp),
                         )
                     }
@@ -132,6 +135,7 @@ fun DashboardScreen(
                             labelCoreClock = labelCoreClock,
                             labelMemClock = labelMemClock,
                             labelPower = labelPower,
+                            chartPoints = chartWindowSeconds,
                             modifier = Modifier.padding(horizontal = 12.dp),
                         )
                     }
@@ -147,6 +151,7 @@ fun DashboardScreen(
                                 labelCoreClock = labelCoreClock,
                                 labelMemClock = labelMemClock,
                                 labelPower = labelPower,
+                                chartPoints = chartWindowSeconds,
                                 modifier = Modifier.padding(horizontal = 12.dp),
                             )
                         }
@@ -157,6 +162,7 @@ fun DashboardScreen(
                             labelUsage = labelRam,
                             labelUsed = labelRamUsed,
                             labelClock = labelClock,
+                            chartPoints = chartWindowSeconds,
                             modifier = Modifier.padding(horizontal = 12.dp),
                         )
                     }
@@ -189,6 +195,7 @@ private fun LandscapeDashboard(
     labelRam: String,
     labelRamUsed: String,
     labelNoData: String,
+    chartWindowSeconds: Int = 60,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         ConnectionBar(
@@ -235,6 +242,7 @@ private fun LandscapeDashboard(
                         labelPower = labelPower,
                         labelCores = labelCpu,
                         compact = true,
+                        chartPoints = chartWindowSeconds,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -249,6 +257,7 @@ private fun LandscapeDashboard(
                         labelMemClock = labelMemClock,
                         labelPower = labelPower,
                         compact = true,
+                        chartPoints = chartWindowSeconds,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -265,6 +274,7 @@ private fun LandscapeDashboard(
                             labelMemClock = labelMemClock,
                             labelPower = labelPower,
                             compact = true,
+                            chartPoints = chartWindowSeconds,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -276,6 +286,7 @@ private fun LandscapeDashboard(
                         labelUsed = labelRamUsed,
                         labelClock = labelClock,
                         compact = true,
+                        chartPoints = chartWindowSeconds,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

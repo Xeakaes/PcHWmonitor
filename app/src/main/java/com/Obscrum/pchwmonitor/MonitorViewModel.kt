@@ -16,6 +16,7 @@ import com.Obscrum.pchwmonitor.data.network.WebSocketClient
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
@@ -30,6 +31,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     )
     val settings: StateFlow<AppSettings> = settingsStore.settings
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+    val chartWindowSeconds: StateFlow<Int> = settingsStore.settings
+        .map { it.chartWindowSeconds }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().chartWindowSeconds)
 
     private val controller = MonitorController(
         client = WebSocketClient(parser = StatusParser),
