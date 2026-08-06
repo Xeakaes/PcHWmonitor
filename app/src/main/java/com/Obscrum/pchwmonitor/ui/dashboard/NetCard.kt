@@ -27,6 +27,7 @@ fun NetCard(
     modifier: Modifier = Modifier,
     compact: Boolean = false,
     chartPoints: Int = 60,
+    chartMax: Float = 200f,
 ) {
     MetricCard(title = labelTitle, modifier = modifier, compact = compact) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
@@ -52,7 +53,7 @@ fun NetCard(
             )
         }
         if (!compact) {
-            LineChart(points = points, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
+            LineChart(points = points, color = MaterialTheme.colorScheme.primary, max = chartMax, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }

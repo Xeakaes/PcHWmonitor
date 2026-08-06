@@ -46,8 +46,24 @@ fun DashboardScreen(
     labelRam: String,
     labelRamUsed: String,
     labelNoData: String,
+    labelFps: String,
+    labelFpsAvg: String,
+    labelFpsOnePercentLow: String,
+    labelFpsDetails: String,
+    labelFpsHint: String,
+    labelDisk: String,
+    labelDiskRead: String,
+    labelDiskWrite: String,
+    labelDiskUsage: String,
+    labelNet: String,
+    labelNetDownload: String,
+    labelNetUpload: String,
+    labelFan: String,
     modifier: Modifier = Modifier,
     chartWindowSeconds: Int = 60,
+    fpsChartMax: Float = 360f,
+    diskChartMax: Float = 200f,
+    netChartMax: Float = 200f,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val landscape = isLandscapeLayout(maxWidth = maxWidth, maxHeight = maxHeight)
@@ -73,7 +89,23 @@ fun DashboardScreen(
                 labelRam = labelRam,
                 labelRamUsed = labelRamUsed,
                 labelNoData = labelNoData,
+                labelFps = labelFps,
+                labelFpsAvg = labelFpsAvg,
+                labelFpsOnePercentLow = labelFpsOnePercentLow,
+                labelFpsDetails = labelFpsDetails,
+                labelFpsHint = labelFpsHint,
+                labelDisk = labelDisk,
+                labelDiskRead = labelDiskRead,
+                labelDiskWrite = labelDiskWrite,
+                labelDiskUsage = labelDiskUsage,
+                labelNet = labelNet,
+                labelNetDownload = labelNetDownload,
+                labelNetUpload = labelNetUpload,
+                labelFan = labelFan,
                 chartWindowSeconds = chartWindowSeconds,
+                fpsChartMax = fpsChartMax,
+                diskChartMax = diskChartMax,
+                netChartMax = netChartMax,
             )
         } else {
             LazyColumn(
@@ -156,6 +188,57 @@ fun DashboardScreen(
                             )
                         }
                     }
+                    if (status.fps != null) {
+                        item {
+                            FpsCard(
+                                fps = status.fps,
+                                labelTitle = labelFps,
+                                labelAvg = labelFpsAvg,
+                                labelOnePercentLow = labelFpsOnePercentLow,
+                                labelFpsDetails = labelFpsDetails,
+                                labelFpsHint = labelFpsHint,
+                                chartPoints = chartWindowSeconds,
+                                chartMax = fpsChartMax,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                        }
+                    }
+                    if (status.disk != null) {
+                        item {
+                            DiskCard(
+                                disk = status.disk,
+                                labelTitle = labelDisk,
+                                labelRead = labelDiskRead,
+                                labelWrite = labelDiskWrite,
+                                labelUsage = labelDiskUsage,
+                                chartPoints = chartWindowSeconds,
+                                chartMax = diskChartMax,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                        }
+                    }
+                    if (status.net != null) {
+                        item {
+                            NetCard(
+                                net = status.net,
+                                labelTitle = labelNet,
+                                labelDownload = labelNetDownload,
+                                labelUpload = labelNetUpload,
+                                chartPoints = chartWindowSeconds,
+                                chartMax = netChartMax,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                        }
+                    }
+                    if (status.fans != null) {
+                        item {
+                            FanCard(
+                                fans = status.fans,
+                                labelTitle = labelFan,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                        }
+                    }
                     item {
                         RamCard(
                             ram = status.ram,
@@ -195,7 +278,23 @@ private fun LandscapeDashboard(
     labelRam: String,
     labelRamUsed: String,
     labelNoData: String,
+    labelFps: String,
+    labelFpsAvg: String,
+    labelFpsOnePercentLow: String,
+    labelFpsDetails: String,
+    labelFpsHint: String,
+    labelDisk: String,
+    labelDiskRead: String,
+    labelDiskWrite: String,
+    labelDiskUsage: String,
+    labelNet: String,
+    labelNetDownload: String,
+    labelNetUpload: String,
+    labelFan: String,
     chartWindowSeconds: Int = 60,
+    fpsChartMax: Float = 360f,
+    diskChartMax: Float = 200f,
+    netChartMax: Float = 200f,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         ConnectionBar(
@@ -275,6 +374,61 @@ private fun LandscapeDashboard(
                             labelPower = labelPower,
                             compact = true,
                             chartPoints = chartWindowSeconds,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                if (status.fps != null) {
+                    item {
+                        FpsCard(
+                            fps = status.fps,
+                            labelTitle = labelFps,
+                            labelAvg = labelFpsAvg,
+                            labelOnePercentLow = labelFpsOnePercentLow,
+                            labelFpsDetails = labelFpsDetails,
+                            labelFpsHint = labelFpsHint,
+                            compact = true,
+                            chartPoints = chartWindowSeconds,
+                            chartMax = fpsChartMax,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                if (status.disk != null) {
+                    item {
+                        DiskCard(
+                            disk = status.disk,
+                            labelTitle = labelDisk,
+                            labelRead = labelDiskRead,
+                            labelWrite = labelDiskWrite,
+                            labelUsage = labelDiskUsage,
+                            compact = true,
+                            chartPoints = chartWindowSeconds,
+                            chartMax = diskChartMax,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                if (status.net != null) {
+                    item {
+                        NetCard(
+                            net = status.net,
+                            labelTitle = labelNet,
+                            labelDownload = labelNetDownload,
+                            labelUpload = labelNetUpload,
+                            compact = true,
+                            chartPoints = chartWindowSeconds,
+                            chartMax = netChartMax,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                if (status.fans != null) {
+                    item {
+                        FanCard(
+                            fans = status.fans,
+                            labelTitle = labelFan,
+                            compact = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
