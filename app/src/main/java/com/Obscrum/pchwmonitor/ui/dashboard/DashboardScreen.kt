@@ -203,6 +203,16 @@ fun DashboardScreen(
                             )
                         }
                     }
+                    item {
+                        RamCard(
+                            ram = status.ram,
+                            labelUsage = labelRam,
+                            labelUsed = labelRamUsed,
+                            labelClock = labelClock,
+                            chartPoints = chartWindowSeconds,
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                        )
+                    }
                     if (status.disk != null) {
                         item {
                             DiskCard(
@@ -238,16 +248,6 @@ fun DashboardScreen(
                                 modifier = Modifier.padding(horizontal = 12.dp),
                             )
                         }
-                    }
-                    item {
-                        RamCard(
-                            ram = status.ram,
-                            labelUsage = labelRam,
-                            labelUsed = labelRamUsed,
-                            labelClock = labelClock,
-                            chartPoints = chartWindowSeconds,
-                            modifier = Modifier.padding(horizontal = 12.dp),
-                        )
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
@@ -394,6 +394,17 @@ private fun LandscapeDashboard(
                         )
                     }
                 }
+                item {
+                    RamCard(
+                        ram = status.ram,
+                        labelUsage = labelRam,
+                        labelUsed = labelRamUsed,
+                        labelClock = labelClock,
+                        compact = true,
+                        chartPoints = chartWindowSeconds,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 if (status.disk != null) {
                     item {
                         DiskCard(
@@ -432,17 +443,6 @@ private fun LandscapeDashboard(
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
-                }
-                item {
-                    RamCard(
-                        ram = status.ram,
-                        labelUsage = labelRam,
-                        labelUsed = labelRamUsed,
-                        labelClock = labelClock,
-                        compact = true,
-                        chartPoints = chartWindowSeconds,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
             }
         }
