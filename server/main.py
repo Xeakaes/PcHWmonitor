@@ -107,6 +107,7 @@ def build_app(
     app = FastAPI(title="PC HW Monitor bridge")
     app.state.hub = hub
     app.state.fps_process = fps_process
+    app.state.fps_adapter = fps_adapter
     app.state.fps_active = fps_adapter is not None
     app.state.welcome = WelcomeMessage(intervalMs=interval_ms, serverName=pc_name, source=source_name, pcName=pc_name)
 
@@ -164,6 +165,8 @@ def _run_with_tray(app: FastAPI, port: int) -> None:
     thread = threading.Thread(target=_serve_in_thread, args=(app, port, stop_event), daemon=True)
     thread.start()
     _run_tray(stop_event)
+    if app.state.fps_adapter is not None:
+        app.state.fps_adapter.stop()
     os._exit(0)
 
 
@@ -174,6 +177,8 @@ async def _run_forever(app: FastAPI, port: int) -> None:
         await uvicorn.Server(config).serve()
     finally:
         task.cancel()
+        if app.state.fps_adapter is not None:
+            app.state.fps_adapter.stop()
 
 
 def _redirect_noconsole_streams() -> None:
