@@ -71,7 +71,7 @@ class PresentMonFps:
         assert self._proc is not None and self._proc.stdout is not None
         header: list[str] | None = None
         for raw in self._proc.stdout:
-            line = raw.rstrip("\n")
+            line = raw.lstrip("\ufeff").strip()
             if header is None:
                 if "msBetweenPresents" in line:
                     header = line.split(",")
@@ -79,10 +79,11 @@ class PresentMonFps:
             parsed = parse_csv_line(header, line)
             if parsed is not None:
                 self._entries.append(parsed)
+        self._entries.clear()
         self._stop.set()
 
     def sample(self) -> FpsInfo | None:
-        if not self._entries:
+        if not self._entries or self._stop.is_set():
             return None
         return compute_fps(list(self._entries), time.time(), self._interval_s, self._window_s)
 
