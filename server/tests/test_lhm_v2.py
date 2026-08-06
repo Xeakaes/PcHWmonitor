@@ -52,7 +52,7 @@ def test_lhm_v2_maps_real_device():
     assert msg.gpu.coreClockMhz == 1470.0
     assert msg.gpu.memClockMhz == 7001.0
     assert msg.gpu.powerW == 9.0
-    assert msg.gpu.fps is None
+    assert msg.fps is None
 
     assert msg.ram is not None
     assert msg.ram.usedGb == 14.7

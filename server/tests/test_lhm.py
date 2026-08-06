@@ -55,7 +55,7 @@ def test_lhm_maps_all_sensors():
     assert msg.gpu.coreClockMhz == 2745.0
     assert msg.gpu.memClockMhz == 10500.0
     assert msg.gpu.powerW == 182.0
-    assert msg.gpu.fps is None
+    assert msg.fps is None
 
     assert msg.ram is not None
     assert msg.ram.usedGb == 11.2
