@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from adapters.fps import compute_fps, parse_csv_line  # noqa: E402
+from adapters.fps import PresentMonFps, compute_fps, parse_csv_line  # noqa: E402
 
 
 HEADER = "Application,ProcessID,SwapChainAddress,Runtime,msBetweenPresents,PresentMode,TimeInSeconds"
@@ -43,3 +43,61 @@ def test_compute_fps_math():
     assert 50 <= info.avg <= 62              # 1703/91 = 18.71 ms -> 53.5 fps
     assert info.onePercentLow < info.avg     # the 200 ms outlier drags p99 down
     assert info.onePercentLow >= 4.0         # 1000/200 = 5 fps floor
+
+
+class _FakeStdout:
+    def __init__(self, lines):
+        self._lines = list(lines)
+
+    def __iter__(self):
+        return iter(self._lines)
+
+
+class _FakeProc:
+    def __init__(self, lines):
+        self.stdout = _FakeStdout(lines)
+        self.stderr = None
+
+    def terminate(self):
+        self.stdout = None
+
+    def wait(self, timeout=None):
+        return 0
+
+    def kill(self):
+        self.stdout = None
+
+
+def test_read_eof_clears_entries_and_sample_returns_none():
+    lines = [
+        HEADER + "\n",
+        "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.000\n",
+        "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.100\n",
+    ]
+    adapter = PresentMonFps("presentmon.exe")
+    adapter._proc = _FakeProc(lines)
+    adapter._read()
+    assert adapter._stop.is_set()
+    assert not adapter._entries
+    assert adapter.sample() is None
+
+
+def test_read_handles_bom_and_trailing_whitespace_in_header():
+    lines = [
+        "\ufeff" + HEADER + "\r\n",
+        "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.000\n",
+    ]
+    adapter = PresentMonFps("presentmon.exe")
+    adapter._proc = _FakeProc(lines)
+    adapter._read()
+    assert adapter._stop.is_set()
+    assert not adapter._entries
+    assert adapter.sample() is None
+
+
+def test_sample_returns_none_after_stop_without_read():
+    adapter = PresentMonFps("presentmon.exe")
+    adapter._proc = _FakeProc([HEADER + "\n", "game.exe,1234,0x1,DXGI,16.7,Hardware: Independent Flip,1.000\n"])
+    adapter.stop()
+    assert adapter._stop.is_set()
+    assert adapter.sample() is None
