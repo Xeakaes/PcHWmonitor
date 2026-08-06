@@ -2,8 +2,11 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 
 import java.util.Collections
 
-class RingBuffer(private val capacity: Int = 60) {
+class RingBuffer(capacity: Int = 60) {
     private val buffer = Collections.synchronizedList(mutableListOf<Float>())
+    private var capacity: Int
+
+    init { this.capacity = capacity }
 
     fun append(value: Float) {
         synchronized(buffer) {
@@ -16,5 +19,12 @@ class RingBuffer(private val capacity: Int = 60) {
 
     fun clear() {
         synchronized(buffer) { buffer.clear() }
+    }
+
+    fun clearAndResize(newCapacity: Int) {
+        synchronized(buffer) {
+            capacity = newCapacity
+            buffer.clear()
+        }
     }
 }
