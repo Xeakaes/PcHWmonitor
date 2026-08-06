@@ -14,6 +14,10 @@ data class SystemStatus(
     val gpu: GpuInfo? = null,
     val igpu: GpuInfo? = null,
     val ram: RamInfo? = null,
+    val disk: DiskInfo? = null,
+    val net: NetInfo? = null,
+    val fans: List<FanInfo>? = null,
+    val fps: FpsInfo? = null,
 )
 
 @Serializable
@@ -44,7 +48,6 @@ data class GpuInfo(
     @SerialName("coreClockMhz") val coreClockMhz: Float? = null,
     @SerialName("memClockMhz") val memClockMhz: Float? = null,
     @SerialName("powerW") val powerW: Float? = null,
-    val fps: Float? = null,
 )
 
 @Serializable
@@ -53,6 +56,33 @@ data class RamInfo(
     @SerialName("totalGb") val totalGb: Float? = null,
     @SerialName("usagePct") val usagePct: Float? = null,
     @SerialName("clockMhz") val clockMhz: Float? = null,
+)
+
+@Serializable
+data class FanInfo(
+    val label: String? = null,
+    val rpm: Float? = null,
+)
+
+@Serializable
+data class DiskInfo(
+    @SerialName("usagePct") val usagePct: Float? = null,
+    @SerialName("readMbPerSec") val readMbPerSec: Float? = null,
+    @SerialName("writeMbPerSec") val writeMbPerSec: Float? = null,
+)
+
+@Serializable
+data class NetInfo(
+    @SerialName("downloadMbPerSec") val downloadMbPerSec: Float? = null,
+    @SerialName("uploadMbPerSec") val uploadMbPerSec: Float? = null,
+)
+
+@Serializable
+data class FpsInfo(
+    val name: String? = null,
+    val current: Float? = null,
+    val avg: Float? = null,
+    @SerialName("onePercentLow") val onePercentLow: Float? = null,
 )
 
 @Serializable
