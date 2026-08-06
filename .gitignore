@@ -25,6 +25,9 @@ server/vendor/
 # Logs
 *.log
 
+# Git worktrees
+.worktrees/
+
 # OS
 .DS_Store
 Thumbs.db
