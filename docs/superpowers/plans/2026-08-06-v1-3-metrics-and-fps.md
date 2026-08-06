@@ -446,7 +446,7 @@ def test_compute_fps_math():
     assert info is not None
     assert info.name == "game.exe"
     assert 55 <= info.current <= 62          # mean ~16.7-17 ms window
-    assert 55 <= info.avg <= 62              # mean over 91 entries ~ 18.6 ms
+    assert 50 <= info.avg <= 62              # 1703/91 = 18.71 ms -> 53.5 fps
     assert info.onePercentLow < info.avg     # the 200 ms outlier drags p99 down
     assert info.onePercentLow >= 4.0         # 1000/200 = 5 fps floor
 ```
@@ -1269,6 +1269,11 @@ fun DiskCard(
         LaunchedEffect(chartPoints) { spark.clearAndResize(chartPoints) }
 
         Column(verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 12.dp)) {
+            Text(
+                text = labelUsage,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Text(
                 text = "${(disk?.usagePct ?: 0f).toInt()} %",
                 style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
