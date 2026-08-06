@@ -19,7 +19,11 @@ def test_simulator_values_in_ranges_and_change():
     assert a.gpu.hotspotC > a.gpu.tempC
     assert 0 <= a.gpu.vramUsedMb <= a.gpu.vramTotalMb
     assert a.ram.usedGb <= a.ram.totalGb
-    assert a.fps is None
+    assert a.fps is not None and a.fps.current is not None
+    assert 30 <= a.fps.current <= 240
+    assert a.disk is not None and 0 <= a.disk.usagePct <= 100
+    assert a.net is not None and a.net.downloadMbPerSec >= 0
+    assert a.fans is not None and len(a.fans) == 2
 
     values = [sim.sample().cpu.tempC for _ in range(20)]
     assert len(set(values)) > 5, "simulator must produce changing values"

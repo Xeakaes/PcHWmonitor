@@ -3,7 +3,7 @@ import platform
 import random
 import time
 
-from schema import CpuInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
+from schema import CpuInfo, DiskInfo, FanInfo, FpsInfo, GpuInfo, NetInfo, PcInfo, RamInfo, StatusMessage
 
 CPU_NAMES = ["Intel Core i7-13700K", "AMD Ryzen 7 7800X3D", "Intel Core i5-13600K"]
 GPU_NAMES = ["NVIDIA GeForce RTX 4070", "NVIDIA GeForce RTX 3060 Ti", "AMD Radeon RX 7800 XT"]
@@ -50,7 +50,6 @@ class Simulator:
             coreClockMhz=round(clamp(400 + (gpu_usage / 100.0) * 2300 + r.uniform(-60, 60), 300, 2900), 0),
             memClockMhz=round(r.choice([10000.0, 10500.0, 11250.0, 14000.0]) + r.uniform(-30, 30), 0),
             powerW=round(clamp(15 + gpu_usage * 1.9 + r.uniform(-8, 8), 5, 220), 1),
-            fps=None,
         )
         igpu = GpuInfo(
             name="Intel UHD Graphics",
@@ -65,8 +64,29 @@ class Simulator:
             usagePct=round(ram_usage, 1),
             clockMhz=3600.0,
         )
+        disk = DiskInfo(
+            usagePct=round(clamp(20 + 40 * (0.5 + 0.5 * math.sin(t / 70.0)) + r.uniform(-5, 5), 2, 100), 1),
+            readMbPerSec=round(clamp(80 + 160 * (0.5 + 0.5 * math.sin(t / 45.0)) + r.uniform(-20, 20), 0, 500), 1),
+            writeMbPerSec=round(clamp(20 + 80 * (0.5 + 0.5 * math.sin(t / 60.0)) + r.uniform(-10, 10), 0, 300), 1),
+        )
+        net = NetInfo(
+            downloadMbPerSec=round(clamp(4 + 40 * (0.5 + 0.5 * math.sin(t / 30.0)) + r.uniform(-5, 5), 0, 200), 1),
+            uploadMbPerSec=round(clamp(1 + 10 * (0.5 + 0.5 * math.sin(t / 35.0)) + r.uniform(-2, 2), 0, 60), 1),
+        )
+        fans = [
+            FanInfo(label="CPU Fan", rpm=round(clamp(900 + cpu_usage * 8 + r.uniform(-50, 50), 600, 2200), 0)),
+            FanInfo(label="Case Fan", rpm=round(clamp(700 + cpu_usage * 4 + r.uniform(-40, 40), 500, 1600), 0)),
+        ]
+        fps = FpsInfo(
+            name="game.exe",
+            current=round(clamp(60 + 70 * (0.5 + 0.5 * math.sin(t / 25.0)) + r.uniform(-8, 8), 30, 240), 1),
+            avg=round(clamp(85 + r.uniform(-5, 5), 30, 240), 1),
+            onePercentLow=round(clamp(60 + r.uniform(-10, 10), 30, 200), 1),
+        )
         pc = PcInfo(name=self.pc_name, os=platform.system(), source="simulator")
-        return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram)
+        return StatusMessage(
+            timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram, disk=disk, net=net, fans=fans, fps=fps
+        )
 
 
 def clamp(v: float, lo: float, hi: float) -> float:
