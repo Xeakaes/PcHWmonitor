@@ -629,7 +629,7 @@ import time
 from schema import CpuInfo, DiskInfo, FanInfo, FpsInfo, GpuInfo, NetInfo, PcInfo, RamInfo, StatusMessage
 ```
 
-Remove `fps=None,` from the `GpuInfo(...)` construction. Add before the `pc` construction:
+Remove `fps=None,` from the `GpuInfo(...)` construction. Also remove the now-dead `fps=None` keyword from the `GpuInfo(...)` calls in `server/adapters/lhm.py` (around line 175) and `server/adapters/lhm_lib.py` (around line 126) — `GpuInfo` no longer has an `fps` field (review finding F1). Add before the `pc` construction:
 
 ```python
         disk = DiskInfo(
