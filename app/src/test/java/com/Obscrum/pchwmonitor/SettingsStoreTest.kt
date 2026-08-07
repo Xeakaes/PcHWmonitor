@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.SettingsStore
 import com.Obscrum.pchwmonitor.data.ThemeMode
+import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -91,6 +92,38 @@ class SettingsStoreTest {
         assertEquals("tr", second.store.settings.first().language)
         second.store.setLanguage(null)
         assertEquals(null, second.store.settings.first().language)
+        second.close()
+    }
+
+    @Test
+    fun themePaletteDefaultsToDefault() = runTest {
+        val handle = store(createTempDir())
+        assertEquals("default", handle.store.settings.first().themePaletteId)
+        handle.close()
+    }
+
+    @Test
+    fun themePaletteRoundTrip() = runTest {
+        val dir = createTempDir()
+        val first = store(dir)
+        first.store.setThemePalette("gold")
+        first.close()
+
+        val second = store(dir)
+        assertEquals("gold", second.store.settings.first().themePaletteId)
+        second.close()
+    }
+
+    @Test
+    fun dashboardLayoutRoundTrip() = runTest {
+        val dir = createTempDir()
+        val layout = DashboardLayout.default()
+        val first = store(dir)
+        first.store.setDashboardLayout(layout)
+        first.close()
+
+        val second = store(dir)
+        assertEquals(layout, second.store.settings.first().dashboardLayout)
         second.close()
     }
 }
