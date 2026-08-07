@@ -20,5 +20,5 @@ goto :build
 :no_presentmon
 echo WARNING: %PRESENTMON% not found - FPS will be disabled in this build
 :build
-%PY% -m PyInstaller --onefile --noconsole --uac-admin --name PcHwMonitor --add-data "%VENDOR%;." %PRESENTMON_ARGS% server\main.py
+%PY% -m PyInstaller --onefile --noconsole --uac-admin --name PcHwMonitor --hidden-import psutil --hidden-import pystray --hidden-import PIL --hidden-import pythonnet --add-data "%VENDOR%;." %PRESENTMON_ARGS% server\main.py
 endlocal
