@@ -76,6 +76,12 @@
     <string name="net_card_title">Ağ</string>
     <string name="net_download">İndirme</string>
     <string name="net_upload">Yükleme</string>
+    <string name="theme_palette">Renk paleti</string>
+    <string name="palette_default">Varsayılan</string>
+    <string name="palette_ocean">Okyanus</string>
+    <string name="palette_ember">Kor</string>
+    <string name="palette_forest">Orman</string>
+    <string name="palette_gold">Siyah &amp; Altın</string>
     <string name="menu_hide">Kartı gizle</string>
     <string name="menu_pin">İlk ekranda tut</string>
     <string name="menu_unpin">İlk ekrandan kaldır</string>

@@ -53,6 +53,10 @@ fun SettingsScreen(
     labelThemeSystem: String,
     labelThemeLight: String,
     labelThemeDark: String,
+    labelThemePalette: String,
+    paletteLabels: List<Pair<String, String>>,
+    paletteId: String,
+    onPaletteChange: (String) -> Unit,
     labelLanguage: String,
     labelLanguageSystem: String,
     languages: List<Pair<String?, String>>,
@@ -133,6 +137,20 @@ fun SettingsScreen(
         ).forEach { (mode, label) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(selected = theme == mode, onClick = { theme = mode })
+                Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = labelThemePalette,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        paletteLabels.forEach { (id, label) ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = paletteId == id, onClick = { onPaletteChange(id) })
                 Text(text = label, style = MaterialTheme.typography.bodyMedium)
             }
         }
