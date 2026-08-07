@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             LaunchedEffect(settings.language) {
                 applyLanguage(settings.language)
             }
-            PcHWMonitorTheme(themeMode = settings.theme) {
+            PcHWMonitorTheme(themeMode = settings.theme, paletteId = settings.themePaletteId) {
                 AppNavHost(viewModel = viewModel)
             }
         }
