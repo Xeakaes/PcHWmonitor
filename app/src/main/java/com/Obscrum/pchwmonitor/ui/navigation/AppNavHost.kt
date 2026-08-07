@@ -165,6 +165,16 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     labelThemeSystem = stringResource(R.string.theme_system),
                     labelThemeLight = stringResource(R.string.theme_light),
                     labelThemeDark = stringResource(R.string.theme_dark),
+                    labelThemePalette = stringResource(R.string.theme_palette),
+                    paletteLabels = listOf(
+                        "default" to stringResource(R.string.palette_default),
+                        "ocean" to stringResource(R.string.palette_ocean),
+                        "ember" to stringResource(R.string.palette_ember),
+                        "forest" to stringResource(R.string.palette_forest),
+                        "gold" to stringResource(R.string.palette_gold),
+                    ),
+                    paletteId = settings.themePaletteId,
+                    onPaletteChange = viewModel::setThemePalette,
                     labelLanguage = stringResource(R.string.settings_language),
                     labelLanguageSystem = stringResource(R.string.settings_language_system),
                     languages = listOf(

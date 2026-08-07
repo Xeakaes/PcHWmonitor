@@ -76,6 +76,12 @@
     <string name="net_card_title">Network</string>
     <string name="net_download">Download</string>
     <string name="net_upload">Upload</string>
+    <string name="theme_palette">Color palette</string>
+    <string name="palette_default">Default</string>
+    <string name="palette_ocean">Ocean</string>
+    <string name="palette_ember">Ember</string>
+    <string name="palette_forest">Forest</string>
+    <string name="palette_gold">Black &amp; Gold</string>
     <string name="menu_hide">Hide card</string>
     <string name="menu_pin">Keep on first screen</string>
     <string name="menu_unpin">Remove from first screen</string>
