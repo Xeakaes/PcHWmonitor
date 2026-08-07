@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -86,6 +88,8 @@ fun DashboardScreen(
     labelEditDone: String = "",
     labelEditCancel: String = "",
     labelHiddenCards: String = "",
+    labelCardWidthHalf: String = "",
+    labelCardWidthFull: String = "",
     modifier: Modifier = Modifier,
     chartWindowSeconds: Int = 60,
     fpsChartMax: Float = 360f,
@@ -190,6 +194,8 @@ fun DashboardScreen(
                                         labelMenuUnpin = labelMenuUnpin,
                                         labelMenuEdit = labelMenuEdit,
                                         labelMenuFpsDetails = labelMenuFpsDetails,
+                                        labelCardWidthHalf = labelCardWidthHalf,
+                                        labelCardWidthFull = labelCardWidthFull,
                                         labelFpsHint = labelFpsHint,
                                         fpsDetailsOpen = fpsDetailsOpen,
                                         onFpsDetailsClick = { fpsDetailsOpen = true },
@@ -298,6 +304,8 @@ fun DashboardScreen(
                                         labelMenuUnpin = labelMenuUnpin,
                                         labelMenuEdit = labelMenuEdit,
                                         labelMenuFpsDetails = labelMenuFpsDetails,
+                                        labelCardWidthHalf = labelCardWidthHalf,
+                                        labelCardWidthFull = labelCardWidthFull,
                                         labelFpsHint = labelFpsHint,
                                         fpsDetailsOpen = fpsDetailsOpen,
                                         onFpsDetailsClick = { fpsDetailsOpen = true },
@@ -368,6 +376,8 @@ private fun RowScope.CardFor(
     labelMenuUnpin: String,
     labelMenuEdit: String,
     labelMenuFpsDetails: String,
+    labelCardWidthHalf: String,
+    labelCardWidthFull: String,
     labelFpsHint: String,
     fpsDetailsOpen: Boolean,
     onFpsDetailsClick: () -> Unit,
@@ -403,6 +413,8 @@ private fun RowScope.CardFor(
                 labelMenuUnpin = labelMenuUnpin,
                 labelMenuEdit = labelMenuEdit,
                 labelMenuFpsDetails = labelMenuFpsDetails,
+                labelCardWidthHalf = labelCardWidthHalf,
+                labelCardWidthFull = labelCardWidthFull,
                 onFpsDetailsClick = onFpsDetailsClick,
             )
         }
@@ -521,10 +533,13 @@ private fun RowScope.CardMenu(
     labelMenuUnpin: String,
     labelMenuEdit: String,
     labelMenuFpsDetails: String,
+    labelCardWidthHalf: String,
+    labelCardWidthFull: String,
     onFpsDetailsClick: () -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
     val isPinned = layout.entries.firstOrNull { it.card == cardId }?.pinned == true
+    val isWide = layout.entries.firstOrNull { it.card == cardId }?.wide == true
     Box {
         IconButton(onClick = { open = true }) {
             Icon(Icons.Filled.MoreVert, contentDescription = null)
@@ -535,6 +550,13 @@ private fun RowScope.CardMenu(
                 onClick = {
                     open = false
                     onEditModeChange(true)
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(if (isWide) labelCardWidthHalf else labelCardWidthFull) },
+                onClick = {
+                    open = false
+                    onLayoutChange(setCardWidth(layout, cardId, !isWide))
                 },
             )
             DropdownMenuItem(
@@ -574,7 +596,13 @@ private fun RowScope.CardEditControls(
     globalIndex: Int,
 ) {
     val visible = layout.visibleEntries()
+    val isWide = layout.entries.firstOrNull { it.card == cardId }?.wide == true
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        IconButton(onClick = {
+            onLayoutChange(setCardWidth(layout, cardId, !isWide))
+        }) {
+            Icon(if (isWide) Icons.Filled.UnfoldLess else Icons.Filled.UnfoldMore, contentDescription = null)
+        }
         IconButton(
             onClick = {
                 val prevVisibleIndex = layout.entries.indexOfFirst { it.card == visible.getOrNull(index - 1)?.card }
