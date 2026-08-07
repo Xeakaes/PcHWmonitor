@@ -105,7 +105,7 @@ class LayoutHelperTest {
                 listOf(CardId.IGPU, CardId.DISK),
                 listOf(CardId.NET, CardId.FAN),
             ),
-            buildRows(plan),
+            buildRows(plan, DashboardLayout.default()),
         )
     }
 
@@ -123,7 +123,7 @@ class LayoutHelperTest {
                 listOf(CardId.IGPU, CardId.DISK),
                 listOf(CardId.NET),
             ),
-            buildRows(plan),
+            buildRows(plan, DashboardLayout.default()),
         )
     }
 
@@ -143,5 +143,37 @@ class LayoutHelperTest {
         )
         val plan = layoutDashboard(layout, DashboardSizeClass.PHONE, maxWidth = 800.dp, landscape = true)
         assertEquals(listOf(CardId.CPU, CardId.RAM, CardId.GPU, CardId.FPS), plan.firstScreen)
+    }
+
+    @Test
+    fun wideCardOwnsItsRowInLandscape() {
+        val layout = DashboardLayout(
+            entries = DashboardLayout.default().entries.map { if (it.card == CardId.RAM) it.copy(wide = true) else it },
+        )
+        val plan = RenderPlan(
+            columns = 2,
+            firstScreen = listOf(CardId.CPU, CardId.GPU, CardId.FPS, CardId.RAM),
+            rest = listOf(CardId.IGPU, CardId.DISK, CardId.NET, CardId.FAN),
+            isGrid = true,
+        )
+        assertEquals(
+            listOf(
+                listOf(CardId.CPU, CardId.GPU),
+                listOf(CardId.FPS),
+                listOf(CardId.RAM),
+                listOf(CardId.IGPU, CardId.DISK),
+                listOf(CardId.NET, CardId.FAN),
+            ),
+            buildRows(plan, layout),
+        )
+    }
+
+    @Test
+    fun wideCardSingleColumnBehavesLikeNormal() {
+        val layout = DashboardLayout(
+            entries = DashboardLayout.default().entries.map { if (it.card == CardId.RAM) it.copy(wide = true) else it },
+        )
+        val plan = RenderPlan(columns = 1, firstScreen = emptyList(), rest = listOf(CardId.RAM, CardId.CPU), isGrid = false)
+        assertEquals(listOf(listOf(CardId.RAM), listOf(CardId.CPU)), buildRows(plan, layout))
     }
 }

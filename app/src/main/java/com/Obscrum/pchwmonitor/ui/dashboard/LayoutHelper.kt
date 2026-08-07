@@ -50,5 +50,19 @@ fun layoutDashboard(
     return RenderPlan(columns, firstScreen, rest, isGrid)
 }
 
-fun buildRows(plan: RenderPlan): List<List<CardId>> =
-    (plan.firstScreen + plan.rest).chunked(plan.columns)
+fun buildRows(plan: RenderPlan, layout: DashboardLayout): List<List<CardId>> {
+    val wideCards = layout.entries.filter { it.wide }.map { it.card }.toSet()
+    val rows = mutableListOf<List<CardId>>()
+    var pending = mutableListOf<CardId>()
+    for (card in plan.firstScreen + plan.rest) {
+        if (card in wideCards) {
+            if (pending.isNotEmpty()) { rows.add(pending.toList()); pending = mutableListOf() }
+            rows.add(listOf(card))
+        } else {
+            pending.add(card)
+            if (pending.size >= plan.columns) { rows.add(pending.toList()); pending = mutableListOf() }
+        }
+    }
+    if (pending.isNotEmpty()) rows.add(pending.toList())
+    return rows
+}
