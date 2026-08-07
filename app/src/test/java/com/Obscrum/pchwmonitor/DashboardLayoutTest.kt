@@ -62,4 +62,21 @@ class DashboardLayoutTest {
         )
         assertEquals(listOf(CardId.GPU), layout.visibleEntries().map { it.card })
     }
+
+    @Test
+    fun wideRoundTripsThroughJson() {
+        val layout = DashboardLayout(
+            entries = listOf(LayoutEntry(CardId.RAM, wide = true), LayoutEntry(CardId.CPU)),
+        )
+        val restored = DashboardLayout().fromJson(layout.toJson())
+        assertTrue(restored.entries.first { it.card == CardId.RAM }.wide)
+        assertFalse(restored.entries.first { it.card == CardId.CPU }.wide)
+    }
+
+    @Test
+    fun jsonWithoutWideDefaultsToFalse() {
+        val json = """[{"card":"ram","visible":true,"pinned":false}]"""
+        val layout = DashboardLayout().fromJson(json)
+        assertFalse(layout.entries.first { it.card == CardId.RAM }.wide)
+    }
 }

@@ -21,12 +21,13 @@ data class LayoutEntry(
     val card: CardId,
     val visible: Boolean = true,
     val pinned: Boolean = false,
+    val wide: Boolean = false,
 ) {
-    internal fun toDto() = LayoutEntryDto(card.storageId, visible, pinned)
+    internal fun toDto() = LayoutEntryDto(card.storageId, visible, pinned, wide)
 
     companion object {
         internal fun fromDto(d: LayoutEntryDto): LayoutEntry? =
-            CardId.fromStorage(d.card)?.let { LayoutEntry(it, d.visible, d.pinned) }
+            CardId.fromStorage(d.card)?.let { LayoutEntry(it, d.visible, d.pinned, d.wide) }
     }
 }
 
@@ -59,4 +60,4 @@ data class DashboardLayout(val entries: List<LayoutEntry> = emptyList()) {
 }
 
 @Serializable
-internal data class LayoutEntryDto(val card: String, val visible: Boolean, val pinned: Boolean)
+internal data class LayoutEntryDto(val card: String, val visible: Boolean, val pinned: Boolean, val wide: Boolean = false)
