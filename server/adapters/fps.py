@@ -61,7 +61,13 @@ class PresentMonFps:
         if self._process_name:
             cmd += ["--process_name", self._process_name]
         try:
-            self._proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+            self._proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
         except OSError:
             self._proc = None
             return False
