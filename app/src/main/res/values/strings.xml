@@ -89,5 +89,8 @@
     <string name="edit_done">Done</string>
     <string name="edit_cancel">Cancel</string>
     <string name="hidden_cards">Hidden cards</string>
+    <string name="card_width_half">Half width</string>
+    <string name="card_width_full">Full width</string>
+    <string name="nav_show">Show navigation</string>
     <string name="fan_card_title">Fan</string>
 </resources>
