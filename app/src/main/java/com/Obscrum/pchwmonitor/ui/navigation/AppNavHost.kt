@@ -13,6 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -47,6 +50,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
     val status by viewModel.status.collectAsState()
     val connection by viewModel.connection.collectAsState()
     val chartWindowSeconds by viewModel.chartWindowSeconds.collectAsState()
+    val dashboardLayout by viewModel.dashboardLayout.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -79,10 +83,23 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable("dashboard") {
+                var editMode by rememberSaveable { mutableStateOf(false) }
                 DashboardScreen(
                     status = status,
                     connection = connection,
                     chartWindowSeconds = chartWindowSeconds,
+                    layout = dashboardLayout,
+                    onLayoutChange = viewModel::setDashboardLayout,
+                    editMode = editMode,
+                    onEditModeChange = { editMode = it },
+                    labelMenuHide = stringResource(R.string.menu_hide),
+                    labelMenuPin = stringResource(R.string.menu_pin),
+                    labelMenuUnpin = stringResource(R.string.menu_unpin),
+                    labelMenuEdit = stringResource(R.string.menu_edit_layout),
+                    labelMenuFpsDetails = stringResource(R.string.fps_details_title),
+                    labelEditDone = stringResource(R.string.edit_done),
+                    labelEditCancel = stringResource(R.string.edit_cancel),
+                    labelHiddenCards = stringResource(R.string.hidden_cards),
                     labelConnecting = stringResource(R.string.connecting),
                     labelConnected = stringResource(R.string.connected),
                     labelDisconnected = stringResource(R.string.disconnected),

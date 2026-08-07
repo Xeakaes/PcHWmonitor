@@ -76,5 +76,12 @@
     <string name="net_card_title">Network</string>
     <string name="net_download">Download</string>
     <string name="net_upload">Upload</string>
+    <string name="menu_hide">Hide card</string>
+    <string name="menu_pin">Keep on first screen</string>
+    <string name="menu_unpin">Remove from first screen</string>
+    <string name="menu_edit_layout">Edit layout</string>
+    <string name="edit_done">Done</string>
+    <string name="edit_cancel">Cancel</string>
+    <string name="hidden_cards">Hidden cards</string>
     <string name="fan_card_title">Fan</string>
 </resources>

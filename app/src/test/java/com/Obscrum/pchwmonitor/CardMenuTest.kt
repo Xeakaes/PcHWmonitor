@@ -54,4 +54,12 @@ class CardMenuTest {
         assertEquals(layout, applyReorder(layout, from = 0, to = 99))
         assertEquals(layout, applyReorder(layout, from = -1, to = 3))
     }
+
+    @Test
+    fun reorderPreservesVisibility() {
+        val withHidden = applyLayoutAction(CardMenuAction.HIDE, DashboardLayout.default(), CardId.DISK)
+        val reordered = applyReorder(withHidden, from = 0, to = 3)
+        assertEquals(CardId.CPU, reordered.entries[3].card)
+        assertFalse(reordered.entries.first { it.card == CardId.DISK }.visible)
+    }
 }
