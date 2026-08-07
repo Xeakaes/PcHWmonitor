@@ -14,6 +14,7 @@ import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.data.network.StatusParser
 import com.Obscrum.pchwmonitor.data.network.WebSocketClient
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
+import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -34,6 +35,12 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     val chartWindowSeconds: StateFlow<Int> = settingsStore.settings
         .map { it.chartWindowSeconds }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().chartWindowSeconds)
+    val themePaletteId: StateFlow<String> = settingsStore.settings
+        .map { it.themePaletteId }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().themePaletteId)
+    val dashboardLayout: StateFlow<DashboardLayout> = settingsStore.settings
+        .map { it.dashboardLayout }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().dashboardLayout)
 
     private val controller = MonitorController(
         client = WebSocketClient(parser = StatusParser),
@@ -74,4 +81,12 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     suspend fun setTheme(theme: ThemeMode) = settingsStore.setTheme(theme)
 
     suspend fun setLanguage(language: String?) = settingsStore.setLanguage(language)
+
+    fun setThemePalette(id: String) {
+        viewModelScope.launch { settingsStore.setThemePalette(id) }
+    }
+
+    fun setDashboardLayout(layout: DashboardLayout) {
+        viewModelScope.launch { settingsStore.setDashboardLayout(layout) }
+    }
 }

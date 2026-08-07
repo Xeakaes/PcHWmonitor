@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -16,6 +17,8 @@ data class AppSettings(
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val language: String? = null,
     val chartWindowSeconds: Int = 60,
+    val themePaletteId: String = "default",
+    val dashboardLayout: DashboardLayout = DashboardLayout.default(),
 )
 
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
@@ -24,6 +27,8 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyTheme = stringPreferencesKey("theme")
     private val keyLanguage = stringPreferencesKey("language")
     private val keyChartWindow = intPreferencesKey("chart_window_seconds")
+    private val keyThemePalette = stringPreferencesKey("theme_palette")
+    private val keyDashboardLayout = stringPreferencesKey("dashboard_layout")
 
     val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
         AppSettings(
@@ -32,6 +37,10 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             theme = runCatching { ThemeMode.valueOf(prefs[keyTheme] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
             language = prefs[keyLanguage],
             chartWindowSeconds = prefs[keyChartWindow] ?: 60,
+            themePaletteId = prefs[keyThemePalette]?.takeIf { it.isNotBlank() } ?: "default",
+            dashboardLayout = prefs[keyDashboardLayout].let {
+                if (it == null) DashboardLayout.default() else DashboardLayout().fromJson(it)
+            },
         )
     }
 
@@ -55,5 +64,13 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setChartWindowSeconds(value: Int) {
         dataStore.edit { it[keyChartWindow] = value }
+    }
+
+    suspend fun setThemePalette(value: String) {
+        dataStore.edit { it[keyThemePalette] = value.takeIf { v -> v.isNotBlank() } ?: "default" }
+    }
+
+    suspend fun setDashboardLayout(value: DashboardLayout) {
+        dataStore.edit { it[keyDashboardLayout] = value.toJson() }
     }
 }
