@@ -2,6 +2,7 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +17,9 @@ fun FanCard(
     labelTitle: String,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
+    menu: @Composable RowScope.() -> Unit = {},
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (fans.isNullOrEmpty()) {
                 Text("--", style = MaterialTheme.typography.bodyMedium)

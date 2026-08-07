@@ -3,12 +3,9 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,11 +36,13 @@ fun FpsCard(
     compact: Boolean = false,
     chartPoints: Int = 60,
     chartMax: Float = 360f,
+    menu: @Composable RowScope.() -> Unit = {},
+    showDetails: Boolean = false,
+    onDetailsDismiss: () -> Unit = {},
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
-        var showHint by remember { mutableStateOf(false) }
         LaunchedEffect(fps?.current) {
             fps?.current?.let {
                 spark.append(it)
@@ -60,9 +59,6 @@ fun FpsCard(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
-                IconButton(onClick = { showHint = true }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = labelFpsDetails)
-                }
             }
             Text(
                 text = "$labelAvg ${fps?.avg?.toInt() ?: "--"} · $labelOnePercentLow ${fps?.onePercentLow?.toInt() ?: "--"} · ${fps?.name ?: "--"}",
@@ -73,13 +69,13 @@ fun FpsCard(
         if (!compact) {
             LineChart(points = points, color = MaterialTheme.colorScheme.primary, max = chartMax, modifier = Modifier.padding(top = 8.dp))
         }
-        if (showHint) {
+        if (showDetails) {
             AlertDialog(
-                onDismissRequest = { showHint = false },
+                onDismissRequest = onDetailsDismiss,
                 title = { Text(labelFpsDetails) },
                 text = { Text(labelFpsHint) },
                 confirmButton = {
-                    TextButton(onClick = { showHint = false }) { Text(stringResource(R.string.fps_ok)) }
+                    TextButton(onClick = onDetailsDismiss) { Text(stringResource(R.string.fps_ok)) }
                 },
             )
         }

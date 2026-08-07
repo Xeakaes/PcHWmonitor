@@ -3,6 +3,7 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +37,9 @@ fun GpuCard(
     titleFallback: String = "GPU",
     compact: Boolean = false,
     chartPoints: Int = 60,
+    menu: @Composable RowScope.() -> Unit = {},
 ) {
-    MetricCard(title = gpu?.name ?: titleFallback, modifier = modifier, compact = compact) {
+    MetricCard(title = gpu?.name ?: titleFallback, modifier = modifier, compact = compact, menu = menu) {
         val tempColor = TemperatureColor.forTemp(gpu?.tempC ?: 0f)
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }

@@ -2,6 +2,7 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,8 +29,9 @@ fun NetCard(
     compact: Boolean = false,
     chartPoints: Int = 60,
     chartMax: Float = 200f,
+    menu: @Composable RowScope.() -> Unit = {},
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
         LaunchedEffect(net?.downloadMbPerSec, net?.uploadMbPerSec) {
