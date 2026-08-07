@@ -89,5 +89,8 @@
     <string name="edit_done">Bitti</string>
     <string name="edit_cancel">İptal</string>
     <string name="hidden_cards">Gizli kartlar</string>
+    <string name="card_width_half">Yarım genişlik</string>
+    <string name="card_width_full">Tam genişlik</string>
+    <string name="nav_show">Çubuğu göster</string>
     <string name="fan_card_title">Fan</string>
 </resources>
