@@ -249,7 +249,7 @@ fun DashboardScreen(
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                 } else {
-                    val rows = buildRows(plan)
+                    val rows = buildRows(plan, layout)
                 rows.forEach { rowCards ->
                     val visible = rowCards.filter { card -> card.isAvailable(status) }
                     if (visible.isNotEmpty()) {
