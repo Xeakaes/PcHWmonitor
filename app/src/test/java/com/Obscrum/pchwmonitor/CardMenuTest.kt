@@ -6,6 +6,7 @@ import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import com.Obscrum.pchwmonitor.ui.dashboard.LayoutEntry
 import com.Obscrum.pchwmonitor.ui.dashboard.applyLayoutAction
 import com.Obscrum.pchwmonitor.ui.dashboard.applyReorder
+import com.Obscrum.pchwmonitor.ui.dashboard.setCardWidth
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -61,5 +62,19 @@ class CardMenuTest {
         val reordered = applyReorder(withHidden, from = 0, to = 3)
         assertEquals(CardId.CPU, reordered.entries[3].card)
         assertFalse(reordered.entries.first { it.card == CardId.DISK }.visible)
+    }
+
+    @Test
+    fun setCardWidthTogglesWide() {
+        var layout = setCardWidth(DashboardLayout.default(), CardId.RAM, true)
+        assertTrue(layout.entries.first { it.card == CardId.RAM }.wide)
+        layout = setCardWidth(layout, CardId.RAM, false)
+        assertFalse(layout.entries.first { it.card == CardId.RAM }.wide)
+    }
+
+    @Test
+    fun setCardWidthOnUnknownCardIsNoop() {
+        val layout = DashboardLayout(entries = emptyList())
+        assertEquals(layout, setCardWidth(layout, CardId.RAM, true))
     }
 }
