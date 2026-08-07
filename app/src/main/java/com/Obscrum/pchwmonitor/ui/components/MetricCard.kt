@@ -1,12 +1,16 @@
 package com.Obscrum.pchwmonitor.ui.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -16,6 +20,7 @@ fun MetricCard(
     title: String,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
+    menu: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     Card(
@@ -25,11 +30,18 @@ fun MetricCard(
         ),
     ) {
         Column(modifier = Modifier.padding(if (compact) 10.dp else 16.dp)) {
-            Text(
-                text = title,
-                style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = title,
+                    style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                )
+                menu()
+            }
             Column(modifier = Modifier.padding(top = if (compact) 6.dp else 12.dp)) {
                 content()
             }
