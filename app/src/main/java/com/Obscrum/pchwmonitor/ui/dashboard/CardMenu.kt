@@ -25,3 +25,8 @@ fun applyReorder(layout: DashboardLayout, from: Int, to: Int): DashboardLayout {
     list.add(to, entry)
     return DashboardLayout(list)
 }
+
+fun setCardWidth(layout: DashboardLayout, card: CardId, wide: Boolean): DashboardLayout {
+    if (layout.entries.none { it.card == card }) return layout
+    return DashboardLayout(layout.entries.map { if (it.card == card) it.copy(wide = wide) else it })
+}
