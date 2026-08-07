@@ -1,0 +1,68 @@
+name: Build v1.3 release
+
+on:
+  push:
+    tags:
+      - "v1.3*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create server venv and install deps
+        shell: cmd
+        run: |
+          python -m venv server\.venv
+          server\.venv\Scripts\pip install -r server\requirements.txt -r server\requirements-dev.txt
+
+      - name: Download LibreHardwareMonitor release
+        shell: pwsh
+        run: |
+          $r = Invoke-RestMethod -Uri "https://api.github.com/repos/LibreHardwareMonitor/LibreHardwareMonitor/releases/latest" -Headers @{ "User-Agent" = "PcHwMonitor-build" }
+          $asset = $r.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
+          if (-not $asset) { throw "No zip asset in LibreHardwareMonitor latest release" }
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile "$env:TEMP\lhm.zip"
+          Expand-Archive -Path "$env:TEMP\lhm.zip" -DestinationPath "$env:TEMP\lhm" -Force
+          New-Item -ItemType Directory -Force -Path server\vendor | Out-Null
+          Get-ChildItem -Recurse "$env:TEMP\lhm" -Filter "*.dll" | Copy-Item -Destination server\vendor -Force
+
+      - name: Download PresentMon64.exe
+        shell: pwsh
+        run: |
+          $r = Invoke-RestMethod -Uri "https://api.github.com/repos/GameTechDev/PresentMon/releases/latest" -Headers @{ "User-Agent" = "PcHwMonitor-build" }
+          $asset = $r.assets | Where-Object { $_.name -like "*x64*" -and $_.name -like "*.exe" } | Select-Object -First 1
+          if (-not $asset) { throw "No x64.exe asset in PresentMon latest release" }
+          New-Item -ItemType Directory -Force -Path server\presentmon | Out-Null
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile "server\presentmon\PresentMon64.exe"
+
+      - name: Build EXE
+        shell: cmd
+        env:
+          LHMDIR: "%CD%\\server\\vendor"
+        run: |
+          build_exe.bat
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PcHwMonitor
+          path: dist/PcHwMonitor.exe
+
+      - name: Attach EXE to release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload $env:GITHUB_REF_NAME "dist/PcHwMonitor.exe" --clobber

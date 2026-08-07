@@ -34,3 +34,4 @@ server/presentmon/PresentMon64.exe
 # OS
 .DS_Store
 Thumbs.db
+key.properties

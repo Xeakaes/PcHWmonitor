@@ -2,11 +2,15 @@
 REM PC HW Monitor - single-file Windows EXE build (run from project root)
 setlocal
 set PY=server\.venv\Scripts\python.exe
-set LHMDIR=C:\Users\msi\LibreHardwareMonitor
+if not defined LHMDIR set LHMDIR=C:\Users\msi\LibreHardwareMonitor
 set VENDOR=server\vendor
 set PRESENTMON=server\presentmon\PresentMon64.exe
 if not exist "%VENDOR%" mkdir "%VENDOR%"
-copy /y "%LHMDIR%\*.dll" "%VENDOR%" >nul
+if exist "%LHMDIR%\*.dll" (
+    copy /y "%LHMDIR%\*.dll" "%VENDOR%" >nul
+) else (
+    echo WARNING: No DLLs found in %LHMDIR% - hardware sensors disabled in this build
+)
 set PRESENTMON_ARGS=
 if not exist "%PRESENTMON%" goto :no_presentmon
 REM stage the binary so the onefile build can reference it
