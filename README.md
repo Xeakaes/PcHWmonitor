@@ -29,8 +29,10 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 - **Android** (Kotlin, Jetpack Compose, Material 3):
    - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
    - Disk, Network, Fan, and FPS cards — disk usage & throughput, net up/down, fan RPM, game FPS with 1% low
-   - Live charts, configurable chart window (30s / 60s / 300s), 1-hour history (Room DB), light/dark theme, custom logo
-   - **Landscape mode: all cards in a compact scroll-free 2×2 grid on one screen**
+   - Live charts, configurable chart window (30s / 60s / 300s), 1-hour history (Room DB), custom logo
+   - **5 color palettes** (Default, Ocean, Ember, Forest, Black & Gold) — light/dark variants, applies instantly from Settings
+   - **Dashboard edit mode**: reorder cards, hide/unhide cards, pin cards to the first screen, and toggle each card between half/full width
+   - **Landscape mode: compact scroll-free grid on one screen**, with the nav bar auto-hiding and reappearing on tap; tablets get a wider multi-column layout
    - 14 languages (selectable in Settings)
 - **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil`; packaged FPS support uses an embedded `PresentMon64.exe` (see Building the EXE).
 
@@ -155,8 +157,10 @@ Missing sensors arrive as `null` (the UI shows "—"). Disk/Network/Fans/FPS fie
 - **Android** (Kotlin, Jetpack Compose, Material 3):
    - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
    - Disk, Ağ, Fan ve FPS kartları — disk kullanımı ve aktarım, ağ gönderim/alan, fan RPM, oyun FPS'yi ve 1% düşük değeri (1% low)
-   - Canlı grafikler, grafik penceresi (30s / 60s / 300s), 1 saatlik geçmiş (Room DB), açık/koyu tema, özel logo
-   - **Yatay modda (landscape) tüm kartlar tek ekranda kompakt 2×2 ızgara** — kaydırmasız
+   - Canlı grafikler, grafik penceresi (30s / 60s / 300s), 1 saatlik geçmiş (Room DB), özel logo
+   - **5 renk paleti** (Default, Ocean, Ember, Forest, Black & Gold) — açık/koyu varyantlarla, ayarlardan anında uygulanır
+   - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
+   - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
    - 14 dil (ayarlardan seçilebilir)
 - **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur; paketli FPS desteği gömülü `PresentMon64.exe`'e dayanır (bunu `build_exe.bat` inşa eder).
 
