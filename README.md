@@ -9,6 +9,10 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 <a href="https://alternativeto.net/software/pc-hw-monitor/about/" target="_blank">
   <img src="https://img.shields.io/badge/AlternativeTo-Listed-blue" alt="AlternativesTo Page">
 </a>
+<a href="https://xeakaes.github.io/PcHWmonitor/" target="_blank">
+  <img src="https://img.shields.io/badge/Website-Visit-brightgreen" alt="Project Website">
+</a>
+
 
 
 **Lisans / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
