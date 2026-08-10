@@ -3,9 +3,7 @@
 Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gösteren modern dashboard.
 A modern dashboard that shows your PC's real-time hardware stats on your phone over local Wi-Fi.
 
-[![CodeQL Analysis](https://github.com)](https://github.com)
-[![Open Source](https://shields.io)](https://github.com)
-[![AlternativesTo](https://shields.io)](https://alternativeto.net)
+[<img src="https://github.com" alt="CodeQL Analysis">](https://github.com) [<img src="https://shields.io" alt="Open Source">](https://github.com) [<img src="https://shields.io" alt="AlternativesTo">](https://alternativeto.net)
 
 **Lisans / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
 
