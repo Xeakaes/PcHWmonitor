@@ -3,14 +3,11 @@
 Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gösteren modern dashboard.
 A modern dashboard that shows your PC's real-time hardware stats on your phone over local Wi-Fi.
 
-<a href="https://github.com" target="_blank">
-  <img src="https://github.com/badge.svg" alt="CodeQL Status">
+<a href="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml" target="_blank">
+  <img src="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml/badge.svg" alt="CodeQL Status">
 </a>
-<a href="https://github.com" target="_blank">
-  <img src="https://shields.io" alt="Open Source Repo">
-</a>
-<a href="https://alternativeto.net" target="_blank">
-  <img src="https://shields.io" alt="AlternativesTo Page">
+<a href="https://alternativeto.net/software/pc-hw-monitor/about/" target="_blank">
+  <img src="https://img.shields.io/badge/AlternativeTo-Listed-blue" alt="AlternativesTo Page">
 </a>
 
 
