@@ -13,9 +13,9 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
   <img src="https://img.shields.io/badge/Website-Visit-brightgreen" alt="Project Website">
 </a>
 <a href="https://androidweekly.net/issues/issue-739" target="_blank">
-  <img src="https://img.shields.io/badge/Android%20Weekly-%23739-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Android Weekly #739">
+  <img src="https://androidweekly.net/issues/issue-739/badge"
+       alt="Featured in androidweekly.net Issue #739">
 </a>
-
 
 **Lisans / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
 
