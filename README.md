@@ -12,8 +12,7 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
 <a href="https://xeakaes.github.io/PcHWmonitor/" target="_blank">
   <img src="https://img.shields.io/badge/Website-Visit-brightgreen" alt="Project Website">
 </a>
-[![Android Weekly](https://img.shields.io/badge/Android%20Weekly-%23739-3DDC84?style=flat-square&logo=android&logoColor=white)](https://androidweekly.net/issues/issue-739)
-
+[![Android Weekly](https://raw.githubusercontent.com/Xeakaes/PcHWmonitor/main/assets/aw-badge.svg)](https://androidweekly.net/issues/issue-739)
 
 
 **Lisans / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
