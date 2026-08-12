@@ -3,276 +3,567 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PC HW Monitor — Open Source Remote PC Hardware Stats on Android</title>
-<meta name="description" content="Open-source monitoring tool that streams CPU, GPU, iGPU, RAM, disk, network and FPS data to an Android dashboard over local Wi-Fi." />
-<meta name="keywords" content="pc hw monitor, open source hardware monitor, remote pc monitoring, android hardware dashboard, xeakaes, librehardwaremonitor, presentmon fps tool">
+<title>PC HW Monitor — Your PC on your phone</title>
+<meta name="description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM and more streamed over local Wi-Fi." />
+<meta name="keywords" content="pc hw monitor, android hardware dashboard, remote pc monitoring, open source telemetry">
 <meta name="robots" content="index, follow">
 <meta name="googlebot" content="index, follow">
+<meta name="google-site-verification" content="DN_JodShVPapdB1r7m7HzUvDP_grr1r2i_oGJKR6k_E" />
 <meta property="og:title" content="PC HW Monitor — PC hardware stats on your phone" />
-<meta property="og:description" content="Single-file Windows server + Jetpack Compose Android dashboard. Telemetry once per second over WebSocket." />
+<meta property="og:description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM and more streamed over local Wi-Fi." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta property="og:image" content="https://pchwmonitor.app/og-image.png" />
 <link rel="canonical" href="https://pchwmonitor.app/" />
-<meta name="google-site-verification" content="DN_JodShVPapdB1r7m7HzUvDP_grr1r2i_oGJKR6k_E" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232a2b3a'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%239fa2b9'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%235e6077'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%235e6077'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%239fa2b9'/%3E%3C/svg%3E" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-:root{
-  --primary:#6d28d9;
-  --on-primary:#ffffff;
-  --background:#000;
-  --surface:rgba(255,255,255,.05);
-  --glass:rgba(255,255,255,.05);
-  --glass-border:rgba(255,255,255,.11);
-  --glass-hover:rgba(139,92,246,.24);
-  --border-soft:rgba(167,139,250,.16);
-  --text:#f4f4ff;
-  --text-muted:#dfe1f4;
-  --accent:#8b5cf6;
-  --accent-strong:#a78bfa;
-  --sans:'Roobert','Inter',ui-sans-serif,system-ui,sans-serif;
-  --mono:'Roboto Mono',ui-monospace,monospace;
-  --radius-sm:6px;
-  --radius-md:12px;
-  --radius-lg:19px;
-  --radius-xl:24px;
-  --shadow-card:inset 0 1px 0 rgba(255,255,255,.14),
-    0 8px 32px rgba(0,0,0,.3);
-  --shadow-glass:inset 0 1px 0 rgba(255,255,255,.14),
-    0 8px 32px rgba(0,0,0,.3);
-  --ease:cubic-bezier(0.45,0,0.55,1);
+:root {
+  /* Colors */
+  --primary: #ffffff;
+  --primary-pressed: #e8e8e8;
+  --on-primary: #000000;
+  --ink: #f4f4f6;
+  --body: #cdcdcd;
+  --charcoal: #d3d3d4;
+  --mute: #9c9c9d;
+  --ash: #6a6b6c;
+  --stone: #434345;
+  --on-dark: #ffffff;
+  --on-dark-mute: rgba(255,255,255,0.72);
+  
+  --canvas: #07080a;
+  --surface: #0d0d0d;
+  --surface-elevated: #101111;
+  --surface-card: #121212;
+  --button-fg: #18191a;
+  
+  --hairline: #242728;
+  --hairline-soft: rgba(255,255,255,0.08);
+  --hairline-strong: rgba(255,255,255,0.16);
+  
+  --accent-blue: #57c1ff;
+  --accent-blue-soft: rgba(87,193,255,0.15);
+  --accent-red: #ff6161;
+  --accent-red-soft: rgba(255,97,97,0.15);
+  --accent-green: #59d499;
+  --accent-green-soft: rgba(89,212,153,0.15);
+  --accent-yellow: #ffc533;
+  --accent-yellow-soft: rgba(255,197,51,0.15);
+  
+  --hero-stripe-start: #ff5757;
+  --hero-stripe-end: #a1131a;
+  --key-bg-start: #121212;
+  --key-bg-end: #0d0d0d;
+
+  /* Typography */
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-feature: "calt", "kern", "liga", "ss03";
+  --font-feature-display: "calt", "kern", "ss03", "ss02", "ss08";
+
+  /* Border Radius */
+  --rounded-none: 0px;
+  --rounded-xs: 4px;
+  --rounded-sm: 6px;
+  --rounded-md: 8px;
+  --rounded-lg: 10px;
+  --rounded-xl: 16px;
+  --rounded-full: 9999px;
+
+  /* Spacing */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-section: 96px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{background:#000;color:var(--text);font-family:var(--sans);
-  font-size:15px;font-weight:500;line-height:1.5;-webkit-font-smoothing:antialiased}
-body::before{
-  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(ellipse 95% 75% at 50% 15%,rgba(139,92,246,.62) 0%,rgba(124,58,237,.32) 38%,transparent 68%),
-    radial-gradient(ellipse 70% 55% at 78% 82%,rgba(167,139,250,.20) 0%,transparent 60%),
-    radial-gradient(ellipse 55% 45% at 12% 70%,rgba(99,102,241,.16) 0%,transparent 55%);
-  background-size:190% 190%,150% 150%,130% 130%;
-  background-repeat:no-repeat;
-  animation:bgdrift 22s var(--ease) infinite alternate;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background-color: var(--canvas);
+  color: var(--body);
+  font-family: var(--font-inter);
+  font-feature-settings: var(--font-feature);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-@keyframes bgdrift{
-  0%{background-position:50% 15%,78% 82%,12% 70%}
-  50%{background-position:54% 22%,72% 76%,18% 64%}
-  100%{background-position:47% 28%,82% 70%,8% 78%}
+
+::selection { background: var(--surface-card); color: var(--on-dark); }
+a { color: inherit; text-decoration: none; transition: color 0.2s; }
+ul { list-style: none; }
+
+/* Container */
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
-::selection{background:var(--accent);color:var(--background)}
-a{color:inherit;text-decoration:none}
-.mono{font-family:var(--mono)}
-.wrap{max-width:1080px;margin:0 auto}
 
-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--glass-border);background:rgba(255,255,255,.05);
-  backdrop-filter:blur(16px) saturate(160%);padding:24px 32px}
-.logo{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:-.02em}
-.logo span{color:var(--accent)}
-.nav-right{display:flex;align-items:center;gap:24px}
-.tag{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--text-muted);font-weight:500}
-.nav-right a.tag:hover{color:var(--text)}
+/* Typography Scale */
+.display-xl { font-size: 64px; font-weight: 600; line-height: 1.1; letter-spacing: 0; color: var(--ink); font-feature-settings: var(--font-feature-display); }
+.display-lg { font-size: 56px; font-weight: 500; line-height: 1.17; letter-spacing: 0.2px; color: var(--ink); }
+.heading-xl { font-size: 24px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px; color: var(--on-dark); }
+.heading-md { font-size: 20px; font-weight: 500; line-height: 1.4; letter-spacing: 0.2px; color: var(--on-dark); }
+.heading-sm { font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: 0.2px; color: var(--on-dark); }
+.body-lg { font-size: 18px; font-weight: 400; line-height: 1.6; color: var(--body); }
+.body-md { font-size: 16px; font-weight: 400; line-height: 1.6; color: var(--body); }
+.body-sm { font-size: 14px; font-weight: 400; line-height: 1.6; color: var(--mute); }
+.body-sm-strong { font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px; color: var(--on-dark); }
+.caption-md { font-size: 13px; font-weight: 400; line-height: 1.4; letter-spacing: 0.1px; color: var(--body); }
+.caption-sm { font-size: 12px; font-weight: 400; line-height: 1.5; letter-spacing: 0.4px; color: var(--mute); }
+.link-inline { font-size: 16px; font-weight: 500; line-height: 1.4; letter-spacing: 0.3px; color: var(--on-dark); }
+.link-inline:hover { text-decoration: underline; }
 
-section{padding:116px 32px;border-bottom:1px solid var(--border-soft)}
-section:last-of-type{border-bottom:none}
-.eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;
-  letter-spacing:.22em;color:var(--text-muted)}
-h2.eyebrow{color:var(--text)}
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-inter);
+  font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px;
+  border-radius: var(--rounded-md);
+  padding: 8px 16px;
+  height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; transition: background-color 0.2s;
+  font-feature-settings: var(--font-feature);
+}
+.btn-primary:hover { background-color: var(--primary-pressed); }
 
-.hero{padding-top:160px;padding-bottom:160px;text-align:center}
-.hero .eyebrow{color:var(--accent)}
-h1{font-family:var(--sans);font-size:clamp(44px,9vw,96px);font-weight:500;
-  letter-spacing:-.03em;line-height:1.05;margin-top:16px}
-.lede{margin:24px auto 0;max-width:52ch;font-size:16px;color:var(--text-muted)}
-.cta{margin-top:48px;display:flex;flex-direction:column;gap:16px;max-width:384px;
-  margin-left:auto;margin-right:auto}
-.btn{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;
-  font-family:var(--mono);font-size:13px;border-radius:var(--radius-md);
-  transition:transform var(--ease) .25s,background var(--ease) .25s}
-.btn-primary{background:var(--on-primary);color:var(--primary);font-weight:600;
-  box-shadow:var(--shadow-card)}
-.btn-primary:hover{transform:translateX(4px)}
-.btn-ghost{border:1px solid var(--glass-border);background:var(--glass);
-  color:var(--text);border-radius:var(--radius-md);backdrop-filter:blur(12px) saturate(160%);
-  transition:transform var(--ease) .25s,background var(--ease) .25s,border-color var(--ease) .25s}
-.btn-ghost:hover{background:var(--glass-hover);border-color:rgba(139,92,246,.5);transform:translateX(4px)}
-.btn-ghost .meta{color:var(--text-muted)}
+.btn-secondary {
+  background-color: transparent;
+  color: var(--on-dark);
+  font-family: var(--font-inter);
+  font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px;
+  border-radius: var(--rounded-md);
+  padding: 8px 16px;
+  height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; transition: background-color 0.2s;
+  font-feature-settings: var(--font-feature);
+}
+.btn-secondary:hover { background-color: var(--surface-card); }
 
-.sensors{margin-top:32px;display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:768px){.sensors{grid-template-columns:1fr 1fr}}
-.sensor{background:var(--glass);border:1px solid var(--glass-border);
-  border-radius:var(--radius-lg);box-shadow:var(--shadow-glass);backdrop-filter:blur(14px) saturate(160%);
-  padding:24px;transition:transform var(--ease) .25s,background var(--ease) .25s,border-color var(--ease) .25s}
-.sensor:hover{transform:translateY(-2px);background:rgba(255,255,255,.08);
-  border-color:rgba(139,92,246,.45)}
-.sensor-head{display:flex;justify-content:space-between;align-items:flex-start}
-.sensor-head b{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
-.sensor-head i{font-family:var(--mono);font-size:11px;color:var(--accent);font-style:normal}
-.sensor p{margin-top:10px;font-size:14px;color:var(--text-muted)}
+/* Keycap */
+.keycap {
+  background: linear-gradient(180deg, var(--key-bg-start) 0%, var(--key-bg-end) 100%);
+  color: var(--body);
+  font-size: 13px; font-weight: 400; line-height: 1.4; letter-spacing: 0.1px;
+  border-radius: var(--rounded-xs);
+  padding: 1px 6px;
+  height: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--hairline);
+}
 
-.feature{display:flex;gap:32px;padding:26px 0;border-bottom:1px solid var(--border-soft)}
-.feature:first-of-type{padding-top:0}
-.feature:last-of-type{border-bottom:none}
-.feature .n{font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:2px}
-.feature h3{font-size:16px;font-weight:500}
-.feature p{margin-top:8px;font-size:14px;color:var(--text-muted)}
+/* Badges */
+.badge-info-soft {
+  background-color: var(--accent-blue-soft);
+  color: var(--accent-blue);
+  font-size: 12px; font-weight: 400; line-height: 1.5; letter-spacing: 0.4px;
+  border-radius: var(--rounded-xs);
+  padding: 2px 8px;
+  display: inline-block;
+}
 
-.arch{margin-top:32px;display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:768px){.arch{grid-template-columns:1fr 1fr 1fr}}
-.node{background:var(--glass);border:1px solid var(--glass-border);
-  border-radius:var(--radius-lg);box-shadow:var(--shadow-glass);
-  backdrop-filter:blur(14px) saturate(160%);padding:24px;
-  transition:transform var(--ease) .25s,border-color var(--ease) .25s}
-.node:hover{transform:translateY(-2px);border-color:rgba(139,92,246,.45)}
-.node h3{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-strong)}
-.node p{margin-top:10px;font-size:14px;color:var(--text-muted)}
-.node .arrow{display:block;font-family:var(--mono);color:var(--accent);margin-bottom:12px}
-@media(min-width:768px){.node .arrow{display:none}}
+/* Nav */
+.primary-nav {
+  background-color: var(--canvas);
+  height: 56px;
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo-mark {
+  color: var(--on-dark);
+  font-size: 14px; font-weight: 500; letter-spacing: 0.2px;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-right { display: flex; align-items: center; gap: 16px; }
 
-.step{display:flex;gap:24px;padding:26px 0;border-bottom:1px solid var(--border-soft)}
-.step:first-of-type{padding-top:0}
-.step:last-of-type{border-bottom:none}
-.step .n{font-family:var(--mono);font-size:13px;color:var(--accent)}
-.step h3{font-size:16px;font-weight:500}
-.step p{margin-top:8px;font-size:14px;color:var(--text-muted)}
+/* Sections */
+section { padding: var(--spacing-section) 0; }
+.section-header { margin-bottom: 48px; }
 
-.code{margin-top:32px;border-radius:var(--radius-lg);box-shadow:var(--shadow-glass);
-  border:1px solid var(--glass-border);background:rgba(255,255,255,.04);
-  backdrop-filter:blur(14px) saturate(160%);overflow:hidden}
-.code-head{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;
-  border-bottom:1px solid var(--border-soft);font-family:var(--mono);font-size:11px;
-  color:var(--text-muted);letter-spacing:.08em}
-pre{overflow-x:auto;padding:24px 20px;font-family:var(--mono);font-size:12.5px;
-  line-height:1.8;color:var(--text)}
-pre .k{color:var(--accent)}
-pre .s{color:var(--accent-strong)}
-pre .n{color:var(--text-muted)}
+/* Hero Stripe Band */
+.hero-stripe-band {
+  background-color: var(--canvas);
+  padding: var(--spacing-section) 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--rounded-none);
+  border-bottom: 1px solid var(--hairline);
+}
+.hero-stripe-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 80px,
+    var(--hero-stripe-start) 80px,
+    var(--hero-stripe-end) 160px
+  );
+  opacity: 0.08;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 60%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 60%);
+  z-index: 0; pointer-events: none;
+}
+.hero-content {
+  position: relative; z-index: 1;
+  max-width: 800px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.hero-cta { display: flex; gap: 12px; margin-top: 16px; }
 
-footer{border-top:1px solid var(--border-soft);padding:32px}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1080px;margin:0 auto}
-.fcol .tag{display:block;margin-bottom:12px;color:var(--accent)}
-.fcol a{display:block;font-size:14px;margin-top:6px;color:var(--text-muted)}
-.fcol a:hover{color:var(--text)}
-.fbottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--border-soft);
-  max-width:1080px;margin-left:auto;margin-right:auto}
-.fbottom div:first-child{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
-.fbottom div:last-child{margin-top:12px;font-family:var(--mono);font-size:10px;
-  text-transform:uppercase;letter-spacing:.08em;color:rgba(223,225,244,.6)}
+/* App Image Containers */
+.app-mockup {
+  width: 100%;
+  max-width: 340px;
+  margin: 48px auto 0;
+  border-radius: var(--rounded-xl);
+  border: 1px solid var(--hairline-strong);
+  overflow: hidden;
+  background-color: var(--surface-card);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+}
+.app-mockup.landscape {
+  max-width: 100%;
+  margin-top: 0;
+}
+.app-mockup.mini {
+  max-width: 220px;
+  margin: 0;
+  border-radius: var(--rounded-lg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.app-mockup img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Theme Gallery */
+.theme-gallery {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  overflow-x: auto;
+  padding-bottom: 16px; /* for shadows */
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+@media(min-width: 768px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(min-width: 1024px) { .card-grid-3 { grid-template-columns: repeat(3, 1fr); } }
+
+.feature-card-dark {
+  background-color: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-xl);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.feature-card-elevated {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-xl);
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+
+/* Feature List (Rows) */
+.feature-row {
+  display: flex; gap: 24px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--hairline-strong);
+}
+.feature-row:last-child { border-bottom: none; }
+.feature-row .num {
+  color: var(--mute);
+  font-size: 14px; font-weight: 500;
+  padding-top: 2px;
+}
+.feature-row-content { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+/* Code Block */
+.code-container {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rounded-md);
+  overflow: hidden;
+}
+.code-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--hairline);
+  background-color: var(--surface-card);
+}
+.code-header span {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.2px; color: var(--mute); text-transform: uppercase;
+}
+.code-container pre {
+  padding: 24px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 14px; line-height: 1.6; color: var(--body);
+}
+.code-container .key { color: var(--accent-blue); }
+.code-container .val-num { color: var(--accent-green); }
+.code-container .val-str { color: var(--accent-yellow); }
+
+/* Footer */
+.footer-section {
+  background-color: var(--canvas);
+  border-top: 1px solid var(--hairline);
+  padding: 64px 48px;
+}
+.footer-grid {
+  display: grid; grid-template-columns: 1fr; gap: 48px;
+  max-width: 1240px; margin: 0 auto;
+}
+@media(min-width: 768px) { .footer-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.footer-col { display: flex; flex-direction: column; gap: 16px; }
+.footer-col .label { color: var(--on-dark); font-size: 14px; font-weight: 500; letter-spacing: 0.2px; }
+.footer-col a { color: var(--body); font-size: 14px; font-weight: 400; }
+.footer-col a:hover { color: var(--on-dark); }
+.footer-bottom {
+  max-width: 1240px; margin: 64px auto 0;
+  padding-top: 32px; border-top: 1px solid var(--hairline);
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--mute); font-size: 13px;
+}
+
+/* Mobile responsive scaling */
+@media(max-width: 480px) {
+  .display-xl { font-size: 44px; }
+  .display-lg { font-size: 36px; }
+  .hero-stripe-band { padding: 64px 24px; }
+  .app-mockup.mini { max-width: 160px; }
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="logo">PC<span>HW</span>MONITOR</div>
+<nav class="primary-nav">
+  <div class="logo-mark">PC HW Monitor</div>
   <div class="nav-right">
-    <span class="tag">AGPL-3.0</span>
-    <a class="tag" href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">GitHub</a>
+    <a href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer" class="link-inline">GitHub</a>
+    <a href="https://github.com/Xeakaes/PcHWmonitor/releases" target="_blank" rel="noreferrer" class="btn-primary">Download</a>
   </div>
 </nav>
 
 <main>
+  <!-- 1. HERO + APP IMAGE -->
+  <section class="hero-stripe-band">
+    <div class="hero-stripe-bg"></div>
+    <div class="hero-content">
+      <h1 class="display-xl">Your PC.<br/>On your phone.</h1>
+      <p class="body-lg">Real-time CPU, GPU, RAM and more streamed to your Android phone over local Wi-Fi.</p>
+      <div class="hero-cta">
+        <a href="https://github.com/Xeakaes/PcHWmonitor/releases" target="_blank" rel="noreferrer" class="btn-primary">Download App</a>
+        <a href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer" class="btn-secondary">View on GitHub</a>
+      </div>
+      
+      <!-- Hero Mockup (Dikey Karanlık Mod - Ember) -->
+      <div class="app-mockup">
+        <img src="images/main_ember.jpg" alt="PC HW Monitor App Dashboard Portrait" />
+      </div>
+    </div>
+  </section>
+
   <div class="wrap">
-
-    <section class="hero">
-      <span class="eyebrow">Open Source Telemetry</span>
-      <h1>PC HW<br />MONITOR</h1>
-      <p class="lede">
-        Real-time PC hardware stats streamed to an Android dashboard over local Wi-Fi.
-      </p>
-      <div class="cta">
-        <a class="btn btn-primary" href="https://github.com/Xeakaes/PcHWmonitor/releases" target="_blank" rel="noreferrer">
-          <span>DOWNLOADS</span><span>→</span>
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">
-          <span>VIEW ON GITHUB</span><span class="meta">[Xeakaes/PcHWmonitor]</span>
-        </a>
+    
+    <!-- 2. WHAT YOU CAN MONITOR -->
+    <section>
+      <div class="section-header">
+        <h2 class="display-lg">What you can monitor</h2>
+      </div>
+      <div class="card-grid card-grid-3">
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">CPU</h3>
+            <span class="keycap">01</span>
+          </div>
+          <p class="body-sm">Temperature, usage, clock speed, power, and per-core load tracking.</p>
+        </div>
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">GPU / iGPU</h3>
+            <span class="keycap">02</span>
+          </div>
+          <p class="body-sm">Hotspot, VRAM limits, core & memory clock speeds, and active watt draw.</p>
+        </div>
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">RAM</h3>
+            <span class="keycap">03</span>
+          </div>
+          <p class="body-sm">Live used vs total capacity in GB, percentage footprint, and MHz.</p>
+        </div>
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">Disk & Network</h3>
+            <span class="keycap">04</span>
+          </div>
+          <p class="body-sm">Read/write speeds in MB/s alongside active download and upload rates.</p>
+        </div>
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">Fan Speed</h3>
+            <span class="keycap">05</span>
+          </div>
+          <p class="body-sm">Detailed labeled fan RPM readings directly from motherboard headers.</p>
+        </div>
+        <div class="feature-card-dark">
+          <div class="card-head">
+            <h3 class="heading-md">FPS Metrics</h3>
+            <span class="keycap">06</span>
+          </div>
+          <p class="body-sm">Current, average, and 1% low framerate data collected via PresentMon.</p>
+        </div>
       </div>
     </section>
 
+    <!-- 3. USE YOUR PHONE AS A DASHBOARD -->
     <section>
-      <h2 class="eyebrow">Sensor Coverage</h2>
-      <div class="sensors">
-        <div class="sensor"><div class="sensor-head"><b>CPU</b><i>[01]</i></div><p>Temperature, usage, clock speed, power, per-core load</p></div>
-        <div class="sensor"><div class="sensor-head"><b>GPU / iGPU</b><i>[02]</i></div><p>Hotspot, VRAM, core &amp; mem clock, watt</p></div>
-        <div class="sensor"><div class="sensor-head"><b>RAM</b><i>[03]</i></div><p>Used / total GB, usage %, MHz</p></div>
-        <div class="sensor"><div class="sensor-head"><b>Disk &amp; Network</b><i>[04]</i></div><p>Read/write MB/s, download &amp; upload</p></div>
-        <div class="sensor"><div class="sensor-head"><b>Fan</b><i>[05]</i></div><p>Labeled fan RPM readings</p></div>
-        <div class="sensor"><div class="sensor-head"><b>FPS</b><i>[06]</i></div><p>Current, average, and 1% low via PresentMon</p></div>
+      <div class="section-header">
+        <h2 class="display-lg">Use your phone as a dashboard</h2>
+        <p class="body-lg" style="margin-top: 16px; max-width: 600px;">Keep an eye on your hardware without taking up precious monitor space. All your stats perfectly optimized for a single, scroll-free mobile screen.</p>
+      </div>
+      
+      <!-- Landscape Mockup (Yatay Karanlık Mod) -->
+      <div class="app-mockup landscape">
+        <img src="images/main_landscape.jpg" alt="PC HW Monitor App Dashboard Landscape" />
       </div>
     </section>
 
+    <!-- 4. FEATURES -->
     <section>
-      <h2 class="eyebrow">Features</h2>
-      <div class="feature"><span class="n">01</span><div><h3>Live charts &amp; 1-hour history</h3><p>30s / 60s / 300s window selection, one hour of history stored in a Room database.</p></div></div>
-      <div class="feature"><span class="n">02</span><div><h3>2×2 landscape grid</h3><p>All cards on one screen, compact and scroll-free.</p></div></div>
-      <div class="feature"><span class="n">03</span><div><h3>14 languages supported</h3><p>Selectable from the Settings tab, with light/dark theme and custom logo support.</p></div></div>
-      <div class="feature"><span class="n">04</span><div><h3>Zero-install Windows EXE</h3><p>Single file with an embedded LibreHardwareMonitorLib.dll; --simulate mode when no hardware is available.</p></div></div>
-    </section>
+      <div class="section-header">
+        <h2 class="display-lg">Core Features</h2>
+      </div>
+      <div>
+        <div class="feature-row">
+          <span class="num keycap">01</span>
+          <div class="feature-row-content">
+            <h3 class="heading-md">Live charts & history</h3>
+            <p class="body-md">Seamlessly toggle between 30s, 60s, and 300s viewing windows. Up to one hour of continuous historical hardware data is stored efficiently in a local Room database.</p>
+          </div>
+        </div>
 
-    <section>
-      <h2 class="eyebrow">System Architecture</h2>
-      <div class="arch">
-        <div class="node"><span class="arrow">01 →</span>
-          <h3>PcHwMonitor.exe :8765</h3>
-          <p>In-process reads via an embedded LibreHardwareMonitor library; disk/network via psutil, FPS via PresentMon64.</p></div>
-        <div class="node"><span class="arrow">02 →</span>
-          <h3>ws://&lt;pc-ip&gt;:8765/ws</h3>
-          <p>Sends a welcome message on connect, then a status message once per second.</p></div>
-        <div class="node"><span class="arrow">03 →</span>
-          <h3>Android · Jetpack Compose</h3>
-          <p>The phone, on the same Wi-Fi network, only talks to the server — it never touches the hardware directly.</p></div>
+        <div class="feature-row">
+          <span class="num keycap">02</span>
+          <div class="feature-row-content">
+            <h3 class="heading-md">Themes & Palettes</h3>
+            <p class="body-md">Personalize your dashboard with system-aware Light and Dark modes. Choose from 5 distinct color palettes (Default, Ocean, Ember, Forest, Black & Gold) to match your setup perfectly.</p>
+            
+            <!-- Mini Theme Gallery -->
+            <div class="theme-gallery">
+              <div class="app-mockup mini">
+                <img src="images/main_light.jpg" alt="PC HW Monitor Light Theme" />
+              </div>
+              <div class="app-mockup mini">
+                <img src="images/settings_light.jpg" alt="PC HW Monitor Color Palette Settings" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <span class="num keycap">03</span>
+          <div class="feature-row-content">
+            <h3 class="heading-md">Zero-install Windows EXE</h3>
+            <p class="body-md">Operates as a single executable file with no bulky installers. Just run it and connect. Includes a safe `--simulate` mode for testing.</p>
+          </div>
+        </div>
       </div>
     </section>
 
+    <!-- 5. HOW IT WORKS (SYSTEM ARCHITECTURE) -->
     <section>
-      <h2 class="eyebrow">Quickstart</h2>
-      <div class="step"><span class="n">01/</span><div><h3>Run the EXE</h3><p>Open dist\PcHwMonitor.exe and accept the UAC prompt — admin rights are required for CPU temperature.</p></div></div>
-      <div class="step"><span class="n">02/</span><div><h3>Connect your phone</h3><p>In the app's Settings tab, enter the PC's Wi-Fi IP (e.g. 192.168.1.50) and port 8765, then tap Save.</p></div></div>
-      <div class="step"><span class="n">03/</span><div><h3>Manage from the tray</h3><p>The server sits in the system tray next to the clock; right-click → Exit to stop it.</p></div></div>
+      <div class="section-header">
+        <h2 class="display-lg">How it works</h2>
+      </div>
+      <div class="card-grid card-grid-3">
+        <div class="feature-card-elevated">
+          <h3 class="heading-md">1. Host PC</h3>
+          <p class="body-sm">PcHwMonitor.exe reads hardware data via an embedded LibreHardwareMonitor library and PresentMon64 in the background.</p>
+        </div>
+        <div class="feature-card-elevated">
+          <h3 class="heading-md">2. Wi-Fi Stream</h3>
+          <p class="body-sm">The host opens port 8765 and broadcasts a dense JSON payload exactly once per second over your local network.</p>
+        </div>
+        <div class="feature-card-elevated">
+          <h3 class="heading-md">3. Android Client</h3>
+          <p class="body-sm">The Jetpack Compose app connects to the server and visualizes the incoming data in real-time. It never touches your PC directly.</p>
+        </div>
+      </div>
     </section>
 
+    <!-- 6. DEVELOPER / PROTOCOL -->
     <section>
-      <h2 class="eyebrow">WebSocket Protocol</h2>
-      <div class="code">
-        <div class="code-head"><span>STATUS_MESSAGE.JSON</span><span>1 MSG / SEC</span></div>
-<pre><span class="k">{</span>
-<span class="n">  "type"</span>: <span class="s">"status"</span>,
-<span class="n">  "timestamp"</span>: 1754150000,
-<span class="n">  "cpu"</span>:  <span class="s">{ "usagePct"</span>: 34.5, <span class="s">"tempC"</span>: 61.2, <span class="s">"clockMhz"</span>: 5100, <span class="s">"powerW"</span>: 125 <span class="s">}</span>,
-<span class="n">  "gpu"</span>:  <span class="s">{ "tempC"</span>: 71.4, <span class="s">"hotspotC"</span>: 84.1, <span class="s">"vramUsedMb"</span>: 6112, <span class="s">"powerW"</span>: 182 <span class="s">}</span>,
-<span class="n">  "ram"</span>:  <span class="s">{ "usedGb"</span>: 11.2, <span class="s">"totalGb"</span>: 32, <span class="s">"clockMhz"</span>: 3600 <span class="s">}</span>,
-<span class="n">  "net"</span>:  <span class="s">{ "downloadMbPerSec"</span>: 8.1, <span class="s">"uploadMbPerSec"</span>: 1.6 <span class="s">}</span>,
-<span class="n">  "fps"</span>:  <span class="s">{ "current"</span>: 142.3, <span class="s">"avg"</span>: 138.7, <span class="s">"onePercentLow"</span>: 97 <span class="s">}</span>
-<span class="k">}</span></pre>
+      <div class="section-header">
+        <h2 class="display-lg">Developer API</h2>
+        <p class="body-lg" style="margin-top: 16px;">Want to build your own client? Connect to the WebSocket and parse the JSON payload sent every second.</p>
+      </div>
+      <div class="code-container">
+        <div class="code-header">
+          <span>status_message.json</span>
+          <span class="badge-info-soft">1 MSG / SEC</span>
+        </div>
+<pre><code>{
+  <span class="key">"type"</span>: <span class="val-str">"status"</span>,
+  <span class="key">"timestamp"</span>: <span class="val-num">1754150000</span>,
+  <span class="key">"cpu"</span>: { <span class="key">"usagePct"</span>: <span class="val-num">34.5</span>, <span class="key">"tempC"</span>: <span class="val-num">61.2</span>, <span class="key">"clockMhz"</span>: <span class="val-num">5100</span>, <span class="key">"powerW"</span>: <span class="val-num">125</span> },
+  <span class="key">"gpu"</span>: { <span class="key">"tempC"</span>: <span class="val-num">71.4</span>, <span class="key">"hotspotC"</span>: <span class="val-num">84.1</span>, <span class="key">"vramUsedMb"</span>: <span class="val-num">6112</span>, <span class="key">"powerW"</span>: <span class="val-num">182</span> },
+  <span class="key">"ram"</span>: { <span class="key">"usedGb"</span>: <span class="val-num">11.2</span>, <span class="key">"totalGb"</span>: <span class="val-num">32</span>, <span class="key">"clockMhz"</span>: <span class="val-num">3600</span> },
+  <span class="key">"net"</span>: { <span class="key">"downloadMbPerSec"</span>: <span class="val-num">8.1</span>, <span class="key">"uploadMbPerSec"</span>: <span class="val-num">1.6</span> },
+  <span class="key">"fps"</span>: { <span class="key">"current"</span>: <span class="val-num">142.3</span>, <span class="key">"avg"</span>: <span class="val-num">138.7</span>, <span class="key">"onePercentLow"</span>: <span class="val-num">97</span> }
+}</code></pre>
       </div>
     </section>
 
   </div>
 </main>
 
-<footer>
-  <div class="fgrid">
-    <div class="fcol">
-      <span class="tag">Project</span>
+<footer class="footer-section">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <span class="label">Project</span>
       <a href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">GitHub Repository</a>
       <a href="https://github.com/Xeakaes/PcHWmonitor/issues" target="_blank" rel="noreferrer">Issues</a>
       <a href="https://github.com/Xeakaes/PcHWmonitor/blob/main/LICENSE" target="_blank" rel="noreferrer">AGPL-3.0 License</a>
     </div>
-    <div class="fcol">
-      <span class="tag">Support</span>
-      <a href="https://www.patreon.com/cw/Obscrum" target="_blank" rel="noreferrer">Patreon</a>
+    <div class="footer-col">
+      <span class="label">Support & Dependencies</span>
       <a href="https://github.com/LibreHardwareMonitor/LibreHardwareMonitor" target="_blank" rel="noreferrer">LibreHardwareMonitor</a>
+      <a href="https://www.patreon.com/cw/Obscrum" target="_blank" rel="noreferrer">Patreon</a>
     </div>
   </div>
-  <div class="fbottom">
-    <div>AGPL-3.0 © Xeakaes — PC HW Monitor</div>
-    <div>The EXE bundles the AGPL-3.0-licensed LibreHardwareMonitor DLL.</div>
+  <div class="footer-bottom">
+    <span>AGPL-3.0 © Xeakaes — PC HW Monitor</span>
+    <span>Bundles AGPL-3.0 LibreHardwareMonitor DLL</span>
   </div>
 </footer>
 
