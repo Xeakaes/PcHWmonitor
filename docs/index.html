@@ -12,110 +12,136 @@
 <meta property="og:description" content="Single-file Windows server + Jetpack Compose Android dashboard. Telemetry once per second over WebSocket." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta property="og:image" content="https://github.io" />
-<link rel="canonical" href="https://github.io" />
+<meta property="og:image" content="https://pchwmonitor.app/og-image.png" />
+<link rel="canonical" href="https://pchwmonitor.app/" />
 <meta name="google-site-verification" content="DN_JodShVPapdB1r7m7HzUvDP_grr1r2i_oGJKR6k_E" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111112'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%23fbbf24'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%232a2a2e'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%232a2a2e'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%23fbbf24'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232a2b3a'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%239fa2b9'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%235e6077'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%235e6077'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%239fa2b9'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --background:#111112;
-    --foreground:#fafafa;
-    --card:#18181b;
-    --secondary:#1f1f22;
-    --muted:#9d9da5;
-    --accent:#fbbf24;
-    --border:#2a2a2e;
-    --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
-    --mono:'JetBrains Mono',ui-monospace,monospace;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{background:var(--background);color:var(--foreground);font-family:var(--sans);line-height:1.5;
-    -webkit-font-smoothing:antialiased}
-  ::selection{background:var(--accent);color:#111112}
-  a{color:inherit;text-decoration:none}
-  .mono{font-family:var(--mono)}
-  .wrap{max-width:768px;margin:0 auto}
-  .grid-bg{
-    background-image:linear-gradient(var(--border) 1px,transparent 1px),
-      linear-gradient(90deg,var(--border) 1px,transparent 1px);
-    background-size:20px 20px;
-  }
+:root{
+  --primary:#5e6077;
+  --on-primary:#ffffff;
+  --background:#2a2b3a;
+  --surface:#33344a;
+  --surface-2:#3a3b55;
+  --border:#5e6077;
+  --border-soft:rgba(159,162,185,.16);
+  --text:#f4f4ff;
+  --text-muted:#dfe1f4;
+  --accent:#9fa2b9;
+  --accent-strong:#b9bcd4;
+  --sans:'Roobert','Inter',ui-sans-serif,system-ui,sans-serif;
+  --mono:'Roboto Mono',ui-monospace,monospace;
+  --radius-sm:6px;
+  --radius-md:12px;
+  --radius-lg:19px;
+  --radius-xl:24px;
+  --shadow-card:rgba(255,255,255,.2) 0px 1px 0px 0px inset,
+    rgba(0,0,0,.12) 0px -1px 24px 0px inset,
+    rgba(0,0,0,.08) 0px 0px 16px 0px inset,
+    rgba(0,0,0,.2) 0px 0px 0px 1px,
+    rgba(0,0,0,.2) 0px 1px 2px 0px,
+    rgba(0,0,0,.2) 0px 2px 4px 0px;
+  --ease:cubic-bezier(0.45,0,0.55,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--background);color:var(--text);font-family:var(--sans);
+  font-size:15px;font-weight:500;line-height:1.5;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent);color:var(--background)}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono)}
+.wrap{max-width:1080px;margin:0 auto}
 
-  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-    border-bottom:1px solid var(--border);background:rgba(17,17,18,.8);backdrop-filter:blur(10px);
-    padding:12px 24px}
-  .logo{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:-.04em}
-  .logo span{color:var(--accent)}
-  .nav-right{display:flex;align-items:center;gap:16px}
-  .tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted)}
-  .nav-right a.tag:hover{color:var(--accent)}
+nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border-soft);background:rgba(42,43,58,.82);
+  backdrop-filter:blur(12px);padding:24px 32px}
+.logo{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:-.02em}
+.logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:24px}
+.tag{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text-muted);font-weight:500}
+.nav-right a.tag:hover{color:var(--text)}
 
-  section{padding:48px 24px;border-bottom:1px solid var(--border)}
-  section:last-of-type{border-bottom:none}
-  .eyebrow{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--muted)}
-  h2.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--foreground)}
+section{padding:116px 32px;border-bottom:1px solid var(--border-soft)}
+section:last-of-type{border-bottom:none}
+.eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;
+  letter-spacing:.22em;color:var(--text-muted)}
+h2.eyebrow{color:var(--text)}
 
-  .hero{padding-top:56px;padding-bottom:40px}
-  .hero .eyebrow{color:var(--accent)}
-  h1{font-family:var(--mono);font-size:40px;font-weight:700;letter-spacing:-.05em;line-height:1;margin-top:8px}
-  @media(min-width:640px){h1{font-size:60px}}
-  .lede{margin-top:20px;max-width:46ch;font-size:14px;color:var(--muted)}
-  .cta{margin-top:32px;display:flex;flex-direction:column;gap:12px;max-width:384px}
-  .btn{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
-    font-family:var(--mono);font-size:12px}
-  .btn-primary{background:var(--foreground);color:var(--background);font-weight:700}
-  .btn-primary .arrow{transition:transform .2s}
-  .btn-primary:hover .arrow{transform:translateX(4px)}
-  .btn-ghost{border:1px solid var(--border)}
-  .btn-ghost:hover{background:var(--secondary)}
-  .btn-ghost .meta{color:var(--muted)}
+.hero{padding-top:160px;padding-bottom:160px;text-align:center}
+.hero .eyebrow{color:var(--accent)}
+h1{font-family:var(--sans);font-size:clamp(44px,9vw,96px);font-weight:500;
+  letter-spacing:-.03em;line-height:1.05;margin-top:16px}
+.lede{margin:24px auto 0;max-width:52ch;font-size:16px;color:var(--text-muted)}
+.cta{margin-top:48px;display:flex;flex-direction:column;gap:16px;max-width:384px;
+  margin-left:auto;margin-right:auto}
+.btn{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;
+  font-family:var(--mono);font-size:13px;border-radius:var(--radius-md);
+  transition:transform var(--ease) .25s,background var(--ease) .25s}
+.btn-primary{background:var(--on-primary);color:var(--primary);font-weight:600;
+  box-shadow:var(--shadow-card)}
+.btn-primary:hover{transform:translateX(4px)}
+.btn-ghost{border:1px solid var(--border);color:var(--text);border-radius:var(--radius-md)}
+.btn-ghost:hover{background:var(--surface)}
+.btn-ghost .meta{color:var(--text-muted)}
 
-  .sensors{margin-top:24px;display:grid;grid-template-columns:1fr;gap:1px;background:var(--border)}
-  @media(min-width:640px){.sensors{grid-template-columns:1fr 1fr}}
-  .sensor{background:var(--background);padding:16px}
-  .sensor-head{display:flex;justify-content:space-between;align-items:flex-start}
-  .sensor-head b{font-family:var(--mono);font-size:12px;text-transform:uppercase}
-  .sensor-head i{font-family:var(--mono);font-size:10px;color:var(--accent);font-style:normal}
-  .sensor p{margin-top:8px;font-size:12px;color:var(--muted)}
+.sensors{margin-top:32px;display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:768px){.sensors{grid-template-columns:1fr 1fr}}
+.sensor{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
+  padding:24px;transition:transform var(--ease) .25s}
+.sensor:hover{transform:translateY(-2px)}
+.sensor-head{display:flex;justify-content:space-between;align-items:flex-start}
+.sensor-head b{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.sensor-head i{font-family:var(--mono);font-size:11px;color:var(--accent);font-style:normal}
+.sensor p{margin-top:10px;font-size:14px;color:var(--text-muted)}
 
-  .feature{border-left:1px solid var(--border);padding-left:16px;margin-top:24px}
-  .feature h3{font-size:14px;font-weight:600}
-  .feature p{margin-top:4px;font-size:12px;color:var(--muted)}
+.feature{display:flex;gap:32px;padding:26px 0;border-bottom:1px solid var(--border-soft)}
+.feature:first-of-type{padding-top:0}
+.feature:last-of-type{border-bottom:none}
+.feature .n{font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:2px}
+.feature h3{font-size:16px;font-weight:500}
+.feature p{margin-top:8px;font-size:14px;color:var(--text-muted)}
 
-  .arch{margin-top:32px;border-left:1px solid var(--border);padding-left:32px}
-  .node{position:relative;margin-bottom:40px}
-  .node:last-child{margin-bottom:0}
-  .node .dot{position:absolute;left:-37px;top:4px;width:16px;height:16px;border-radius:9999px;
-    border:1px solid var(--border);background:var(--background);display:grid;place-items:center}
-  .node .dot i{display:block;width:6px;height:6px;background:var(--border)}
-  .node.active .dot{border-color:var(--accent)}
-  .node.active .dot i{background:var(--accent)}
-  .node h3{font-family:var(--mono);font-size:12px;font-weight:700}
-  .node p{margin-top:4px;font-size:12px;color:var(--muted)}
+.arch{margin-top:32px;display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:768px){.arch{grid-template-columns:1fr 1fr 1fr}}
+.node{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
+  padding:24px;border-top:1px solid var(--border-soft)}
+.node h3{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-strong)}
+.node p{margin-top:10px;font-size:14px;color:var(--text-muted)}
+.node .arrow{display:block;font-family:var(--mono);color:var(--accent);margin-bottom:12px}
+@media(min-width:768px){.node .arrow{display:none}}
 
-  .step{display:flex;gap:16px;margin-top:24px}
-  .step .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
-  .step h3{font-size:14px;font-weight:600}
-  .step p{margin-top:4px;font-size:12px;color:var(--muted)}
+.step{display:flex;gap:24px;padding:26px 0;border-bottom:1px solid var(--border-soft)}
+.step:first-of-type{padding-top:0}
+.step:last-of-type{border-bottom:none}
+.step .n{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.step h3{font-size:16px;font-weight:500}
+.step p{margin-top:8px;font-size:14px;color:var(--text-muted)}
 
-  .code{margin-top:24px;border:1px solid var(--border);background:var(--card)}
-  .code-head{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);
-    font-family:var(--mono);font-size:10px;color:var(--muted)}
-  pre{overflow-x:auto;padding:16px;font-family:var(--mono);font-size:11px;line-height:1.7;color:rgba(251,191,36,.8)}
-  .note{margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.code{margin-top:32px;border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
+  background:var(--surface);overflow:hidden}
+.code-head{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;
+  border-bottom:1px solid var(--border-soft);font-family:var(--mono);font-size:11px;
+  color:var(--text-muted);letter-spacing:.08em}
+pre{overflow-x:auto;padding:24px 20px;font-family:var(--mono);font-size:12.5px;
+  line-height:1.8;color:var(--text)}
+pre .k{color:var(--accent)}
+pre .s{color:var(--accent-strong)}
+pre .n{color:var(--text-muted)}
 
-  footer{border-top:1px solid var(--border);padding:40px 24px}
-  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-  .fcol .tag{display:block;margin-bottom:8px}
-  .fcol a{display:block;font-size:12px;margin-top:4px}
-  .fcol a:hover{color:var(--accent)}
-  .fbottom{margin-top:32px;padding-top:24px;border-top:1px solid rgba(42,42,46,.6)}
-  .fbottom div:first-child{font-family:var(--mono);font-size:10px;color:var(--muted)}
-  .fbottom div:last-child{margin-top:8px;font-family:var(--mono);font-size:9px;text-transform:uppercase;color:rgba(157,157,165,.7)}
+footer{border-top:1px solid var(--border-soft);padding:32px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1080px;margin:0 auto}
+.fcol .tag{display:block;margin-bottom:12px;color:var(--accent)}
+.fcol a{display:block;font-size:14px;margin-top:6px;color:var(--text-muted)}
+.fcol a:hover{color:var(--text)}
+.fbottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--border-soft);
+  max-width:1080px;margin-left:auto;margin-right:auto}
+.fbottom div:first-child{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.fbottom div:last-child{margin-top:12px;font-family:var(--mono);font-size:10px;
+  text-transform:uppercase;letter-spacing:.08em;color:rgba(223,225,244,.6)}
 </style>
 </head>
 <body>
@@ -128,7 +154,7 @@
   </div>
 </nav>
 
-<main class="grid-bg">
+<main>
   <div class="wrap">
 
     <section class="hero">
@@ -139,7 +165,7 @@
       </p>
       <div class="cta">
         <a class="btn btn-primary" href="https://github.com/Xeakaes/PcHWmonitor/releases" target="_blank" rel="noreferrer">
-          <span>DOWNLOADS</span><span class="arrow">→</span>
+          <span>DOWNLOADS</span><span>→</span>
         </a>
         <a class="btn btn-ghost" href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">
           <span>VIEW ON GITHUB</span><span class="meta">[Xeakaes/PcHWmonitor]</span>
@@ -161,22 +187,22 @@
 
     <section>
       <h2 class="eyebrow">Features</h2>
-      <div class="feature"><h3>Live charts &amp; 1-hour history</h3><p>30s / 60s / 300s window selection, one hour of history stored in a Room database.</p></div>
-      <div class="feature"><h3>2×2 landscape grid</h3><p>All cards on one screen, compact and scroll-free.</p></div>
-      <div class="feature"><h3>14 languages supported</h3><p>Selectable from the Settings tab, with light/dark theme and custom logo support.</p></div>
-      <div class="feature"><h3>Zero-install Windows EXE</h3><p>Single file with an embedded LibreHardwareMonitorLib.dll; --simulate mode when no hardware is available.</p></div>
+      <div class="feature"><span class="n">01</span><div><h3>Live charts &amp; 1-hour history</h3><p>30s / 60s / 300s window selection, one hour of history stored in a Room database.</p></div></div>
+      <div class="feature"><span class="n">02</span><div><h3>2×2 landscape grid</h3><p>All cards on one screen, compact and scroll-free.</p></div></div>
+      <div class="feature"><span class="n">03</span><div><h3>14 languages supported</h3><p>Selectable from the Settings tab, with light/dark theme and custom logo support.</p></div></div>
+      <div class="feature"><span class="n">04</span><div><h3>Zero-install Windows EXE</h3><p>Single file with an embedded LibreHardwareMonitorLib.dll; --simulate mode when no hardware is available.</p></div></div>
     </section>
 
     <section>
       <h2 class="eyebrow">System Architecture</h2>
       <div class="arch">
-        <div class="node active"><div class="dot"><i></i></div>
+        <div class="node"><span class="arrow">01 →</span>
           <h3>PcHwMonitor.exe :8765</h3>
           <p>In-process reads via an embedded LibreHardwareMonitor library; disk/network via psutil, FPS via PresentMon64.</p></div>
-        <div class="node"><div class="dot"><i></i></div>
+        <div class="node"><span class="arrow">02 →</span>
           <h3>ws://&lt;pc-ip&gt;:8765/ws</h3>
           <p>Sends a welcome message on connect, then a status message once per second.</p></div>
-        <div class="node"><div class="dot"><i></i></div>
+        <div class="node"><span class="arrow">03 →</span>
           <h3>Android · Jetpack Compose</h3>
           <p>The phone, on the same Wi-Fi network, only talks to the server — it never touches the hardware directly.</p></div>
       </div>
@@ -192,16 +218,16 @@
     <section>
       <h2 class="eyebrow">WebSocket Protocol</h2>
       <div class="code">
-        <div class="code-head"><span>STATUS_MESSAGE.JSON</span><span>1 msg / sec</span></div>
-<pre>{
-  "type": "status",
-  "timestamp": 1754150000,
-  "cpu":  { "usagePct": 34.5, "tempC": 61.2, "clockMhz": 5100, "powerW": 125 },
-  "gpu":  { "tempC": 71.4, "hotspotC": 84.1, "vramUsedMb": 6112, "powerW": 182 },
-  "ram":  { "usedGb": 11.2, "totalGb": 32, "clockMhz": 3600 },
-  "net":  { "downloadMbPerSec": 8.1, "uploadMbPerSec": 1.6 },
-  "fps":  { "current": 142.3, "avg": 138.7, "onePercentLow": 97 }
-}</pre>
+        <div class="code-head"><span>STATUS_MESSAGE.JSON</span><span>1 MSG / SEC</span></div>
+<pre><span class="k">{</span>
+<span class="n">  "type"</span>: <span class="s">"status"</span>,
+<span class="n">  "timestamp"</span>: 1754150000,
+<span class="n">  "cpu"</span>:  <span class="s">{ "usagePct"</span>: 34.5, <span class="s">"tempC"</span>: 61.2, <span class="s">"clockMhz"</span>: 5100, <span class="s">"powerW"</span>: 125 <span class="s">}</span>,
+<span class="n">  "gpu"</span>:  <span class="s">{ "tempC"</span>: 71.4, <span class="s">"hotspotC"</span>: 84.1, <span class="s">"vramUsedMb"</span>: 6112, <span class="s">"powerW"</span>: 182 <span class="s">}</span>,
+<span class="n">  "ram"</span>:  <span class="s">{ "usedGb"</span>: 11.2, <span class="s">"totalGb"</span>: 32, <span class="s">"clockMhz"</span>: 3600 <span class="s">}</span>,
+<span class="n">  "net"</span>:  <span class="s">{ "downloadMbPerSec"</span>: 8.1, <span class="s">"uploadMbPerSec"</span>: 1.6 <span class="s">}</span>,
+<span class="n">  "fps"</span>:  <span class="s">{ "current"</span>: 142.3, <span class="s">"avg"</span>: 138.7, <span class="s">"onePercentLow"</span>: 97 <span class="s">}</span>
+<span class="k">}</span></pre>
       </div>
     </section>
 
@@ -209,24 +235,22 @@
 </main>
 
 <footer>
-  <div class="wrap">
-    <div class="fgrid">
-      <div class="fcol">
-        <span class="tag">Project</span>
-        <a href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">GitHub Repository</a>
-        <a href="https://github.com/Xeakaes/PcHWmonitor/issues" target="_blank" rel="noreferrer">Issues</a>
-        <a href="https://github.com/Xeakaes/PcHWmonitor/blob/main/LICENSE" target="_blank" rel="noreferrer">AGPL-3.0 License</a>
-      </div>
-      <div class="fcol">
-        <span class="tag">Support</span>
-        <a href="https://www.patreon.com/cw/Obscrum" target="_blank" rel="noreferrer">Patreon</a>
-        <a href="https://github.com/LibreHardwareMonitor/LibreHardwareMonitor" target="_blank" rel="noreferrer">LibreHardwareMonitor</a>
-      </div>
+  <div class="fgrid">
+    <div class="fcol">
+      <span class="tag">Project</span>
+      <a href="https://github.com/Xeakaes/PcHWmonitor" target="_blank" rel="noreferrer">GitHub Repository</a>
+      <a href="https://github.com/Xeakaes/PcHWmonitor/issues" target="_blank" rel="noreferrer">Issues</a>
+      <a href="https://github.com/Xeakaes/PcHWmonitor/blob/main/LICENSE" target="_blank" rel="noreferrer">AGPL-3.0 License</a>
     </div>
-    <div class="fbottom">
-      <div>AGPL-3.0 © Xeakaes — PC HW Monitor</div>
-      <div>The EXE bundles the AGPL-3.0-licensed LibreHardwareMonitor DLL.</div>
+    <div class="fcol">
+      <span class="tag">Support</span>
+      <a href="https://www.patreon.com/cw/Obscrum" target="_blank" rel="noreferrer">Patreon</a>
+      <a href="https://github.com/LibreHardwareMonitor/LibreHardwareMonitor" target="_blank" rel="noreferrer">LibreHardwareMonitor</a>
     </div>
+  </div>
+  <div class="fbottom">
+    <div>AGPL-3.0 © Xeakaes — PC HW Monitor</div>
+    <div>The EXE bundles the AGPL-3.0-licensed LibreHardwareMonitor DLL.</div>
   </div>
 </footer>
 
