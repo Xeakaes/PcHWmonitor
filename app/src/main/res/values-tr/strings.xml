@@ -4,7 +4,6 @@
     <string name="tab_history">Geçmiş</string>
     <string name="tab_settings">Ayarlar</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">RAM</string>
     <string name="cpu_temp">CPU Sıcaklığı</string>
     <string name="gpu_temp">GPU Sıcaklığı</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Bu uygulama ücretsiz ve açık kaynak. İşine yaradıysa geliştirmeyi Patreon üzerinden destekleyebilirsin.</string>
     <string name="support_patreon">Patreon\'da destekle</string>
     <string name="no_data">Veri yok — Ayarlar sekmesinden PC sunucusuna bağlanın</string>
-    <string name="history">Geçmiş</string>
     <string name="last_hour">Son 1 saat</string>
     <string name="min">En düşük</string>
     <string name="max">En yüksek</string>

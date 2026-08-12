@@ -4,7 +4,6 @@
     <string name="tab_history">История</string>
     <string name="tab_settings">Настройки</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">ОЗУ</string>
     <string name="cpu_temp">Температура CPU</string>
     <string name="gpu_temp">Температура GPU</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Это приложение бесплатное и с открытым исходным кодом. Если оно полезно для вас, вы можете поддержать разработку на Patreon.</string>
     <string name="support_patreon">Поддержать на Patreon</string>
     <string name="no_data">Нет данных — подключитесь к серверу ПК во вкладке Настройки</string>
-    <string name="history">История</string>
     <string name="last_hour">Последний час</string>
     <string name="min">Мин</string>
     <string name="max">Макс</string>

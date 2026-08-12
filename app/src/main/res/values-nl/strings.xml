@@ -4,7 +4,6 @@
     <string name="tab_history">Geschiedenis</string>
     <string name="tab_settings">Instellingen</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">RAM</string>
     <string name="cpu_temp">CPU-temperatuur</string>
     <string name="gpu_temp">GPU-temperatuur</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Deze app is gratis en open source. Als hij nuttig is, kun je de ontwikkeling steunen op Patreon.</string>
     <string name="support_patreon">Steunen op Patreon</string>
     <string name="no_data">Geen gegevens — verbind via Instellingen met je pc-server</string>
-    <string name="history">Geschiedenis</string>
     <string name="last_hour">Laatste uur</string>
     <string name="min">Min</string>
     <string name="max">Max</string>

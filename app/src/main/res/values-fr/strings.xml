@@ -4,7 +4,6 @@
     <string name="tab_history">Historique</string>
     <string name="tab_settings">Réglages</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">RAM</string>
     <string name="cpu_temp">Température CPU</string>
     <string name="gpu_temp">Température GPU</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Cette application est gratuite et open source. Si elle vous est utile, vous pouvez soutenir le développement sur Patreon.</string>
     <string name="support_patreon">Soutenir sur Patreon</string>
     <string name="no_data">Aucune donnée — connectez-vous au serveur de votre PC depuis l\'onglet Réglages</string>
-    <string name="history">Historique</string>
     <string name="last_hour">Dernière heure</string>
     <string name="min">Min</string>
     <string name="max">Max</string>

@@ -21,11 +21,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import com.Obscrum.pchwmonitor.util.PATREON_URL
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.ThemeMode
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
@@ -77,7 +78,7 @@ fun SettingsScreen(
     var port by remember { mutableStateOf(settings.serverPort.toString()) }
     var theme by remember { mutableStateOf(settings.theme) }
     var language by remember { mutableStateOf(settings.language) }
-    var chartWindowSeconds by remember { mutableStateOf(settings.chartWindowSeconds) }
+    var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
 
     Column(
@@ -244,7 +245,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PATREON_URL)))
+                context.startActivity(Intent(Intent.ACTION_VIEW, PATREON_URL.toUri()))
             },
         ) {
             Text(labelSupportPatreon)

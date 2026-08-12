@@ -4,7 +4,6 @@
     <string name="tab_history">Cronologia</string>
     <string name="tab_settings">Impostazioni</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">RAM</string>
     <string name="cpu_temp">Temperatura CPU</string>
     <string name="gpu_temp">Temperatura GPU</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Questa app è gratuita e open source. Se ti è utile, puoi sostenere lo sviluppo su Patreon.</string>
     <string name="support_patreon">Sostieni su Patreon</string>
     <string name="no_data">Nessun dato — connettiti al server del tuo PC da Impostazioni</string>
-    <string name="history">Cronologia</string>
     <string name="last_hour">Ultima ora</string>
     <string name="min">Min</string>
     <string name="max">Max</string>

@@ -27,7 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -62,8 +62,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
     val connection by viewModel.connection.collectAsState()
     val chartWindowSeconds by viewModel.chartWindowSeconds.collectAsState()
     val dashboardLayout by viewModel.dashboardLayout.collectAsState()
-    val configuration = LocalConfiguration.current
-    val landscape = configuration.screenWidthDp >= configuration.screenHeightDp
+    val windowSize = LocalWindowInfo.current.containerSize
+    val landscape = windowSize.width >= windowSize.height
     var navHidden by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(landscape) {
         if (landscape) navHidden = true

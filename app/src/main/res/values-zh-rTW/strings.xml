@@ -4,7 +4,6 @@
     <string name="tab_history">歷史</string>
     <string name="tab_settings">設定</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">記憶體</string>
     <string name="cpu_temp">CPU 溫度</string>
     <string name="gpu_temp">GPU 溫度</string>
@@ -32,7 +31,6 @@
     <string name="support_description">這個應用程式是免費開源的。如果對你有用，可以在 Patreon 上支持開發。</string>
     <string name="support_patreon">在 Patreon 上支持</string>
     <string name="no_data">暫無資料 — 請在設定頁連接到電腦伺服器</string>
-    <string name="history">歷史</string>
     <string name="last_hour">最近一小時</string>
     <string name="min">最低</string>
     <string name="max">最高</string>

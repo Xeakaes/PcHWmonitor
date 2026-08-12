@@ -4,7 +4,6 @@
     <string name="tab_history">Verlauf</string>
     <string name="tab_settings">Einstellungen</string>
     <string name="cpu">CPU</string>
-    <string name="gpu">GPU</string>
     <string name="ram">RAM</string>
     <string name="cpu_temp">CPU-Temperatur</string>
     <string name="gpu_temp">GPU-Temperatur</string>
@@ -32,7 +31,6 @@
     <string name="support_description">Diese App ist kostenlos und Open Source. Wenn sie dir nützt, kannst du die Entwicklung auf Patreon unterstützen.</string>
     <string name="support_patreon">Auf Patreon unterstützen</string>
     <string name="no_data">Keine Daten — verbinde dich über Einstellungen mit deinem PC-Server</string>
-    <string name="history">Verlauf</string>
     <string name="last_hour">Letzte Stunde</string>
     <string name="min">Min</string>
     <string name="max">Max</string>
