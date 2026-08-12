@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">Integrierte GPU</string>
     <string name="chart_window">Diagrammfenster</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Ø</string>
+    <string name="fps_1pct_low" formatted="false">1 % Low</string>
+    <string name="fps_details_title">FPS-Details</string>
+    <string name="fps_hint" formatted="false">1 % Low ist der Durchschnitt der schlechtesten 1 % der Bildzeiten – es misst Ruckeln.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Festplatte</string>
+    <string name="disk_read">Lesen</string>
+    <string name="disk_write">Schreiben</string>
+    <string name="disk_usage">Speichernutzung</string>
+    <string name="net_card_title">Netzwerk</string>
+    <string name="net_download">Download</string>
+    <string name="net_upload">Upload</string>
+    <string name="theme_palette">Farbpalette</string>
+    <string name="palette_default">Standard</string>
+    <string name="palette_ocean">Ozean</string>
+    <string name="palette_ember">Glut</string>
+    <string name="palette_forest">Wald</string>
+    <string name="palette_gold">Schwarz &amp; Gold</string>
+    <string name="menu_hide">Karte ausblenden</string>
+    <string name="menu_pin">Auf dem ersten Bildschirm behalten</string>
+    <string name="menu_unpin">Vom ersten Bildschirm entfernen</string>
+    <string name="menu_edit_layout">Layout bearbeiten</string>
+    <string name="edit_done">Fertig</string>
+    <string name="edit_cancel">Abbrechen</string>
+    <string name="hidden_cards">Ausgeblendete Karten</string>
+    <string name="card_width_half">Halbe Breite</string>
+    <string name="card_width_full">Volle Breite</string>
+    <string name="nav_show">Navigation anzeigen</string>
+    <string name="fan_card_title">Lüfter</string>
 </resources>

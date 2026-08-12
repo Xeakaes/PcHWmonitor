@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">Wbudowana karta graficzna</string>
     <string name="chart_window">Okno wykresu</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Średnia</string>
+    <string name="fps_1pct_low" formatted="false">1% niskich</string>
+    <string name="fps_details_title">Szczegóły FPS</string>
+    <string name="fps_hint" formatted="false">1% niskich to średnia najgorszego 1% czasów klatek — mierzy przycięcia.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Dysk</string>
+    <string name="disk_read">Odczyt</string>
+    <string name="disk_write">Zapis</string>
+    <string name="disk_usage">Użycie dysku</string>
+    <string name="net_card_title">Sieć</string>
+    <string name="net_download">Pobieranie</string>
+    <string name="net_upload">Wysyłanie</string>
+    <string name="theme_palette">Paleta kolorów</string>
+    <string name="palette_default">Domyślna</string>
+    <string name="palette_ocean">Ocean</string>
+    <string name="palette_ember">Żar</string>
+    <string name="palette_forest">Las</string>
+    <string name="palette_gold">Czerń i złoto</string>
+    <string name="menu_hide">Ukryj kartę</string>
+    <string name="menu_pin">Zachowaj na pierwszym ekranie</string>
+    <string name="menu_unpin">Usuń z pierwszego ekranu</string>
+    <string name="menu_edit_layout">Edytuj układ</string>
+    <string name="edit_done">Gotowe</string>
+    <string name="edit_cancel">Anuluj</string>
+    <string name="hidden_cards">Ukryte karty</string>
+    <string name="card_width_half">Połowa szerokości</string>
+    <string name="card_width_full">Pełna szerokość</string>
+    <string name="nav_show">Pokaż nawigację</string>
+    <string name="fan_card_title">Wentylator</string>
 </resources>

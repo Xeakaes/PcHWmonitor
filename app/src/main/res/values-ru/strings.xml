@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">Встроенный GPU</string>
     <string name="chart_window">Окно графика</string>
+    <string name="chart_window_30s">30 с</string>
+    <string name="chart_window_60s">60 с</string>
+    <string name="chart_window_300s">300 с</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Среднее</string>
+    <string name="fps_1pct_low" formatted="false">1% низких</string>
+    <string name="fps_details_title">Детали FPS</string>
+    <string name="fps_hint" formatted="false">1% низких — это среднее худшего 1% времени кадров; он измеряет подвисания.</string>
+    <string name="fps_ok">ОК</string>
+    <string name="disk_card_title">Диск</string>
+    <string name="disk_read">Чтение</string>
+    <string name="disk_write">Запись</string>
+    <string name="disk_usage">Использование диска</string>
+    <string name="net_card_title">Сеть</string>
+    <string name="net_download">Загрузка</string>
+    <string name="net_upload">Отправка</string>
+    <string name="theme_palette">Палитра цветов</string>
+    <string name="palette_default">По умолчанию</string>
+    <string name="palette_ocean">Океан</string>
+    <string name="palette_ember">Угли</string>
+    <string name="palette_forest">Лес</string>
+    <string name="palette_gold">Чёрный и золотой</string>
+    <string name="menu_hide">Скрыть карточку</string>
+    <string name="menu_pin">Оставить на первом экране</string>
+    <string name="menu_unpin">Убрать с первого экрана</string>
+    <string name="menu_edit_layout">Изменить макет</string>
+    <string name="edit_done">Готово</string>
+    <string name="edit_cancel">Отмена</string>
+    <string name="hidden_cards">Скрытые карточки</string>
+    <string name="card_width_half">Половина ширины</string>
+    <string name="card_width_full">Полная ширина</string>
+    <string name="nav_show">Показать навигацию</string>
+    <string name="fan_card_title">Вентилятор</string>
 </resources>

@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">內建顯示卡</string>
     <string name="chart_window">圖表視窗</string>
+    <string name="chart_window_30s">30 秒</string>
+    <string name="chart_window_60s">60 秒</string>
+    <string name="chart_window_300s">300 秒</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">平均</string>
+    <string name="fps_1pct_low" formatted="false">1% 低帧</string>
+    <string name="fps_details_title">FPS 詳情</string>
+    <string name="fps_hint" formatted="false">1% 低帧是最差 1% 帧時間的平均值，用於衡量卡頓。</string>
+    <string name="fps_ok">確定</string>
+    <string name="disk_card_title">磁碟</string>
+    <string name="disk_read">讀取</string>
+    <string name="disk_write">寫入</string>
+    <string name="disk_usage">磁碟使用量</string>
+    <string name="net_card_title">網路</string>
+    <string name="net_download">下載</string>
+    <string name="net_upload">上傳</string>
+    <string name="theme_palette">調色盤</string>
+    <string name="palette_default">預設</string>
+    <string name="palette_ocean">海洋</string>
+    <string name="palette_ember">餘煙</string>
+    <string name="palette_forest">森林</string>
+    <string name="palette_gold">黑金</string>
+    <string name="menu_hide">隱藏卡片</string>
+    <string name="menu_pin">保持在首屏</string>
+    <string name="menu_unpin">從首屏移除</string>
+    <string name="menu_edit_layout">編輯版面配置</string>
+    <string name="edit_done">完成</string>
+    <string name="edit_cancel">取消</string>
+    <string name="hidden_cards">隱藏的卡片</string>
+    <string name="card_width_half">半寬</string>
+    <string name="card_width_full">全寬</string>
+    <string name="nav_show">顯示導覽</string>
+    <string name="fan_card_title">風扇</string>
 </resources>

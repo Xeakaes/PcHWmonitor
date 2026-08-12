@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">GPU intégrée</string>
     <string name="chart_window">Fenêtre graphique</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Moyenne</string>
+    <string name="fps_1pct_low" formatted="false">1 % bas</string>
+    <string name="fps_details_title">Détails des FPS</string>
+    <string name="fps_hint" formatted="false">Le 1 % bas est la moyenne du pire 1 % des temps de trame : il mesure les saccades.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Disque</string>
+    <string name="disk_read">Lecture</string>
+    <string name="disk_write">Écriture</string>
+    <string name="disk_usage">Utilisation du disque</string>
+    <string name="net_card_title">Réseau</string>
+    <string name="net_download">Téléchargement</string>
+    <string name="net_upload">Envoi</string>
+    <string name="theme_palette">Palette de couleurs</string>
+    <string name="palette_default">Par défaut</string>
+    <string name="palette_ocean">Océan</string>
+    <string name="palette_ember">Braises</string>
+    <string name="palette_forest">Forêt</string>
+    <string name="palette_gold">Noir et or</string>
+    <string name="menu_hide">Masquer la carte</string>
+    <string name="menu_pin">Garder sur le premier écran</string>
+    <string name="menu_unpin">Retirer du premier écran</string>
+    <string name="menu_edit_layout">Modifier la disposition</string>
+    <string name="edit_done">Terminé</string>
+    <string name="edit_cancel">Annuler</string>
+    <string name="hidden_cards">Cartes masquées</string>
+    <string name="card_width_half">Demi-largeur</string>
+    <string name="card_width_full">Pleine largeur</string>
+    <string name="nav_show">Afficher la navigation</string>
+    <string name="fan_card_title">Ventilateur</string>
 </resources>

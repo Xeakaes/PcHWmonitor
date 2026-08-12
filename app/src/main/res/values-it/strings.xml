@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">GPU integrata</string>
     <string name="chart_window">Finestra grafico</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Media</string>
+    <string name="fps_1pct_low" formatted="false">1 % basso</string>
+    <string name="fps_details_title">Dettagli FPS</string>
+    <string name="fps_hint" formatted="false">L'1 % basso è la media del peggiore 1 % dei tempi di fotogramma: misura gli scatti.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Disco</string>
+    <string name="disk_read">Lettura</string>
+    <string name="disk_write">Scrittura</string>
+    <string name="disk_usage">Utilizzo disco</string>
+    <string name="net_card_title">Rete</string>
+    <string name="net_download">Download</string>
+    <string name="net_upload">Caricamento</string>
+    <string name="theme_palette">Palette colori</string>
+    <string name="palette_default">Predefinita</string>
+    <string name="palette_ocean">Oceano</string>
+    <string name="palette_ember">Braci</string>
+    <string name="palette_forest">Foresta</string>
+    <string name="palette_gold">Nero e oro</string>
+    <string name="menu_hide">Nascondi scheda</string>
+    <string name="menu_pin">Mantieni nella prima schermata</string>
+    <string name="menu_unpin">Rimuovi dalla prima schermata</string>
+    <string name="menu_edit_layout">Modifica layout</string>
+    <string name="edit_done">Fatto</string>
+    <string name="edit_cancel">Annulla</string>
+    <string name="hidden_cards">Schede nascoste</string>
+    <string name="card_width_half">Metà larghezza</string>
+    <string name="card_width_full">Larghezza intera</string>
+    <string name="nav_show">Mostra navigazione</string>
+    <string name="fan_card_title">Ventola</string>
 </resources>

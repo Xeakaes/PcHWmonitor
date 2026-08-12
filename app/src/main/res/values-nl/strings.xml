@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">Geïntegreerde GPU</string>
     <string name="chart_window">Grafiekvenster</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Gemiddelde</string>
+    <string name="fps_1pct_low" formatted="false">1% laag</string>
+    <string name="fps_details_title">FPS-details</string>
+    <string name="fps_hint" formatted="false">1% laag is het gemiddelde van de slechtste 1% van de frametijden; het meet haperingen.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Schijf</string>
+    <string name="disk_read">Lezen</string>
+    <string name="disk_write">Schrijven</string>
+    <string name="disk_usage">Schijfgebruik</string>
+    <string name="net_card_title">Netwerk</string>
+    <string name="net_download">Downloaden</string>
+    <string name="net_upload">Uploaden</string>
+    <string name="theme_palette">Kleurenpalet</string>
+    <string name="palette_default">Standaard</string>
+    <string name="palette_ocean">Oceaan</string>
+    <string name="palette_ember">Gloed</string>
+    <string name="palette_forest">Bos</string>
+    <string name="palette_gold">Zwart &amp; goud</string>
+    <string name="menu_hide">Kaart verbergen</string>
+    <string name="menu_pin">Op het eerste scherm houden</string>
+    <string name="menu_unpin">Van het eerste scherm verwijderen</string>
+    <string name="menu_edit_layout">Indeling bewerken</string>
+    <string name="edit_done">Klaar</string>
+    <string name="edit_cancel">Annuleren</string>
+    <string name="hidden_cards">Verborgen kaarten</string>
+    <string name="card_width_half">Halve breedte</string>
+    <string name="card_width_full">Volledige breedte</string>
+    <string name="nav_show">Navigatie tonen</string>
+    <string name="fan_card_title">Ventilator</string>
 </resources>

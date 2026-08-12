@@ -59,4 +59,38 @@
     <string name="language_zh_tw">繁體中文</string>
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">GPU integrada</string>
+    <string name="chart_window">Janela do gráfico</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Média</string>
+    <string name="fps_1pct_low" formatted="false">1% baixo</string>
+    <string name="fps_details_title">Detalhes de FPS</string>
+    <string name="fps_hint" formatted="false">O 1% baixo é a média do pior 1% dos tempos de quadro — mede engasgos.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Disco</string>
+    <string name="disk_read">Leitura</string>
+    <string name="disk_write">Escrita</string>
+    <string name="disk_usage">Uso do disco</string>
+    <string name="net_card_title">Rede</string>
+    <string name="net_download">Download</string>
+    <string name="net_upload">Upload</string>
+    <string name="theme_palette">Paleta de cores</string>
+    <string name="palette_default">Padrão</string>
+    <string name="palette_ocean">Oceano</string>
+    <string name="palette_ember">Brasa</string>
+    <string name="palette_forest">Floresta</string>
+    <string name="palette_gold">Preto e dourado</string>
+    <string name="menu_hide">Ocultar cartão</string>
+    <string name="menu_pin">Manter na primeira tela</string>
+    <string name="menu_unpin">Remover da primeira tela</string>
+    <string name="menu_edit_layout">Editar layout</string>
+    <string name="edit_done">Concluído</string>
+    <string name="edit_cancel">Cancelar</string>
+    <string name="hidden_cards">Cartões ocultos</string>
+    <string name="card_width_half">Metade da largura</string>
+    <string name="card_width_full">Largura total</string>
+    <string name="nav_show">Mostrar navegação</string>
+    <string name="fan_card_title">Ventoinha</string>
 </resources>

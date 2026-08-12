@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">GPU integrada</string>
     <string name="chart_window">Ventana de gráfico</string>
+    <string name="chart_window_30s">30 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_300s">300 s</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">Promedio</string>
+    <string name="fps_1pct_low" formatted="false">1 % bajo</string>
+    <string name="fps_details_title">Detalles de FPS</string>
+    <string name="fps_hint" formatted="false">El 1 % bajo es el promedio del peor 1 % de los tiempos de fotograma: mide las sacudidas.</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">Disco</string>
+    <string name="disk_read">Lectura</string>
+    <string name="disk_write">Escritura</string>
+    <string name="disk_usage">Uso del disco</string>
+    <string name="net_card_title">Red</string>
+    <string name="net_download">Descarga</string>
+    <string name="net_upload">Subida</string>
+    <string name="theme_palette">Paleta de colores</string>
+    <string name="palette_default">Predeterminada</string>
+    <string name="palette_ocean">Océano</string>
+    <string name="palette_ember">Ascua</string>
+    <string name="palette_forest">Bosque</string>
+    <string name="palette_gold">Negro y dorado</string>
+    <string name="menu_hide">Ocultar tarjeta</string>
+    <string name="menu_pin">Mantener en la primera pantalla</string>
+    <string name="menu_unpin">Quitar de la primera pantalla</string>
+    <string name="menu_edit_layout">Editar diseño</string>
+    <string name="edit_done">Listo</string>
+    <string name="edit_cancel">Cancelar</string>
+    <string name="hidden_cards">Tarjetas ocultas</string>
+    <string name="card_width_half">Medio ancho</string>
+    <string name="card_width_full">Ancho completo</string>
+    <string name="nav_show">Mostrar navegación</string>
+    <string name="fan_card_title">Ventilador</string>
 </resources>

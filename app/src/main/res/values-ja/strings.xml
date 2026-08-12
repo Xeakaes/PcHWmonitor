@@ -60,4 +60,37 @@
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">内蔵GPU</string>
     <string name="chart_window">チャートウィンドウ</string>
+    <string name="chart_window_30s">30 秒</string>
+    <string name="chart_window_60s">60 秒</string>
+    <string name="chart_window_300s">300 秒</string>
+    <string name="fps_card_title">FPS</string>
+    <string name="fps_avg">平均</string>
+    <string name="fps_1pct_low" formatted="false">1% Low</string>
+    <string name="fps_details_title">FPS詳細</string>
+    <string name="fps_hint" formatted="false">1% Low はフレームタイムの最悪 1% の平均値で、かつくつきを測定します。</string>
+    <string name="fps_ok">OK</string>
+    <string name="disk_card_title">ディスク</string>
+    <string name="disk_read">読み取り</string>
+    <string name="disk_write">書き込み</string>
+    <string name="disk_usage">ディスク使用量</string>
+    <string name="net_card_title">ネットワーク</string>
+    <string name="net_download">ダウンロード</string>
+    <string name="net_upload">アップロード</string>
+    <string name="theme_palette">カラーパレット</string>
+    <string name="palette_default">デフォルト</string>
+    <string name="palette_ocean">海</string>
+    <string name="palette_ember">残り火</string>
+    <string name="palette_forest">森</string>
+    <string name="palette_gold">ブラック＆ゴールド</string>
+    <string name="menu_hide">カードを非表示</string>
+    <string name="menu_pin">最初の画面に固定</string>
+    <string name="menu_unpin">最初の画面から削除</string>
+    <string name="menu_edit_layout">レイアウトを編集</string>
+    <string name="edit_done">完了</string>
+    <string name="edit_cancel">キャンセル</string>
+    <string name="hidden_cards">非表示のカード</string>
+    <string name="card_width_half">半幅</string>
+    <string name="card_width_full">全幅</string>
+    <string name="nav_show">ナビゲーションを表示</string>
+    <string name="fan_card_title">ファン</string>
 </resources>
