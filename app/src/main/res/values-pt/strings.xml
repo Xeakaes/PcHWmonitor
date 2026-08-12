@@ -59,4 +59,5 @@
     <string name="language_zh_tw">繁體中文</string>
     <string name="language_ja">日本語</string>
     <string name="label_integrated_gpu">GPU integrada</string>
+    <string name="chart_window">Janela do gráfico</string>
 </resources>
