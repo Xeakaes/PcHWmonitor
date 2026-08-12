@@ -67,7 +67,7 @@
     <string name="fps_avg">Media</string>
     <string name="fps_1pct_low" formatted="false">1 % basso</string>
     <string name="fps_details_title">Dettagli FPS</string>
-    <string name="fps_hint" formatted="false">L'1 % basso è la media del peggiore 1 % dei tempi di fotogramma: misura gli scatti.</string>
+    <string name="fps_hint" formatted="false">L’1 % basso è la media del peggiore 1 % dei tempi di fotogramma: misura gli scatti.</string>
     <string name="fps_ok">OK</string>
     <string name="disk_card_title">Disco</string>
     <string name="disk_read">Lettura</string>
