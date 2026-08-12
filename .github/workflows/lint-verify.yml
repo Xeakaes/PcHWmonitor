@@ -1,10 +1,10 @@
-name: "Lint Report (temporary)"
+name: "Full Build Verify (temporary)"
 
 on:
   workflow_dispatch:
 
 jobs:
-  lint:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -12,8 +12,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Run lint
-        run: ./gradlew --no-daemon lintDebug
+      - name: Full build with lint
+        run: ./gradlew --no-daemon build
       - name: Upload lint report
         if: always()
         uses: actions/upload-artifact@v4
