@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "fastlane/**"
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "fastlane/**"
+  workflow_dispatch:
+
+# Only keep the latest run per branch; cancel superseded ones to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android build + tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build with Gradle
+        run: ./gradlew --no-daemon build
+
+  server:
+    name: Server tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@8549b9f8f590ad24eab7482f36f6e1e24d34597b # v6.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install -r server/requirements.txt
+
+      - name: Run tests
+        run: python -m pytest server/tests -v
+
+      - name: Smoke test
+        run: |
+          python server/main.py --simulate --port 8765 &
+          SERVER_PID=$!
+          for i in $(seq 1 20); do
+            python -c "import socket; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1', 8765)); s.close(); exit(0)" 2>/dev/null && break
+            sleep 1
+          done
+          python server/smoke_test.py
+          STATUS=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $STATUS
