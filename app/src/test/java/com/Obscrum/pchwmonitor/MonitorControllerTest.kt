@@ -127,6 +127,38 @@ class MonitorControllerTest {
     }
 
     @Test
+    fun connectRejectsPublicIp() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        controller.connect("8.8.8.8", 8765)
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(client.urls.isEmpty())
+        assertEquals("server IP must be in a private range", controller.lastError.value)
+    }
+
+    @Test
+    fun connectAcceptsPrivateIps() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        for (ip in listOf("10.1.2.3", "172.20.0.1", "192.168.1.5", "127.0.0.1")) {
+            controller.connect(ip, 8765)
+        }
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(4, client.urls.size)
+        assertNull(controller.lastError.value)
+    }
+
+    @Test
     fun recordsHistoryWithIntervalThrottle() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = CoroutineScope(dispatcher)

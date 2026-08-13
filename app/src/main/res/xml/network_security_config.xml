@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Cleartext (ws://) is allowed because the bridge server runs on the
+         user's LAN. The app enforces private-IP-only connections at the
+         application layer (MonitorController), which network-security-config
+         cannot express for arbitrary user-entered IPs. -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

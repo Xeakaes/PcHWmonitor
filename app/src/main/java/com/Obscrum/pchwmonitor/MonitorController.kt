@@ -55,6 +55,10 @@ class MonitorController(
     }
 
     fun connect(ip: String, port: Int, token: String? = null) {
+        if (!isPrivateIp(ip)) {
+            _lastError.value = "server IP must be in a private range"
+            return
+        }
         val url = "ws://$ip:$port/ws"
         if (url == currentUrl && token == currentToken) return
         currentUrl = url
@@ -67,6 +71,16 @@ class MonitorController(
         currentUrl = null
         currentToken = null
         client.disconnect()
+    }
+
+    companion object {
+        private fun isPrivateIp(ip: String): Boolean {
+            val parts = ip.split('.').mapNotNull { it.toIntOrNull() }
+            if (parts.size != 4 || parts.any { it !in 0..255 }) return false
+            val a = parts[0]
+            val b = parts[1]
+            return a == 10 || (a == 172 && b in 16..31) || (a == 192 && b == 168) || a == 127
+        }
     }
 
     suspend fun historySamples(start: Long) = history.history(start)
