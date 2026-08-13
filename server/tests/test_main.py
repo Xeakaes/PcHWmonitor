@@ -7,13 +7,13 @@ from starlette.websockets import WebSocketDisconnect
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import main  # noqa: E402
-from main import build_app  # noqa: E402
+import app as app_module  # noqa: E402
+from app import build_app  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
 def no_presentmon_binary(monkeypatch):
-    monkeypatch.setattr(main, "_presentmon_path", lambda: "/nonexistent/PresentMon64.exe")
+    monkeypatch.setattr(app_module, "_presentmon_path", lambda: "/nonexistent/PresentMon64.exe")
 
 
 def test_build_app_http_source_uses_http_adapter():
