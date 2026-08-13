@@ -25,9 +25,11 @@ class FakeWsClient : WsClient {
     override val connectionState: MutableStateFlow<ConnectionState> =
         MutableStateFlow(ConnectionState.DISCONNECTED)
     val urls = mutableListOf<String>()
+    val tokens = mutableListOf<String?>()
 
-    override fun connect(url: String) {
+    override fun connect(url: String, token: String?) {
         urls.add(url)
+        tokens.add(token)
         connectionState.value = ConnectionState.CONNECTED
     }
 
@@ -92,6 +94,36 @@ class MonitorControllerTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(1, client.urls.size)
+    }
+
+    @Test
+    fun changedTokenTriggersReconnect() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        controller.connect("10.0.0.1", 8765, "token-a")
+        controller.connect("10.0.0.1", 8765, "token-b")
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(2, client.urls.size)
+        assertEquals(listOf("token-a", "token-b"), client.tokens)
+    }
+
+    @Test
+    fun connectPassesTokenToClient() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        controller.connect("10.0.0.1", 8765, "sekret")
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("sekret", client.tokens.single())
     }
 
     @Test

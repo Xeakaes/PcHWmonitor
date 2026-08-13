@@ -21,6 +21,7 @@
     <string name="server">サーバー</string>
     <string name="server_ip">サーバー IP</string>
     <string name="port">ポート</string>
+    <string name="settings_token">アクセストークン（任意）</string>
     <string name="theme">テーマ</string>
     <string name="theme_system">システム標準</string>
     <string name="theme_light">ライト</string>

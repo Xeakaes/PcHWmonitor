@@ -21,6 +21,7 @@
     <string name="server">Sunucu</string>
     <string name="server_ip">Sunucu IP</string>
     <string name="port">Port</string>
+    <string name="settings_token">Erişim anahtarı (isteğe bağlı)</string>
     <string name="theme">Tema</string>
     <string name="theme_system">Sistem varsayılanı</string>
     <string name="theme_light">Açık</string>

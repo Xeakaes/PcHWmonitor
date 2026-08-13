@@ -26,6 +26,7 @@ class MonitorController(
     val lastError: StateFlow<String?> = _lastError.asStateFlow()
 
     private var currentUrl: String? = null
+    private var currentToken: String? = null
     private var lastRecordedAt = Long.MIN_VALUE
 
     fun start() {
@@ -53,16 +54,18 @@ class MonitorController(
         }
     }
 
-    fun connect(ip: String, port: Int) {
+    fun connect(ip: String, port: Int, token: String? = null) {
         val url = "ws://$ip:$port/ws"
-        if (url == currentUrl) return
+        if (url == currentUrl && token == currentToken) return
         currentUrl = url
+        currentToken = token
         client.disconnect()
-        client.connect(url)
+        client.connect(url, token)
     }
 
     fun disconnect() {
         currentUrl = null
+        currentToken = null
         client.disconnect()
     }
 

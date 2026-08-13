@@ -183,6 +183,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelServer = stringResource(R.string.server),
                         labelIp = stringResource(R.string.server_ip),
                         labelPort = stringResource(R.string.port),
+                        labelToken = stringResource(R.string.settings_token),
                         labelTheme = stringResource(R.string.theme),
                         labelThemeSystem = stringResource(R.string.theme_system),
                         labelThemeLight = stringResource(R.string.theme_light),
@@ -225,8 +226,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelSupport = stringResource(R.string.support),
                         labelSupportDescription = stringResource(R.string.support_description),
                         labelSupportPatreon = stringResource(R.string.support_patreon),
-                        onSave = { ip, port, theme, language, chartWindowSeconds ->
-                            viewModel.saveSettings(ip, port, theme, language, chartWindowSeconds)
+                        onSave = { ip, port, authToken, theme, language, chartWindowSeconds ->
+                            viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds)
                         },
                     )
                 }

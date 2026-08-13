@@ -21,6 +21,7 @@
     <string name="server">服务器</string>
     <string name="server_ip">服务器 IP</string>
     <string name="port">端口</string>
+    <string name="settings_token">访问令牌（可选）</string>
     <string name="theme">主题</string>
     <string name="theme_system">跟随系统</string>
     <string name="theme_light">浅色</string>

@@ -126,4 +126,18 @@ class SettingsStoreTest {
         assertEquals(layout, second.store.settings.first().dashboardLayout)
         second.close()
     }
+
+    @Test
+    fun authTokenRoundTrip() = runTest {
+        val dir = createTempDir()
+        val first = store(dir)
+        first.store.setAuthToken("sekret")
+        first.close()
+
+        val second = store(dir)
+        assertEquals("sekret", second.store.settings.first().authToken)
+        second.store.setAuthToken(null)
+        assertEquals(null, second.store.settings.first().authToken)
+        second.close()
+    }
 }

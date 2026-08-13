@@ -14,6 +14,7 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 data class AppSettings(
     val serverIp: String = "192.168.1.100",
     val serverPort: Int = 8765,
+    val authToken: String? = null,
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val language: String? = null,
     val chartWindowSeconds: Int = 60,
@@ -24,6 +25,7 @@ data class AppSettings(
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyIp = stringPreferencesKey("server_ip")
     private val keyPort = intPreferencesKey("server_port")
+    private val keyAuthToken = stringPreferencesKey("auth_token")
     private val keyTheme = stringPreferencesKey("theme")
     private val keyLanguage = stringPreferencesKey("language")
     private val keyChartWindow = intPreferencesKey("chart_window_seconds")
@@ -34,6 +36,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
         AppSettings(
             serverIp = prefs[keyIp] ?: "192.168.1.100",
             serverPort = prefs[keyPort] ?: 8765,
+            authToken = prefs[keyAuthToken]?.takeIf { it.isNotBlank() },
             theme = runCatching { ThemeMode.valueOf(prefs[keyTheme] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
             language = prefs[keyLanguage],
             chartWindowSeconds = prefs[keyChartWindow] ?: 60,
@@ -50,6 +53,12 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setServerPort(value: Int) {
         dataStore.edit { it[keyPort] = value }
+    }
+
+    suspend fun setAuthToken(value: String?) {
+        dataStore.edit { prefs ->
+            if (value.isNullOrBlank()) prefs.remove(keyAuthToken) else prefs[keyAuthToken] = value
+        }
     }
 
     suspend fun setTheme(value: ThemeMode) {

@@ -38,9 +38,11 @@ class WebSocketClient(
     private var job: Job? = null
     private var ws: WebSocket? = null
     private var closed = false
+    private var pendingToken: String? = null
 
-    override fun connect(url: String) {
+    override fun connect(url: String, token: String?) {
         if (job?.isActive == true) return
+        pendingToken = token
         closed = false
         job = scope.launch { connectLoop(url) }
     }
@@ -86,6 +88,13 @@ class WebSocketClient(
     }
 
     private fun listener() = object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            pendingToken?.takeIf { it.isNotBlank() }?.let { token ->
+                val escaped = token.replace("\\", "\\\\").replace("\"", "\\\"")
+                webSocket.send("""{"type":"auth","token":"$escaped"}""")
+            }
+        }
+
         override fun onMessage(webSocket: WebSocket, text: String) {
             _messages.tryEmit(parser.parse(text))
         }

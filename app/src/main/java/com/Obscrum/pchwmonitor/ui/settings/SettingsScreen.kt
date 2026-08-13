@@ -50,6 +50,7 @@ fun SettingsScreen(
     labelServer: String,
     labelIp: String,
     labelPort: String,
+    labelToken: String,
     labelTheme: String,
     labelThemeSystem: String,
     labelThemeLight: String,
@@ -71,11 +72,12 @@ fun SettingsScreen(
     labelSupportDescription: String,
     labelSupportPatreon: String,
     modifier: Modifier = Modifier,
-    onSave: (ip: String, port: Int, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
+    onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
 ) {
     val context = LocalContext.current
     var ip by remember { mutableStateOf(settings.serverIp) }
     var port by remember { mutableStateOf(settings.serverPort.toString()) }
+    var authToken by remember { mutableStateOf(settings.authToken ?: "") }
     var theme by remember { mutableStateOf(settings.theme) }
     var language by remember { mutableStateOf(settings.language) }
     var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
@@ -120,6 +122,17 @@ fun SettingsScreen(
                 saved = false
             },
             label = { Text(labelPort) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = authToken,
+            onValueChange = {
+                authToken = it
+                saved = false
+            },
+            label = { Text(labelToken) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -214,7 +227,7 @@ fun SettingsScreen(
                 onClick = {
                     val portInt = port.toIntOrNull() ?: 8765
                     saved = true
-                    onSave(ip.trim(), portInt, theme, language, chartWindowSeconds)
+                    onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
                 },
                 modifier = Modifier.weight(1f),
             ) {

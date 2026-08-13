@@ -55,17 +55,18 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     init {
         controller.start()
         viewModelScope.launch {
-            settings.collect { s -> controller.connect(s.serverIp, s.serverPort) }
+            settings.collect { s -> controller.connect(s.serverIp, s.serverPort, s.authToken) }
         }
     }
 
     fun disconnect() = controller.disconnect()
 
-    fun saveSettings(ip: String, port: Int, theme: ThemeMode, language: String?,
+    fun saveSettings(ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?,
                      chartWindowSeconds: Int) {
         viewModelScope.launch {
             settingsStore.setServerIp(ip)
             settingsStore.setServerPort(port)
+            settingsStore.setAuthToken(authToken)
             settingsStore.setTheme(theme)
             settingsStore.setLanguage(language)
             settingsStore.setChartWindowSeconds(chartWindowSeconds)

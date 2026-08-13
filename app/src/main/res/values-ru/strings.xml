@@ -21,6 +21,7 @@
     <string name="server">Сервер</string>
     <string name="server_ip">IP сервера</string>
     <string name="port">Порт</string>
+    <string name="settings_token">Токен доступа (необязательно)</string>
     <string name="theme">Тема</string>
     <string name="theme_system">Системная</string>
     <string name="theme_light">Светлая</string>

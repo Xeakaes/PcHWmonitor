@@ -21,6 +21,7 @@
     <string name="server">Servidor</string>
     <string name="server_ip">IP do servidor</string>
     <string name="port">Porta</string>
+    <string name="settings_token">Token de acesso (opcional)</string>
     <string name="theme">Tema</string>
     <string name="theme_system">Padrão do sistema</string>
     <string name="theme_light">Claro</string>

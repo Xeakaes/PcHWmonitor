@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface WsClient {
     val messages: SharedFlow<WsMessage>
     val connectionState: StateFlow<ConnectionState>
-    fun connect(url: String)
+    fun connect(url: String, token: String? = null)
     fun disconnect()
 }
