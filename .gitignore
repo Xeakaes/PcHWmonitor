@@ -36,3 +36,4 @@ server/presentmon/PresentMon64.exe
 Thumbs.db
 key.properties
 release-v1.3/
+app/keystore/
