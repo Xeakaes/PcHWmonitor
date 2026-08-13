@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File
+import kotlin.io.path.createTempDirectory
 
 class SettingsStoreTest {
 
@@ -35,9 +36,11 @@ class SettingsStoreTest {
         return StoreHandle(SettingsStore(dataStore), scope)
     }
 
+    private fun tmpDir(): File = createTempDirectory().toFile()
+
     @Test
     fun defaultsAreApplied() = runTest {
-        val handle = store(createTempDir())
+        val handle = store(tmpDir())
         val settings = handle.store.settings.first()
         assertEquals(AppSettings(), settings)
         assertEquals(ThemeMode.SYSTEM, settings.theme)
@@ -46,7 +49,7 @@ class SettingsStoreTest {
 
     @Test
     fun writesRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val first = store(dir)
         first.store.setServerIp("10.0.0.5")
         first.store.setServerPort(9000)
@@ -63,7 +66,7 @@ class SettingsStoreTest {
 
     @Test
     fun chartWindowDefaultIs60Seconds() = runTest {
-        val handle = store(createTempDir())
+        val handle = store(tmpDir())
         val settings = handle.store.settings.first()
         assertEquals(60, settings.chartWindowSeconds)
         handle.close()
@@ -71,7 +74,7 @@ class SettingsStoreTest {
 
     @Test
     fun chartWindowRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val first = store(dir)
         first.store.setChartWindowSeconds(300)
         first.close()
@@ -83,7 +86,7 @@ class SettingsStoreTest {
 
     @Test
     fun languageRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val first = store(dir)
         first.store.setLanguage("tr")
         first.close()
@@ -97,14 +100,14 @@ class SettingsStoreTest {
 
     @Test
     fun themePaletteDefaultsToDefault() = runTest {
-        val handle = store(createTempDir())
+        val handle = store(tmpDir())
         assertEquals("default", handle.store.settings.first().themePaletteId)
         handle.close()
     }
 
     @Test
     fun themePaletteRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val first = store(dir)
         first.store.setThemePalette("gold")
         first.close()
@@ -116,7 +119,7 @@ class SettingsStoreTest {
 
     @Test
     fun dashboardLayoutRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val layout = DashboardLayout.default()
         val first = store(dir)
         first.store.setDashboardLayout(layout)
@@ -129,7 +132,7 @@ class SettingsStoreTest {
 
     @Test
     fun authTokenRoundTrip() = runTest {
-        val dir = createTempDir()
+        val dir = tmpDir()
         val first = store(dir)
         first.store.setAuthToken("sekret")
         first.close()
