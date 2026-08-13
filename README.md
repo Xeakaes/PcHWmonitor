@@ -125,6 +125,15 @@ One `status` message per second from server to client; `welcome` comes first on 
   "net":{"downloadMbPerSec":8.1,"uploadMbPerSec":1.6},
   "fans":[{"label":"CPU Fan","rpm":2150},{"label":"GPU Fan","rpm":1900}],
   "fps":{"name":"Counter-Strike 2","current":142.3,"avg":138.7,"onePercentLow":97}}
+
+{"type":"status","timestamp":1754150001,
+  "cpu":{"name":"...","usagePct":56.2,"tempC":63.0,"clockMhz":5050,"powerW":118,"loads":[22,61,40]},
+  "gpu":{"name":"...","usagePct":65.1,"tempC":72.8,"hotspotC":85.3,"vramUsedMb":6890,"vramTotalMb":12288,
+         "coreClockMhz":2685,"memClockMhz":10500,"powerW":164},
+  "igpu":{"name":"Intel(R) UHD Graphics","usagePct":8.7,"tempC":null,"hotspotC":null,
+          "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":350,"memClockMhz":null,
+          "powerW":null},
+  "ram":{"usedGb":14.8,"totalGb":32,"usagePct":46.3,"clockMhz":3600},
   "disk":{"usagePct":87.1,"readMbPerSec":124.5,"writeMbPerSec":82.0},
   "net":{"downloadMbPerSec":21.4,"uploadMbPerSec":3.2},
   "fans":[{"label":"CPU Fan","rpm":1350},{"label":"Case Fan","rpm":920}],
@@ -253,6 +262,15 @@ Sunucu → istemci, her saniye tek `status` mesajı; bağlantıda önce `welcome
   "net":{"downloadMbPerSec":8.1,"uploadMbPerSec":1.6},
   "fans":[{"label":"CPU Fan","rpm":2150},{"label":"GPU Fan","rpm":1900}],
   "fps":{"name":"Counter-Strike 2","current":142.3,"avg":138.7,"onePercentLow":97}}
+
+{"type":"status","timestamp":1754150001,
+  "cpu":{"name":"...","usagePct":56.2,"tempC":63.0,"clockMhz":5050,"powerW":118,"loads":[22,61,40]},
+  "gpu":{"name":"...","usagePct":65.1,"tempC":72.8,"hotspotC":85.3,"vramUsedMb":6890,"vramTotalMb":12288,
+         "coreClockMhz":2685,"memClockMhz":10500,"powerW":164},
+  "igpu":{"name":"Intel(R) UHD Graphics","usagePct":8.7,"tempC":null,"hotspotC":null,
+          "vramUsedMb":null,"vramTotalMb":null,"coreClockMhz":350,"memClockMhz":null,
+          "powerW":null},
+  "ram":{"usedGb":14.8,"totalGb":32,"usagePct":46.3,"clockMhz":3600},
   "disk":{"usagePct":87.1,"readMbPerSec":124.5,"writeMbPerSec":82.0},
   "net":{"downloadMbPerSec":21.4,"uploadMbPerSec":3.2},
   "fans":[{"label":"CPU Fan","rpm":1350},{"label":"Case Fan","rpm":920}],
