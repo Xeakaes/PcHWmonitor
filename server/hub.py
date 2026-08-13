@@ -1,18 +1,17 @@
 import asyncio
-import json
 import logging
 import time
 
 from fastapi import WebSocket
-from pydantic.json import pydantic_encoder
 
 logger = logging.getLogger("pchw.hub")
 
 
 class Hub:
-    def __init__(self, sample, interval_ms: int = 1000):
+    def __init__(self, sample, interval_ms: int = 1000, send_timeout: float = 2.0):
         self._sample = sample
         self._interval = interval_ms / 1000.0
+        self._send_timeout = send_timeout
         self._clients: set[WebSocket] = set()
         self._last_error_at = 0.0
 
@@ -40,11 +39,13 @@ class Hub:
         if not message.available:
             self._last_error_at = time.monotonic()
             logger.warning("data source unavailable: %s", message.error)
-        payload = json.dumps(message, default=pydantic_encoder)
+        payload = message.model_dump_json()
         stale = []
         for ws in list(self._clients):
             try:
-                await ws.send_text(payload)
+                await asyncio.wait_for(ws.send_text(payload), timeout=self._send_timeout)
+            except asyncio.TimeoutError:
+                logger.warning("slow client timed out sending; keeping it connected")
             except Exception:
                 stale.append(ws)
         for ws in stale:
