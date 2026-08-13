@@ -117,6 +117,11 @@ def build_app(
 
     @app.websocket("/ws")
     async def ws_endpoint(ws: WebSocket):
+        if ws.headers.get("origin"):
+            # Browser-based clients always send an Origin header; the Android
+            # app and CLI tools do not. Reject browser origins to block CSWSH.
+            await ws.close(code=1008)
+            return
         await ws.accept()
         await ws.send_text(app.state.welcome.model_dump_json())
         hub.register(ws)

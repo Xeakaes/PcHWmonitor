@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from starlette.websockets import WebSocketDisconnect
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -37,3 +39,20 @@ def test_build_app_simulate_uses_simulator():
 def test_build_app_accepts_fps_process_arg():
     app = build_app(simulate=True, fps_process="game.exe")
     assert app.state.fps_process == "game.exe"
+
+
+def test_ws_accepts_clients_without_origin():
+    app = build_app(simulate=True)
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as ws:
+            welcome = ws.receive_json()
+            assert welcome["type"] == "welcome"
+
+
+def test_ws_rejects_browser_origin():
+    app = build_app(simulate=True)
+    with TestClient(app) as client:
+        with pytest.raises(WebSocketDisconnect) as excinfo:
+            with client.websocket_connect("/ws", headers={"Origin": "https://evil.example"}):
+                pass
+        assert excinfo.value.code == 1008
