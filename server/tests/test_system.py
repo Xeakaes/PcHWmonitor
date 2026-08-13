@@ -15,10 +15,11 @@ class _FakeCounters:
 
 
 class _FakePsutil:
-    def __init__(self, io, net, usage):
+    def __init__(self, io, net, partitions, usages):
         self.io = io
         self.net = net
-        self.usage = usage
+        self.partitions = partitions
+        self.usages = usages
 
     def disk_io_counters(self):
         return self.io
@@ -26,8 +27,11 @@ class _FakePsutil:
     def net_io_counters(self):
         return self.net
 
+    def disk_partitions(self, all=False):
+        return self.partitions
+
     def disk_usage(self, path):
-        return self.usage
+        return self.usages[path]
 
 
 def test_first_sample_returns_none_none():
@@ -40,7 +44,8 @@ def test_second_sample_computes_mbps():
     fake = _FakePsutil(
         io=_FakeCounters(0, 0, 0, 0),
         net=_FakeCounters(0, 0, 0, 0),
-        usage=type("U", (), {"percent": 40.0}),
+        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4"})()],
+        usages={"/": type("U", (), {"total": 100.0, "used": 40.0, "percent": 40.0})},
     )
     adapter = SystemAdapter(interval=1.0, _psutil=fake)
     adapter.sample()
@@ -54,6 +59,68 @@ def test_second_sample_computes_mbps():
     assert abs(disk.usagePct - 40.0) < 0.01
     assert abs(net.downloadMbPerSec - 30.0) < 0.5
     assert abs(net.uploadMbPerSec - 10.0) < 0.5
+
+
+def test_usage_averages_all_partitions_weighted_by_capacity():
+    fake = _FakePsutil(
+        io=_FakeCounters(0, 0, 0, 0),
+        net=_FakeCounters(0, 0, 0, 0),
+        partitions=[
+            type("P", (), {"mountpoint": "/", "fstype": "ext4"})(),
+            type("P", (), {"mountpoint": "/data", "fstype": "ext4"})(),
+        ],
+        usages={
+            "/": type("U", (), {"total": 100.0, "used": 50.0, "percent": 50.0}),
+            "/data": type("U", (), {"total": 100.0, "used": 0.0, "percent": 0.0}),
+        },
+    )
+    adapter = SystemAdapter(interval=1.0, _psutil=fake)
+    adapter.sample()
+    fake.io = _FakeCounters(0, 0, 0, 0)
+    fake.net = _FakeCounters(0, 0, 0, 0)
+    disk, net = adapter.sample()
+    assert disk is not None
+    assert abs(disk.usagePct - 25.0) < 0.01
+
+
+def test_usage_skips_pseudo_filesystems():
+    fake = _FakePsutil(
+        io=_FakeCounters(0, 0, 0, 0),
+        net=_FakeCounters(0, 0, 0, 0),
+        partitions=[
+            type("P", (), {"mountpoint": "/", "fstype": "ext4"})(),
+            type("P", (), {"mountpoint": "/dev/shm", "fstype": "tmpfs"})(),
+            type("P", (), {"mountpoint": "/snap/x", "fstype": "squashfs"})(),
+        ],
+        usages={
+            "/": type("U", (), {"total": 100.0, "used": 50.0, "percent": 50.0}),
+            "/dev/shm": type("U", (), {"total": 100.0, "used": 100.0, "percent": 100.0}),
+            "/snap/x": type("U", (), {"total": 100.0, "used": 100.0, "percent": 100.0}),
+        },
+    )
+    adapter = SystemAdapter(interval=1.0, _psutil=fake)
+    adapter.sample()
+    fake.io = _FakeCounters(0, 0, 0, 0)
+    fake.net = _FakeCounters(0, 0, 0, 0)
+    disk, net = adapter.sample()
+    assert disk is not None
+    assert abs(disk.usagePct - 50.0) < 0.01
+
+
+def test_usage_none_when_all_partitions_fail():
+    fake = _FakePsutil(
+        io=_FakeCounters(0, 0, 0, 0),
+        net=_FakeCounters(0, 0, 0, 0),
+        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4"})()],
+        usages={},
+    )
+    adapter = SystemAdapter(interval=1.0, _psutil=fake)
+    adapter.sample()
+    fake.io = _FakeCounters(0, 0, 0, 0)
+    fake.net = _FakeCounters(0, 0, 0, 0)
+    disk, net = adapter.sample()
+    assert disk is not None
+    assert disk.usagePct is None
 
 
 def test_psutil_error_yields_none_none():
