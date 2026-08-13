@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -598,9 +599,12 @@ private fun RowScope.CardEditControls(
     val visible = layout.visibleEntries()
     val isWide = layout.entries.firstOrNull { it.card == cardId }?.wide == true
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-        IconButton(onClick = {
-            onLayoutChange(setCardWidth(layout, cardId, !isWide))
-        }) {
+        IconButton(
+            onClick = {
+                onLayoutChange(setCardWidth(layout, cardId, !isWide))
+            },
+            modifier = Modifier.testTag("edit-width-${cardId.storageId}"),
+        ) {
             Icon(if (isWide) Icons.Filled.UnfoldLess else Icons.Filled.UnfoldMore, contentDescription = null)
         }
         IconButton(
@@ -611,6 +615,7 @@ private fun RowScope.CardEditControls(
                 }
             },
             enabled = index > 0,
+            modifier = Modifier.testTag("edit-up-${cardId.storageId}"),
         ) {
             Icon(Icons.Filled.ArrowUpward, contentDescription = null)
         }
@@ -622,12 +627,16 @@ private fun RowScope.CardEditControls(
                 }
             },
             enabled = index < total - 1,
+            modifier = Modifier.testTag("edit-down-${cardId.storageId}"),
         ) {
             Icon(Icons.Filled.ArrowDownward, contentDescription = null)
         }
-        IconButton(onClick = {
-            onLayoutChange(applyLayoutAction(CardMenuAction.HIDE, layout, cardId))
-        }) {
+        IconButton(
+            onClick = {
+                onLayoutChange(applyLayoutAction(CardMenuAction.HIDE, layout, cardId))
+            },
+            modifier = Modifier.testTag("edit-hide-${cardId.storageId}"),
+        ) {
             Icon(Icons.Filled.VisibilityOff, contentDescription = null)
         }
     }
