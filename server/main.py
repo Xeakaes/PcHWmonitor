@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import json
 import logging
 import os
 import platform
@@ -55,6 +56,8 @@ def build_app(
     interval_ms: int = 1000,
     source: str = "auto",
     fps_process: str | None = None,
+    token: str | None = None,
+    auth_timeout: float = 5.0,
 ) -> FastAPI:
     if simulate:
         sample = Simulator().sample
@@ -110,10 +113,23 @@ def build_app(
     app.state.fps_adapter = fps_adapter
     app.state.fps_active = fps_adapter is not None
     app.state.welcome = WelcomeMessage(intervalMs=interval_ms, serverName=pc_name, source=source_name, pcName=pc_name)
+    app.state.token = token
+    app.state.auth_timeout = auth_timeout
 
     @app.get("/health")
     async def health():
         return {"ok": True, "source": source_name, "clients": hub.client_count}
+
+    async def _authenticated(ws: WebSocket) -> bool:
+        try:
+            raw = await asyncio.wait_for(ws.receive_text(), timeout=app.state.auth_timeout)
+        except (asyncio.TimeoutError, WebSocketDisconnect):
+            return False
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError:
+            return False
+        return payload.get("type") == "auth" and payload.get("token") == app.state.token
 
     @app.websocket("/ws")
     async def ws_endpoint(ws: WebSocket):
@@ -123,6 +139,10 @@ def build_app(
             await ws.close(code=1008)
             return
         await ws.accept()
+        if app.state.token is not None and not await _authenticated(ws):
+            logger.warning("client rejected: missing or invalid auth token")
+            await ws.close(code=1008)
+            return
         await ws.send_text(app.state.welcome.model_dump_json())
         hub.register(ws)
         logger.info("client connected (%d total)", hub.client_count)
@@ -209,9 +229,10 @@ def main() -> None:
     parser.add_argument("--lhm-url", default="http://127.0.0.1:8085/data.json")
     parser.add_argument("--interval", type=int, default=1000, help="broadcast interval in ms")
     parser.add_argument("--fps-process", default=None, help="process name to measure FPS for (empty = auto)")
+    parser.add_argument("--token", default=None, help="require clients to authenticate with this token")
     args = parser.parse_args()
 
-    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process)
+    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process, token=args.token)
     if args.simulate:
         logger.info("running in SIMULATION mode on 0.0.0.0:%d", args.port)
     else:

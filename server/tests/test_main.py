@@ -56,3 +56,31 @@ def test_ws_rejects_browser_origin():
             with client.websocket_connect("/ws", headers={"Origin": "https://evil.example"}):
                 pass
         assert excinfo.value.code == 1008
+
+
+def test_ws_with_token_accepts_correct_token():
+    app = build_app(simulate=True, token="sekret")
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as ws:
+            ws.send_json({"type": "auth", "token": "sekret"})
+            welcome = ws.receive_json()
+            assert welcome["type"] == "welcome"
+
+
+def test_ws_with_token_rejects_wrong_token():
+    app = build_app(simulate=True, token="sekret")
+    with TestClient(app) as client:
+        with pytest.raises(WebSocketDisconnect) as excinfo:
+            with client.websocket_connect("/ws") as ws:
+                ws.send_json({"type": "auth", "token": "wrong"})
+                ws.receive_json()
+        assert excinfo.value.code == 1008
+
+
+def test_ws_with_token_times_out_without_auth():
+    app = build_app(simulate=True, token="sekret", auth_timeout=0.1)
+    with TestClient(app) as client:
+        with pytest.raises(WebSocketDisconnect) as excinfo:
+            with client.websocket_connect("/ws") as ws:
+                ws.receive_json()
+        assert excinfo.value.code == 1008
