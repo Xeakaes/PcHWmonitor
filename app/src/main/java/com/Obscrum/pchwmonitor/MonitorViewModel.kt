@@ -3,6 +3,7 @@ package com.Obscrum.pchwmonitor
 import android.app.Application
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.SettingsStore
@@ -57,6 +58,12 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             settings.collect { s -> controller.connect(s.serverIp, s.serverPort, s.authToken) }
         }
+        ProcessLifecycleOwner.get().lifecycle.addObserver(
+            BackgroundConnectionHandler(
+                settingsProvider = { settings.value },
+                controller = controller,
+            ),
+        )
     }
 
     fun disconnect() = controller.disconnect()
