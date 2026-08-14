@@ -2,12 +2,18 @@ package com.Obscrum.pchwmonitor.ui.dashboard
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollToNodeAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
@@ -134,8 +140,65 @@ class DashboardScreenUiTest {
 
     @Test
     fun editModeShowsEditBarAndHidesCard() {
+        var layoutState by mutableStateOf(DashboardLayout.default())
         var changed: DashboardLayout? = null
-        setDashboard(status = fullStatus(), editMode = true, onLayoutChange = { changed = it })
+        compose.setContent {
+            val size = Modifier.size(width = 360.dp, height = 800.dp)
+            androidx.compose.material3.MaterialTheme {
+                DashboardScreen(
+                    status = fullStatus(),
+                    connection = ConnectionState.CONNECTED,
+                    labelConnecting = "Connecting",
+                    labelConnected = "Connected",
+                    labelDisconnected = "Disconnected",
+                    labelCpu = "CPU",
+                    labelCpuTemp = "Temp",
+                    labelUsage = "Usage",
+                    labelClock = "Clock",
+                    labelPower = "Power",
+                    labelCores = "Cores",
+                    labelGpuTemp = "GPU",
+                    labelHotspot = "Hotspot",
+                    labelVram = "VRAM",
+                    labelCoreClock = "Core clock",
+                    labelMemClock = "Mem clock",
+                    labelIntegratedGpu = "iGPU",
+                    labelRam = "RAM",
+                    labelRamUsed = "Used",
+                    labelNoData = "No data",
+                    labelFps = "FPS",
+                    labelFpsAvg = "Avg",
+                    labelFpsOnePercentLow = "1% low",
+                    labelFpsDetails = "Details",
+                    labelFpsHint = "FPS details",
+                    labelDisk = "Disk",
+                    labelDiskRead = "Read",
+                    labelDiskWrite = "Write",
+                    labelDiskUsage = "Usage",
+                    labelNet = "Network",
+                    labelNetDownload = "Download",
+                    labelNetUpload = "Upload",
+                    labelFan = "Fans",
+                    modifier = size,
+                    layout = layoutState,
+                    onLayoutChange = {
+                        layoutState = it
+                        changed = it
+                    },
+                    editMode = true,
+                    labelMenuHide = "Hide",
+                    labelMenuPin = "Pin",
+                    labelMenuUnpin = "Unpin",
+                    labelMenuEdit = "Edit",
+                    labelMenuFpsDetails = "FPS details",
+                    labelEditDone = "Done",
+                    labelEditCancel = "Cancel",
+                    labelHiddenCards = "Hidden cards",
+                    labelCardWidthHalf = "Half width",
+                    labelCardWidthFull = "Full width",
+                )
+            }
+        }
 
         compose.onNodeWithText("Done").assertIsDisplayed()
         compose.onNodeWithText("Cancel").assertIsDisplayed()
@@ -149,7 +212,9 @@ class DashboardScreenUiTest {
             assertFalse(entry.visible)
             assertTrue(changed!!.visibleEntries().none { it.card == CardId.CPU })
         }
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Hidden cards"))
         compose.onNodeWithText("Hidden cards").assertIsDisplayed()
+        compose.onNodeWithText("CPU").assertIsDisplayed()
     }
 
     @Test
@@ -167,7 +232,7 @@ class DashboardScreenUiTest {
         setDashboard(status = fullStatus(), landscape = true)
 
         compose.onNodeWithText("CPU").assertIsDisplayed()
-        compose.onNodeWithText("GPU").assertIsDisplayed()
+        compose.onNodeWithText("Test GPU").assertIsDisplayed()
     }
 
     @Test
