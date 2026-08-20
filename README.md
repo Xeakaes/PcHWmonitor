@@ -282,7 +282,7 @@ Seçenekler: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http:/
 - `--source auto` (varsayılan): gömülü DLL varsa `lib`, yoksa LHM web sunucusuna düşer.
 - `--source lib`: `LibreHardwareMonitorLib.dll`'yi süreç içinde okur (DLL yolu `LHMDIR` env değişkeniyle verilebilir).
 - `--source http`: harici LibreHardwareMonitor'un JSON API'sini okur (Options → Remote Web Server, port 8085).
-- `--fps-process <name>`: kare yakalama için belirli bir sürece hedefler (örn. `--fps-process game.exe`). Boş bırakılırsa veya verilmezse PresentMon aktif tam ekran süreceyi takip eder. `server/presentmon/PresentMon64.exe` gerektirir; eksikse FPS devre dışıdır ve `fps` `null` gelir.
+- `--fps-process <name>`: kare yakalama için belirli bir sürece hedefler (örn. `--fps-process game.exe`). Boş bırakılırsa veya verilmezse PresentMon aktif tam ekran süreci takip eder. `server/presentmon/PresentMon64.exe` gerektirir; eksikse FPS devre dışıdır ve `fps` `null` gelir.
 
 **Simülasyon modu (test için, herhangi bir OS):**
 
@@ -346,7 +346,7 @@ Sunucu → istemci, her saniye tek `status` mesajı; bağlantıda önce `welcome
 
 Eksik sensörler `null` gelir (UI "—" gösterir). Disk/Ağ/Fan/FPS alanları eski sunucu payloadlarında `null` gelirse (ve o kartlar gizlenir); telefon uygulaması bu nedeniyle eski sunucu sürümleriyle uyumludur. Sunucu donanıma ulaşamazsa `"available": false` + `error` yayınlar.
 
-- **FPS kartı:** gömülü `PresentMon64.exe` ile (build_exe.bat inşa eder). Kart anlık FPS, 30s ortalama ve 1% düşük (1% low) değerini gösterir; min/avg/max özet için karta dokunun. `--fps-process <name>` bir oyuna hedefler, boş bırakılırsa aktif tam ekran süreceyi takip eder. PresentMon yoksa FPS `null`'dir.
+- **FPS kartı:** gömülü `PresentMon64.exe` ile (build_exe.bat inşa eder). Kart anlık FPS, 30s ortalama ve 1% düşük (1% low) değerini gösterir; min/avg/max özet için karta dokunun. `--fps-process <name>` bir oyuna hedefler, boş bırakılırsa aktif tam ekran süreci takip eder. PresentMon yoksa FPS `null`'dir.
 
 ### 7. Sorun Giderme
 
