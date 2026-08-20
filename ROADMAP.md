@@ -44,10 +44,10 @@
 
 ### Build & Distribution
 - [x] **Fdroid support**: Add Fdroid metadata and reproducible builds (in progress: MR !44635, TODO.md'de takip)
-- [ ] **GitHub Actions CI**: Enhance CI for both Android and server
+- [x] **GitHub Actions CI**: Enhance CI for both Android and server
 - [ ] **Multiple architecture support**: ARM64, x86_64 builds
-- [ ] **ProGuard/R8 optimization**: Release builds optimization
-- [ ] **Automated testing**: Expand test coverage
+- [x] **ProGuard/R8 optimization**: Release builds optimization
+- [x] **Automated testing**: Expand test coverage
 
 ### Documentation
 - [ ] **Video tutorials**: Setup guides for Windows and Android
