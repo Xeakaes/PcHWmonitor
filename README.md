@@ -44,7 +44,7 @@ Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gö
 <a id="english"></a>
 ## English
 
-### Features
+### 1. Features
 
 - **Android** (Kotlin, Jetpack Compose, Material 3):
    - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
@@ -56,7 +56,19 @@ Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gö
    - 14 languages (selectable in Settings)
 - **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil`; packaged FPS support uses an embedded `PresentMon64.exe` (see Building the EXE).
 
-### Architecture
+### 2. Screenshots
+
+| | |
+|---|---|
+| ![Dashboard (dark)](docs/images/main_ember.jpg) | ![Dashboard (light)](docs/images/main_light.jpg) |
+| ![Dashboard (landscape)](docs/images/main_landscape.jpg) | ![Settings](docs/images/settings_light.jpg) |
+
+### 3. Download
+
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also submitted to [F-Droid](https://f-droid.org/) (awaiting review).
+- **Windows:** `PcHwMonitor.exe` — single-file server, built with `build_exe.bat` (see Getting Started).
+
+### 4. Architecture
 
 ```
 Windows PC
@@ -70,7 +82,9 @@ Android app (same Wi-Fi)
 
 The Android app only talks to the server; it never touches LibreHardwareMonitor directly.
 
-### Windows EXE (recommended path)
+### 5. Getting Started
+
+#### Windows EXE (recommended)
 
 1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature).
 2. On your phone, open the **Settings** tab, enter the PC's Wi-Fi IP (e.g. `192.168.1.50`) and port (`8765`), press **Save**. The dashboard connects automatically.
@@ -80,7 +94,7 @@ To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet 
 
 `psutil` (used for Disk and Network sensors) is listed in `server/requirements.txt`. Packaged FPS support additionally requires `server/presentmon/PresentMon64.exe`; `build_exe.bat` copies it into `dist/` when present and disables FPS otherwise.
 
-### Server Setup (development)
+#### Server Setup (development)
 
 **Windows (real data):**
 
@@ -115,7 +129,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python -m pytest tests -v        # 37 tests
 ```
 
-### Android Setup
+#### Android Setup
 
 ```bash
 ./gradlew :app:assembleDebug
@@ -124,7 +138,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 Tests: `./gradlew :app:testDebugUnitTest`
 
-### WebSocket Protocol
+### 6. WebSocket Protocol
 
 One `status` message per second from server to client; `welcome` comes first on connect:
 
@@ -160,7 +174,9 @@ One `status` message per second from server to client; `welcome` comes first on 
 
 Missing sensors arrive as `null` (the UI shows "—"). Disk/Network/Fans/FPS fields are `null` (and their dashboard cards are hidden) when the server reports an old payload without them; this keeps the phone app compatible with older server builds. If the server cannot reach the hardware it broadcasts `"available": false` plus an `error`.
 
-### Troubleshooting
+- **FPS card:** real-time frame capture via embedded `PresentMon64.exe` (built by `build_exe.bat`). The card shows current FPS, 30s average and 1% low (P99 frame time); tap a card for the min/avg/max summary. `--fps-process <name>` targets a game, or leave it empty to auto-follow the active fullscreen process. FPS is `null` if PresentMon is missing.
+
+### 7. Troubleshooting
 
 | Problem | Solution |
 |---|---|
@@ -170,11 +186,29 @@ Missing sensors arrive as `null` (the UI shows "—"). Disk/Network/Fans/FPS fie
 | CPU temperature "—" | Run the EXE as administrator (required by the manifest). |
 | Unknown IP | Run `ipconfig` (Windows) / `ip a` (Linux) on the PC. |
 
-### Notes
+### 8. FAQ
 
-- **FPS card:** real-time frame capture via embedded `PresentMon64.exe` (built by `build_exe.bat`). The card shows current FPS, 30s average and 1% low (P99 frame time); tap a card for the min/avg/max summary. `--fps-process <name>` targets a game, or leave it empty to auto-follow the active fullscreen process. FPS is `null` if PresentMon is missing.
-- **Disk / Net / Fan:** read with `psutil` on the server; cards are hidden for old server payloads where the fields are `null`.
-- History data is stored in a Room DB on the device for 1 hour and cleaned automatically.
+**Does it work over the internet?**
+No. PC HW Monitor runs on your local Wi-Fi network only — both devices must be on the same network. No accounts, no cloud.
+
+**Why does the Windows EXE need administrator rights?**
+Reading CPU temperature requires hardware access that Windows only grants to elevated processes (UAC). Accept the prompt once when starting.
+
+**Can I try it without a PC?**
+Yes. The server has a `--simulate` mode that generates realistic fake data — works on any OS, ideal for testing.
+
+**Which languages does the app support?**
+14 languages, selectable in Settings.
+
+**Is it free?**
+Yes, AGPL-3.0. Development is supported by Patreon patrons.
+
+### 9. License
+
+[GNU AGPL v3](LICENSE) (GNU Affero General Public License, version 3).
+
+- The Windows EXE bundles [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`), also AGPL-3.0. When distributing the EXE, the corresponding source and license must be made available (see section 13 of the AGPL).
+- The Android app and server source code are licensed under AGPL-3.0.
 
 ---
 
