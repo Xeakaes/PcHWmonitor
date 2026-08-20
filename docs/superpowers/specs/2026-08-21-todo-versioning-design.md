@@ -6,8 +6,10 @@ Date: 2026-08-21
 
 PC HW Monitor is at v1.4 (versionCode 5). An F-Droid inclusion MR (fdroiddata!44635) is
 open with label `waiting-for-upstream`; the MR is technically complete (green pipeline,
-signed APKs with hashes posted) and depends on a maintainer removing the label. If
-F-Droid approves, the user wants to ship a "big update" release as a promo moment.
+signed APKs with hashes posted) and depends on a maintainer removing the label. The
+F-Droid approval timeline is unknown, so whichever version happens to be ready when the
+approval lands will be promoted as the "big update" release — there is no fixed target
+version for that promo moment.
 
 The existing `ROADMAP.md` lists all future ideas under "v1.5 (Planned)" and "v2.0".
 We need a working TODO structure that tracks per-version work without duplicating the
@@ -23,7 +25,8 @@ vision.
    - `## v1.6` — planned next-next release
    - `## Backlog` — everything else from the roadmap, flat, unchecked
    - F-Droid MR tracking line pinned at top so it stays visible.
-3. **v1.5 scope (4 quick wins):**
+3. **v1.5 scope (4 quick wins):** — releases continue on a normal cadence; no
+   commitment that v1.5 itself is the promo release.
    - Material You dynamic theming (dynamic color extraction, integrates with existing palette system + light/dark)
    - Local network discovery (auto-detect the PC server on the same LAN)
    - Notification improvements (ongoing notification with key metrics, expandable)

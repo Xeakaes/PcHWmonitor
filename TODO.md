@@ -5,7 +5,7 @@
 - [ ] Fdroid MR !44635 — maintainer `waiting-for-upstream` etiketini kaldırsın (kanıtlı yorum atıldı: 2026-08-20, APK hash'leri + yeşil pipeline linki)
 - [ ] Fdroid onayı gelince sürümü güncelleme MR'ı olarak gönder (1.4 → güncel)
 
-## v1.5 (hedef: fdroid onayıyla "big update" olarak tanıtılacak)
+## v1.5 (fdroid onayı hangi sürüme denk gelirse o sürüm "big update" olarak tanıtılır)
 
 - [ ] **Material You theming**: Dinamik renk özütleme (duvar kağıdından), mevcut palet sistemi + açık/koyu ile bütünleşik
 - [ ] **Yerel ağ keşfi**: Aynı LAN'daki PC sunucusunu otomatik bul (IP elle girme derdi biter)
