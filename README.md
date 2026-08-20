@@ -216,7 +216,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
 <a id="turkce"></a>
 ## Türkçe
 
-### Özellikler
+### 1. Özellikler
 
 - **Android** (Kotlin, Jetpack Compose, Material 3):
    - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
@@ -228,7 +228,19 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
    - 14 dil (ayarlardan seçilebilir)
 - **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur; paketli FPS desteği gömülü `PresentMon64.exe`'e dayanır (bunu `build_exe.bat` inşa eder).
 
-### Mimari
+### 2. Ekran Görüntüleri
+
+| | |
+|---|---|
+| ![Dashboard (koyu)](docs/images/main_ember.jpg) | ![Dashboard (açık)](docs/images/main_light.jpg) |
+| ![Dashboard (yatay)](docs/images/main_landscape.jpg) | ![Ayarlar](docs/images/settings_light.jpg) |
+
+### 3. İndirme
+
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) listesine gönderildi (inceleme bekleniyor).
+- **Windows:** `PcHwMonitor.exe` — tek dosyalık sunucu; `build_exe.bat` ile derlenir (bkz. Başlarken).
+
+### 4. Mimari
 
 ```
 Windows PC
@@ -242,7 +254,9 @@ Android uygulaması (aynı Wi-Fi)
 
 Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması yoktur.
 
-### Windows EXE (önerilen yol)
+### 5. Başlarken
+
+#### Windows EXE (önerilen yol)
 
 1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir).
 2. Telefonda **Ayarlar** sekmesinden bilgisayarın Wi-Fi IP'sini (örn. `192.168.1.50`) ve portu (`8765`) gir, **Kaydet**'e bas. Dashboard otomatik bağlanır.
@@ -252,7 +266,7 @@ Yeniden derlemek için Windows'ta proje kökünde `build_exe.bat` (pythonnet + p
 
 `psutil` (Disk ve Ağ sensörleri için) `server/requirements.txt`'de listelenir. Paketli FPS desteği ayrıca `server/presentmon/PresentMon64.exe` gerektirir; `build_exe.bat` bulursa `dist/` içine kopyalar, yoksa FPS devre dışı kalır.
 
-### Sunucu Kurulumu (geliştirme)
+#### Sunucu Kurulumu (geliştirme)
 
 **Windows (gerçek veri):**
 
@@ -287,7 +301,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python -m pytest tests -v        # 37 test
 ```
 
-### Android Kurulumu
+#### Android Kurulumu
 
 ```bash
 ./gradlew :app:assembleDebug
@@ -296,7 +310,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 Testler: `./gradlew :app:testDebugUnitTest`
 
-### WebSocket Protokolü
+### 6. WebSocket Protokolü
 
 Sunucu → istemci, her saniye tek `status` mesajı; bağlantıda önce `welcome`:
 
@@ -332,7 +346,9 @@ Sunucu → istemci, her saniye tek `status` mesajı; bağlantıda önce `welcome
 
 Eksik sensörler `null` gelir (UI "—" gösterir). Disk/Ağ/Fan/FPS alanları eski sunucu payloadlarında `null` gelirse (ve o kartlar gizlenir); telefon uygulaması bu nedeniyle eski sunucu sürümleriyle uyumludur. Sunucu donanıma ulaşamazsa `"available": false` + `error` yayınlar.
 
-### Sorun Giderme
+- **FPS kartı:** gömülü `PresentMon64.exe` ile (build_exe.bat inşa eder). Kart anlık FPS, 30s ortalama ve 1% düşük (1% low) değerini gösterir; min/avg/max özet için karta dokunun. `--fps-process <name>` bir oyuna hedefler, boş bırakılırsa aktif tam ekran süreceyi takip eder. PresentMon yoksa FPS `null`'dir.
+
+### 7. Sorun Giderme
 
 | Sorun | Çözüm |
 |---|---|
@@ -342,18 +358,26 @@ Eksik sensörler `null` gelir (UI "—" gösterir). Disk/Ağ/Fan/FPS alanları e
 | CPU sıcaklığı "—" | EXE'yi yönetici olarak çalıştırın (manifest gerektirir). |
 | IP bilinmiyor | Bilgisayarda `ipconfig` (Windows) / `ip a` (Linux) çalıştırın. |
 
-### Notlar
+### 8. SSS
 
-- **FPS kartı:** gömülü `PresentMon64.exe` ile (build_exe.bat inşa eder). Kart anlık FPS, 30s ortalama ve 1% düşük (1% low) değerini gösterir; min/avg/max özet için karta dokunun. `--fps-process <name>` bir oyuna hedefler, boş bırakılırsa aktif tam ekran süreceyi takip eder. PresentMon yoksa FPS `null`'dir.
-- **Disk / Ağ / Fan:** sunucuda `psutil` ile okunur; eski sunucu payloadlarında bu alanlar `null` ise kartlar gizlenir.
-- Geçmiş verileri cihazda Room DB'de 1 saat saklanır, otomatik temizlenir.
+**İnternet üzerinden çalışır mı?**
+Hayır. PC HW Monitor yalnızca yerel Wi-Fi ağında çalışır — her iki cihaz da aynı ağda olmalıdır. Hesap ve bulut yok.
 
----
+**Windows EXE neden yönetici hakları istiyor?**
+CPU sıcaklığını okumak, Windows'un yalnızca yükseltilmiş süreçlere (UAC) verdiği donanım erişimini gerektirir. Başlatırken istemi bir kez onaylayın.
 
+**PC'siz deneyebilir miyim?**
+Evet. Sunucunun `--simulate` modu gerçekçi sahte veri üretir — her işletim sisteminde çalışır, test için idealdir.
 
-## Lisans / License
+**Uygulama kaç dil destekliyor?**
+Ayarlardan seçilebilen 14 dil.
 
-[GNU AGPL v3](LICENSE) (GNU Affero General Public License, version 3).
+**Ücretsiz mi?**
+Evet, AGPL-3.0 lisanslı. Geliştirme Patreon destekçileri sayesinde sürüyor.
 
-- The Windows EXE bundles [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`), also AGPL-3.0. When distributing the EXE, the corresponding source and license must be made available (see section 13 of the AGPL).
-- The Android app and server source code are licensed under AGPL-3.0.
+### 9. Lisans
+
+[GNU AGPL v3](LICENSE) (GNU Affero General Public License, sürüm 3).
+
+- Windows EXE, yine AGPL-3.0 olan [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`) dosyasını paketler. EXE dağıtımında karşılık gelen kaynak kod ve lisansın sunulması gerekir (AGPL madde 13).
+- Android uygulaması ve sunucu kaynak kodu AGPL-3.0 ile lisanslıdır.
