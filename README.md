@@ -1,7 +1,10 @@
+<div align="center">
+
 # PC HW Monitor
 
+**Your PC, on your phone.** Real-time CPU, GPU, RAM, disk, network, fan and FPS stats streamed to your Android device over local Wi-Fi.
+
 Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gösteren modern dashboard.
-A modern dashboard that shows your PC's real-time hardware stats on your phone over local Wi-Fi.
 
 <a href="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml" target="_blank">
   <img src="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml/badge.svg" alt="CodeQL Status">
@@ -17,13 +20,28 @@ A modern dashboard that shows your PC's real-time hardware stats on your phone o
        alt="Featured in androidweekly.net Issue #739">
 </a>
 
-**Lisans / License:** [AGPL-3.0](LICENSE) — EXE, AGPL-3.0 lisanslı [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) DLL'i paketler.
+<p>
+  <img src="docs/images/hero_left.jpg" width="216" alt="PC HW Monitor RAM and Disk cards">
+  <img src="docs/images/main_ember.jpg" width="264" alt="PC HW Monitor CPU and GPU dashboard">
+  <img src="docs/images/hero_right.jpg" width="216" alt="PC HW Monitor Settings">
+</p>
 
-**Support:** [Patreon](https://www.patreon.com/cw/Obscrum) — free software stays free thanks to supporters.
-**Destek:** [Patreon](https://www.patreon.com/cw/Obscrum) — ücretsiz yazılım, destekçiler sayesinde ücretsiz kalır.
+<p>
+  <a href="https://github.com/Xeakaes/PcHWmonitor/releases"><strong>Download</strong></a> ·
+  <a href="#english">English</a> ·
+  <a href="#turkce">Türkçe</a>
+</p>
+
+</div>
 
 ---
 
+<sup><strong>License:</strong> [AGPL-3.0](LICENSE) — the Windows EXE bundles
+[LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor)
+(`LibreHardwareMonitorLib.dll`), also AGPL-3.0.
+<strong>Support:</strong> [Patreon](https://www.patreon.com/cw/Obscrum)</sup>
+
+<a id="english"></a>
 ## English
 
 ### Features
@@ -161,6 +179,7 @@ Missing sensors arrive as `null` (the UI shows "—"). Disk/Network/Fans/FPS fie
 ---
 
 
+<a id="turkce"></a>
 ## Türkçe
 
 ### Özellikler
