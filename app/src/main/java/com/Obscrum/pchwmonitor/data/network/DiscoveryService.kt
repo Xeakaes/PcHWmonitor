@@ -49,6 +49,7 @@ class DiscoveryService(
 
             try {
                 socket = DatagramSocket(BROADCAST_PORT)
+                socket.broadcast = true
                 socket.soTimeout = timeoutMs.toInt()
 
                 val buffer = ByteArray(BUFFER_SIZE)

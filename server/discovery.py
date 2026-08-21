@@ -52,7 +52,7 @@ def start_broadcast(server_port: int, server_name: str | None = None) -> threadi
 
         while not stop_event.is_set():
             try:
-                sock.sendto(payload, ("<broadcast>", BROADCAST_PORT))
+                sock.sendto(payload, ("255.255.255.255", BROADCAST_PORT))
             except Exception as e:
                 logger.debug("broadcast send failed: %s", e)
             stop_event.wait(BROADCAST_INTERVAL)
