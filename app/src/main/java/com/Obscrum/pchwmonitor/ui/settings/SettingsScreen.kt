@@ -71,6 +71,13 @@ fun SettingsScreen(
     labelSupport: String,
     labelSupportDescription: String,
     labelSupportPatreon: String,
+    labelDiscover: String = "Discover",
+    labelDiscovering: String = "Scanning...",
+    labelNoServers: String = "No servers found",
+    discoveredServers: List<Triple<String, String, Int>> = emptyList(),
+    isScanning: Boolean = false,
+    onDiscover: () -> Unit = {},
+    onServerSelected: (ip: String, port: Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
 ) {
@@ -136,6 +143,43 @@ fun SettingsScreen(
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Discovery section
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = onDiscover,
+                enabled = !isScanning,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(if (isScanning) labelDiscovering else labelDiscover)
+            }
+        }
+        if (discoveredServers.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            discoveredServers.forEach { (name, serverIp, serverPort) ->
+                Button(
+                    onClick = {
+                        ip = serverIp
+                        port = serverPort.toString()
+                        saved = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("$name ($serverIp:$serverPort)")
+                }
+            }
+        } else if (!isScanning) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = labelNoServers,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
