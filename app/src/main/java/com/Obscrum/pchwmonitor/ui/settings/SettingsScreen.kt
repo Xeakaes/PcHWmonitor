@@ -145,6 +145,27 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Manual connect button
+        Button(
+            onClick = {
+                val portInt = port.toIntOrNull() ?: 8765
+                saved = true
+                onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(labelSave)
+        }
+        if (saved) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = labelSaved,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
         // Discovery section
         Row(
             verticalAlignment = Alignment.CenterVertically,

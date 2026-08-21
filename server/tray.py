@@ -17,9 +17,31 @@ def _tray_image():
     return img
 
 
-def _run_tray(stop_event: threading.Event) -> None:
+def _run_tray(stop_event: threading.Event, token: str | None = None, port: int = 8765) -> None:
     import pystray
-    menu = pystray.Menu(pystray.MenuItem("Kapat", lambda icon, item: (stop_event.set(), icon.stop())))
+    import tkinter as tk
+    from tkinter import messagebox
+
+    def _show_info(icon, item):
+        root = tk.Tk()
+        root.withdraw()
+        token_display = token if token else "(none)"
+        messagebox.showinfo(
+            "PC HW Monitor",
+            f"Port: {port}\nToken: {token_display}\n\n"
+            f"Android app -> Server: ws://<YOUR_IP>:{port}/ws",
+        )
+        root.destroy()
+
+    def _show_exit(icon, item):
+        stop_event.set()
+        icon.stop()
+
+    menu = pystray.Menu(
+        pystray.MenuItem("Info", _show_info),
+        pystray.Menu.SEPARATOR,
+        pystray.MenuItem("Exit", _show_exit),
+    )
     icon = pystray.Icon("PcHwMonitor", _tray_image(), "PC HW Monitor", menu)
     icon.run()
 
@@ -37,7 +59,7 @@ def _run_with_tray(app: FastAPI, port: int) -> None:
     stop_event = threading.Event()
     thread = threading.Thread(target=_serve_in_thread, args=(app, port, stop_event), daemon=True)
     thread.start()
-    _run_tray(stop_event)
+    _run_tray(stop_event, token=app.state.token, port=port)
     thread.join(timeout=5)
     if app.state.fps_adapter is not None:
         app.state.fps_adapter.stop()
