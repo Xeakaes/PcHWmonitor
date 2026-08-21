@@ -4,8 +4,6 @@
 
 **Your PC, on your phone.** Real-time CPU, GPU, RAM, disk, network, fan and FPS stats streamed to your Android device over local Wi-Fi.
 
-Bilgisayarının anlık sistem verilerini yerel Wi-Fi üzerinden telefonunda gösteren modern dashboard.
-
 <a href="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml" target="_blank">
   <img src="https://github.com/Xeakaes/PcHWmonitor/actions/workflows/codeql.yml/badge.svg" alt="CodeQL Status">
 </a>
