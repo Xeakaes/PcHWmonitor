@@ -92,4 +92,16 @@
     <string name="card_width_full">全寬</string>
     <string name="nav_show">顯示導覽</string>
     <string name="fan_card_title">風扇</string>
+    <string name="palette_material_you">Material You</string>
+    <string name="palette_midnight">Midnight</string>
+    <string name="palette_sunset">Sunset</string>
+    <string name="palette_arctic">Arctic</string>
+    <string name="discover">Discover</string>
+    <string name="discovering">Scanning...</string>
+    <string name="no_servers_found">No servers found</string>
+    <string name="notification_channel_name">Hardware Metrics</string>
+    <string name="notification_channel_description">Shows live hardware monitoring data</string>
+    <string name="notification_waiting_data">Waiting for data...</string>
+    <string name="notification_connecting">Connecting...</string>
+    <string name="notification_disconnected">Disconnected</string>
 </resources>

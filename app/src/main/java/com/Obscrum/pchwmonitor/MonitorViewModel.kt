@@ -12,6 +12,7 @@ import com.Obscrum.pchwmonitor.data.local.HistoryDb
 import com.Obscrum.pchwmonitor.data.local.HistoryRepository
 import com.Obscrum.pchwmonitor.data.local.HistorySample
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
+import com.Obscrum.pchwmonitor.data.network.DiscoveryService
 import com.Obscrum.pchwmonitor.data.network.StatusParser
 import com.Obscrum.pchwmonitor.data.network.WebSocketClient
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
@@ -42,6 +43,8 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     val dashboardLayout: StateFlow<DashboardLayout> = settingsStore.settings
         .map { it.dashboardLayout }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().dashboardLayout)
+
+    val discovery = DiscoveryService(viewModelScope)
 
     private val controller = MonitorController(
         client = WebSocketClient(parser = StatusParser),

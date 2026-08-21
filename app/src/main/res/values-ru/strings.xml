@@ -92,4 +92,16 @@
     <string name="card_width_full">Полная ширина</string>
     <string name="nav_show">Показать навигацию</string>
     <string name="fan_card_title">Вентилятор</string>
+    <string name="palette_material_you">Material</string>
+    <string name="palette_midnight">Polnoch</string>
+    <string name="palette_sunset">Zakat</string>
+    <string name="palette_arctic">Arkticheskij</string>
+    <string name="discover">Najti</string>
+    <string name="discovering">Poisk...</string>
+    <string name="no_servers_found">Server ne naideny</string>
+    <string name="notification_channel_name">Metriki oborudovaniya</string>
+    <string name="notification_channel_description">Pokazyvaet dannye monitoringa oborudovaniya v realnom vremeni</string>
+    <string name="notification_waiting_data">Ozhidanie dannyh...</string>
+    <string name="notification_connecting">Podklyuchenie...</string>
+    <string name="notification_disconnected">Otklyucheno</string>
 </resources>

@@ -15,6 +15,7 @@ from adapters.lhm import LhmAdapter
 from adapters.lhm_lib import LhmLibAdapter
 from adapters.simulator import Simulator
 from adapters.system import SystemAdapter
+from discovery import start_broadcast
 from hub import Hub
 from schema import StatusMessage, WelcomeMessage
 
@@ -154,6 +155,8 @@ def build_app(
 
 async def _run_forever(app: FastAPI, port: int, stop_event: threading.Event | None = None) -> None:
     task = asyncio.create_task(app.state.hub.tick_forever())
+    # Start UDP broadcast for LAN discovery
+    broadcast_thread = start_broadcast(port, app.state.welcome.serverName)
     monitor = None
     try:
         config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info", log_config=None, access_log=False)

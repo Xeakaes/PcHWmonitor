@@ -36,9 +36,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import android.os.Build
 import com.Obscrum.pchwmonitor.MonitorViewModel
 import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardScreen
+import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
 import com.Obscrum.pchwmonitor.ui.settings.SettingsScreen
@@ -174,6 +176,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                 }
                 composable("settings") {
                     val settings by viewModel.settings.collectAsState()
+                    val discoveredServers by viewModel.discovery.servers.collectAsState()
+                    val isScanning by viewModel.discovery.isScanning.collectAsState()
                     SettingsScreen(
                         settings = settings,
                         connection = connection,
@@ -189,13 +193,21 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelThemeLight = stringResource(R.string.theme_light),
                         labelThemeDark = stringResource(R.string.theme_dark),
                         labelThemePalette = stringResource(R.string.theme_palette),
-                        paletteLabels = listOf(
-                            "default" to stringResource(R.string.palette_default),
-                            "ocean" to stringResource(R.string.palette_ocean),
-                            "ember" to stringResource(R.string.palette_ember),
-                            "forest" to stringResource(R.string.palette_forest),
-                            "gold" to stringResource(R.string.palette_gold),
-                        ),
+                        paletteLabels = PaletteDefinitions.idsForApi(Build.VERSION.SDK_INT).map { id ->
+                            val labelRes = when (id) {
+                                "default" -> R.string.palette_default
+                                "ocean" -> R.string.palette_ocean
+                                "ember" -> R.string.palette_ember
+                                "forest" -> R.string.palette_forest
+                                "gold" -> R.string.palette_gold
+                                "midnight" -> R.string.palette_midnight
+                                "sunset" -> R.string.palette_sunset
+                                "arctic" -> R.string.palette_arctic
+                                "material_you" -> R.string.palette_material_you
+                                else -> R.string.palette_default
+                            }
+                            id to stringResource(labelRes)
+                        },
                         paletteId = settings.themePaletteId,
                         onPaletteChange = viewModel::setThemePalette,
                         labelLanguage = stringResource(R.string.settings_language),
@@ -226,6 +238,15 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelSupport = stringResource(R.string.support),
                         labelSupportDescription = stringResource(R.string.support_description),
                         labelSupportPatreon = stringResource(R.string.support_patreon),
+                        labelDiscover = stringResource(R.string.discover),
+                        labelDiscovering = stringResource(R.string.discovering),
+                        labelNoServers = stringResource(R.string.no_servers_found),
+                        discoveredServers = discoveredServers.map { Triple(it.name, it.ip, it.port) },
+                        isScanning = isScanning,
+                        onDiscover = { viewModel.discovery.startScan() },
+                        onServerSelected = { ip, port ->
+                            viewModel.saveSettings(ip, port, settings.authToken, settings.theme, settings.language, settings.chartWindowSeconds)
+                        },
                         onSave = { ip, port, authToken, theme, language, chartWindowSeconds ->
                             viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds)
                         },

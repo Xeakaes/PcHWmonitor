@@ -6,14 +6,30 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 object PaletteDefinitions {
-    val ids: List<String> = listOf("default", "ocean", "ember", "forest", "gold")
+    private val baseIds = listOf("default", "ocean", "ember", "forest", "gold", "midnight", "sunset", "arctic")
 
-    fun schemeFor(id: String, dark: Boolean): ColorScheme = when (id) {
-        "ocean" -> if (dark) OceanDark else OceanLight
-        "ember" -> if (dark) EmberDark else EmberLight
-        "forest" -> if (dark) ForestDark else ForestLight
-        "gold" -> if (dark) GoldDark else GoldLight
-        else -> if (dark) DarkColorScheme else LightColorScheme
+    fun idsForApi(apiLevel: Int): List<String> {
+        return if (apiLevel >= 31) baseIds + "material_you" else baseIds
+    }
+
+    fun schemeFor(
+        id: String,
+        dark: Boolean,
+        dynamicColorScheme: ColorScheme? = null
+    ): ColorScheme {
+        if (id == "material_you" && dynamicColorScheme != null) {
+            return dynamicColorScheme
+        }
+        return when (id) {
+            "ocean" -> if (dark) OceanDark else OceanLight
+            "ember" -> if (dark) EmberDark else EmberLight
+            "forest" -> if (dark) ForestDark else ForestLight
+            "gold" -> if (dark) GoldDark else GoldLight
+            "midnight" -> if (dark) MidnightDark else MidnightLight
+            "sunset" -> if (dark) SunsetDark else SunsetLight
+            "arctic" -> if (dark) ArcticDark else ArcticLight
+            else -> if (dark) DarkColorScheme else LightColorScheme
+        }
     }
 }
 
@@ -93,4 +109,52 @@ private val GoldDark = darkColorScheme(
     tertiary = Color(0xFFE8D08A),
     background = Color(0xFF0E0E0E),
     surface = Color(0xFF141414),
+)
+
+private val MidnightLight = lightColorScheme(
+    primary = Color(0xFF5B4FCF),
+    secondary = Color(0xFF7B6FBF),
+    tertiary = Color(0xFF4A3FA0),
+    background = Color(0xFFF5F3FA),
+    surface = Color(0xFFFFFFFF),
+)
+
+private val MidnightDark = darkColorScheme(
+    primary = Color(0xFF9B8FFF),
+    secondary = Color(0xFF8B7FDF),
+    tertiary = Color(0xFFAB9FEF),
+    background = Color(0xFF0E0E18),
+    surface = Color(0xFF14141F),
+)
+
+private val SunsetLight = lightColorScheme(
+    primary = Color(0xFFD45D2A),
+    secondary = Color(0xFFBF7A4A),
+    tertiary = Color(0xFF9A5A3A),
+    background = Color(0xFFFFF8F5),
+    surface = Color(0xFFFFFFFF),
+)
+
+private val SunsetDark = darkColorScheme(
+    primary = Color(0xFFFFAA77),
+    secondary = Color(0xFFDD8855),
+    tertiary = Color(0xFFEEAA77),
+    background = Color(0xFF18100C),
+    surface = Color(0xFF201510),
+)
+
+private val ArcticLight = lightColorScheme(
+    primary = Color(0xFF2A8FCF),
+    secondary = Color(0xFF4A9FBF),
+    tertiary = Color(0xFF3A7FA0),
+    background = Color(0xFFF5FAFF),
+    surface = Color(0xFFFFFFFF),
+)
+
+private val ArcticDark = darkColorScheme(
+    primary = Color(0xFF7ACFFF),
+    secondary = Color(0xFF6ABFDF),
+    tertiary = Color(0xFF8ADFFF),
+    background = Color(0xFF0E1518),
+    surface = Color(0xFF131A1F),
 )
