@@ -7,10 +7,10 @@
 
 ## v1.5 (fdroid onayı hangi sürüme denk gelirse o sürüm "big update" olarak tanıtılır)
 
-- [ ] **Material You theming**: Dinamik renk özütleme (duvar kağıdından), mevcut palet sistemi + açık/koyu ile bütünleşik
-- [ ] **Yerel ağ keşfi**: Aynı LAN'daki PC sunucusunu otomatik bul (IP elle girme derdi biter)
-- [ ] **Bildirim iyileştirmeleri**: Kalıcı bildirimde ana metrikler, genişletilebilir bildirim detayları
-- [ ] **Yeni renk paletleri**: Daha fazla palet seçeneği, kullanıcı özelleştirilebilir paletler
+- [x] **Material You theming**: Dinamik renk özütleme (duvar kağıdından), mevcut palet sistemi + açık/koyu ile bütünleşik
+- [x] **Yerel ağ keşfi**: Aynı LAN'daki PC sunucusunu otomatik bul (IP elle girme derdi biter)
+- [x] **Bildirim iyileştirmeleri**: Kalıcı bildirimde ana metrikler, genişletilebilir bildirim detayları
+- [x] **Yeni renk paletleri**: Daha fazla palet seçeneği, kullanıcı özelleştirilebilir paletler
 
 ## v1.6 (planlanan)
 
