@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import logging
 import os
+import secrets
 import sys
 from pathlib import Path
 
@@ -38,7 +39,10 @@ def main() -> None:
     parser.add_argument("--token", default=None, help="require clients to authenticate with this token")
     args = parser.parse_args()
 
-    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process, token=args.token)
+    # Always require auth: auto-generate if not provided
+    token = args.token if args.token else secrets.token_urlsafe(16)
+
+    app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process, token=token)
     if args.simulate:
         logger.info("running in SIMULATION mode on 0.0.0.0:%d", args.port)
     else:
@@ -47,6 +51,7 @@ def main() -> None:
     if getattr(sys, "frozen", False) and not args.simulate:
         _run_with_tray(app, args.port)
     else:
+        logger.info("token: %s", token)
         asyncio.run(_run_forever(app, args.port))
 
 
