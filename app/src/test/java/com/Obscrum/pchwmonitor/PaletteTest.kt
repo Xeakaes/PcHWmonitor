@@ -23,7 +23,7 @@ class PaletteTest {
 
     @Test
     fun allPalettesProduceSchemesForBothModes() {
-        for (id in PaletteDefinitions.ids) {
+        for (id in PaletteDefinitions.idsForApi(31)) {
             val light = PaletteDefinitions.schemeFor(id, dark = false)
             val dark = PaletteDefinitions.schemeFor(id, dark = true)
             assertNotEquals(light.background, dark.background)
