@@ -1,9 +1,12 @@
 import asyncio
+import logging
 import threading
 
 from fastapi import FastAPI
 
 from app import _run_forever
+
+logger = logging.getLogger("pchw.tray")
 
 
 def _tray_image():
@@ -23,8 +26,8 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
     active_token = token or "(restart required)"
 
     def _connection_payload() -> str:
-        from discovery import get_local_ip
-        return f"pchw://connect?ip={get_local_ip()}&port={port}&token={active_token}"
+        from discovery import best_lan_ip
+        return f"pchw://connect?ip={best_lan_ip()}&port={port}&token={active_token}"
 
     def _copy_payload(icon, item):
         payload = _connection_payload()
@@ -36,22 +39,34 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
             icon.notify(f"Copy failed. Payload:\n{payload}", "PC HW Monitor")
 
     def _show_qr(icon, item):
+        # Run Tk in its own daemon thread so the tray stays responsive and the
+        # window can always be closed with its [X] button.
+        threading.Thread(target=_open_qr_window, args=(_connection_payload(),), daemon=True).start()
+
+    def _open_qr_window(payload: str) -> None:
         import io
         import tkinter as tk
         import qrcode
-        qr = qrcode.QRCode(box_size=6, border=2)
-        qr.add_data(_connection_payload())
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-        root = tk.Tk()
-        root.title("PC HW Monitor — Scan to connect")
-        photo = tk.PhotoImage(data=buf.getvalue())
-        tk.Label(root, image=photo).pack(padx=12, pady=12)
-        tk.Label(root, text="Scan with the PC HW Monitor app\n(Fill via QR button)", justify="center").pack(pady=(0, 12))
-        root.eval("tk::PlaceWindow . center")
-        root.mainloop()
+        try:
+            qr = qrcode.QRCode(box_size=6, border=2)
+            qr.add_data(payload)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            root = tk.Tk()
+            root.title("PC HW Monitor — Scan to connect")
+            photo = tk.PhotoImage(data=buf.getvalue())
+            tk.Label(root, image=photo).pack(padx=12, pady=(12, 4))
+            tk.Label(root, text=payload, wraplength=340, justify="center",
+                     fg="#555555").pack(padx=12, pady=4)
+            tk.Label(root, text='Scan with the app ("Fill via QR"), then tap Connect.',
+                     justify="center").pack(pady=(2, 12))
+            root.protocol("WM_DELETE_WINDOW", root.destroy)
+            root.eval("tk::PlaceWindow . center")
+            root.mainloop()
+        except Exception as e:
+            logger.error("QR window failed: %s — payload: %s", e, payload)
 
     def _show_info(icon, item):
         info_text = (
