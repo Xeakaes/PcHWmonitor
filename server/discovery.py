@@ -38,6 +38,33 @@ def best_lan_ip() -> str:
     prefer classic home-LAN ranges: 192.168.x.x > 10.x.x.x > 172.16-31.x.x,
     skipping loopback and link-local (169.254.x.x).
     """
+def best_lan_ip() -> str:
+    """Pick the IPv4 address of the adapter that carries real traffic.
+
+    Multi-homed machines (WSL, Hyper-V, Docker) expose several private
+    addresses; picking by name/range heuristics can still land on a virtual
+    switch. The default route never lies: ask the kernel which source address
+    it would use to reach a public DNS server, then accept it when it is a
+    LAN-range address. Falls back to interface enumeration heuristics offline.
+    """
+    for dns in ("8.8.8.8", "1.1.1.1"):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.settimeout(0.5)
+            s.connect((dns, 53))
+            ip = s.getsockname()[0]
+            s.close()
+            octets = ip.split(".")
+            a, b = int(octets[0]), int(octets[1])
+            is_lan_range = (
+                len(octets) == 4
+                and (a == 192 and b == 168 or a == 10 or a == 172 and 16 <= b <= 31)
+                and not ip.startswith("169.254.")
+            )
+            if is_lan_range:
+                return ip
+        except Exception as e:
+            logger.debug("default-route probe via %s failed: %s", dns, e)
     try:
         import psutil
 
