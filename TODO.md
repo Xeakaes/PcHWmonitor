@@ -11,6 +11,10 @@
 - [x] **Yerel ağ keşfi**: Aynı LAN'daki PC sunucusunu otomatik bul (IP elle girme derdi biter)
 - [x] **Bildirim iyileştirmeleri**: Kalıcı bildirimde ana metrikler, genişletilebilir bildirim detayları
 - [x] **Yeni renk paletleri**: Daha fazla palet seçeneği, kullanıcı özelleştirilebilir paletler
+- [x] **QR ile bağlanma**: Sunucu tepsisi QR kod gösterir (`Show QR`), telefonda `QR ile doldur` ile okutulunca IP + port + token otomatik dolar (zxing)
+- [x] **Bağlantı yöntemi seçici**: Ayarlar'da `Elle (IP + port)` / `Ağı tara` dropdown'ı, Kaydet'ten ayrı `Bağlan` butonu
+- [x] **Bağlantı güvenilirliği**: Auth hataları artık ekranda görünür, sunucu örnekleme olay döngüsünü bloklamaz, keşif yayınına subnet broadcast eklendi, gerçek LAN adaptörü seçimi (sanal adaptörler elenir)
+- [x] **Paketli sunucu**: Sürüüm 1.5'e yükseltildi (versionCode 6), PresentMon 1.9.2 tekrar EXE'ye gömüldü (FPS kartı çalışır)
 
 ## v1.6 (planlanan)
 
@@ -20,7 +24,7 @@
 ## Backlog
 
 - [ ] Better simulation mode: `--simulate` için daha gerçekçi donanım profilleri
-- [ ] FPS improvements: `--fps-process` otomatik oyun algılama, PresentMon entegrasyonu
+- [ ] FPS improvements: `--fps-process` otomatik oyun algılama (PresentMon 1.9.2 EXE'ye gömüldü ✅)
 - [ ] Disk I/O improvements: okuma/yazma gecikmesi metrikleri, SMART verisi
 - [ ] Network enhancements: bant genişliği geçmişi, arayüz bazlı istatistikler
 - [ ] Web API v2: geçmiş veri + push bildirimi endpoint'leri

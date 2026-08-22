@@ -52,6 +52,7 @@
    - **Dashboard edit mode**: reorder cards, hide/unhide cards, pin cards to the first screen, and toggle each card between half/full width
    - **Landscape mode: compact scroll-free grid on one screen**, with the nav bar auto-hiding and reappearing on tap; tablets get a wider multi-column layout
    - 14 languages (selectable in Settings)
+- **Flexible connection setup**: enter the IP + port + access token manually, tap **Scan network** to find the server automatically, or tap **Fill via QR** — the server tray displays a QR code that fills everything on the phone with a single scan
 - **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil`; packaged FPS support uses an embedded `PresentMon64.exe` (see Building the EXE).
 
 ### 2. Screenshots
@@ -84,9 +85,9 @@ The Android app only talks to the server; it never touches LibreHardwareMonitor 
 
 #### Windows EXE (recommended)
 
-1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature).
-2. On your phone, open the **Settings** tab, enter the PC's Wi-Fi IP (e.g. `192.168.1.50`) and port (`8765`), press **Save**. The dashboard connects automatically.
-3. The EXE sits in the system tray (next to the clock); right-click → **Kapat** (Close) shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
+1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature). The console prints an **access token**, and the tray menu can display it again (Info) or show a **QR code** (Show QR).
+2. On your phone, open the **Settings** tab and tap **Fill via QR** to scan the code — IP, port and token fill automatically; or enter them manually (IP e.g. `192.168.1.50`, port `8765`) and press **Connect**.
+3. The EXE sits in the system tray (next to the clock); its menu offers **Show QR**, **Copy connection info** and **Info**, and **Exit** shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
 
 To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
 
@@ -224,6 +225,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
    - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
    - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
    - 14 dil (ayarlardan seçilebilir)
+- **Esnek bağlantı kurulumu**: IP + port + erişim anahtarını elle girin, **Ağı tara** ile sunucuyu otomatik bulun veya **QR ile doldur**'a dokunun — sunucu tepsisindeki QR kodu tek okutmayla her şeyi telefona doldurur
 - **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur; paketli FPS desteği gömülü `PresentMon64.exe`'e dayanır (bunu `build_exe.bat` inşa eder).
 
 ### 2. Ekran Görüntüleri
@@ -256,9 +258,9 @@ Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması
 
 #### Windows EXE (önerilen yol)
 
-1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir).
-2. Telefonda **Ayarlar** sekmesinden bilgisayarın Wi-Fi IP'sini (örn. `192.168.1.50`) ve portu (`8765`) gir, **Kaydet**'e bas. Dashboard otomatik bağlanır.
-3. EXE sistem tepsisinde (saatin yanı) simge olarak durur; sağ tık → **Kapat** ile sunucu kapanır. İşlem yokken telefonda "Bağlantı yok" görünür.
+1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir). Konsol bir **erişim anahtarı** yazdırır; tepsi menüsünden tekrar görebilirsin (Info) veya **QR kod** görüntüleyebilirsin (Show QR).
+2. Telefonda **Ayarlar** sekmesini aç, **QR ile doldur**'a dokunup kodu okut — IP, port ve token otomatik dolar; ya da elle gir (IP örn. `192.168.1.50`, port `8765`) ve **Bağlan**'a bas.
+3. EXE sistem tepsisinde (saatin yanı) simge olarak durur; menüsünde **Show QR**, **Copy connection info** ve **Info** bulunur, **Exit** ile sunucu kapanır. İşlem yokken telefonda "Bağlantı yok" görünür.
 
 Yeniden derlemek için Windows'ta proje kökünde `build_exe.bat` (pythonnet + pyinstaller gerektirir; DLL'leri `server\vendor` içine kopyalar ve paketler). Paketli modda hata logu `dist\pchw.log` dosyasına yazılır.
 

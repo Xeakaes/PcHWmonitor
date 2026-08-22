@@ -2,12 +2,22 @@
 
 > Vizyon dokümanı — sürüm bazlı görev takibi için [TODO.md](TODO.md)'ye bakın.
 
+## Shipped — v1.5
+
+- [x] Material You dynamic theming, 8 color palettes
+- [x] Ongoing notification with live metrics + expandable details
+- [x] Connection method picker: Manual (IP + port) / Network scan, dedicated Connect button
+- [x] **QR quick connect**: server tray shows a QR (`pchw://connect?ip&port&token`), phone scans and fills everything automatically
+- [x] LAN discovery hardening: multicast lock, subnet broadcast, real-adapter IP selection
+- [x] Visible connection/auth errors, non-blocking hardware sampling on the server
+- [x] PresentMon re-embedded into the packaged EXE (FPS card)
+
 ## Vision
 
 ### Server-Side Improvements (v1.5+)
 
 - [ ] **Better simulation mode**: Enhance `--simulate` mode with more realistic hardware profiles
-- [ ] **FPS improvements**: Add `--fps-process` auto-detection for common games, improve PresentMon integration
+- [ ] **FPS improvements**: Add `--fps-process` auto-detection for common games, improve PresentMon integration (PresentMon 1.9.2 re-embedded in v1.5)
 - [ ] **Disk I/O improvements**: Add read/write latency metrics, SMART data support
 - [ ] **Network enhancements**: Add bandwidth history, per-interface statistics
 - [ ] **Web API v2**: Add new endpoints for historical data, push notifications (v1.6: TLS/SSL)
@@ -15,27 +25,28 @@
 ### Android App Features (v1.5 since: Material You, local discovery, notifications, new palettes)
 
 - [ ] **Custom widget**: Add home screen widget for quick stats
-- [ ] **Notification improvements**: Add ongoing notification with key metrics, expandable notification details (v1.5)
-- [ ] **Material You theming**: Dynamic color extraction from wallpaper (v1.5)
+- [x] **Notification improvements**: Add ongoing notification with key metrics, expandable notification details (shipped v1.5)
+- [x] **Material You theming**: Dynamic color extraction from wallpaper (shipped v1.5)
 - [ ] **Offline mode**: Cache last known stats, work without server connection
 - [ ] **Multiple PC support**: Connect to multiple PCs simultaneously (v1.6)
 - [ ] **Background updates**: Keep connection alive when app is in background
-- [ ] **Local network discovery**: Auto-detect PC on same network (v1.5)
+- [x] **Local network discovery**: Auto-detect PC on same network (shipped v1.5)
 
 ### Dashboard & UI Enhancements
 
 - [ ] **Custom card layouts**: User-defined card positions and sizes
 - [ ] **Advanced chart options**: Logarithmic scale, comparative charts, per-sensor filtering
 - [ ] **Widget options**: Configurable what appears on widget/home screen
-- [ ] **Landscape improvements**: Better multi-column layout for tablets
-- [ ] **Dark mode palette deepening**: More color palette options, user-customizable palettes (v1.5)
+- [x] **Landscape improvements**: Better multi-column layout for tablets
+- [x] **Dark mode palette deepening**: More color palette options, user-customizable palettes (shipped v1.5: 8 palettes)
 
 ### Connectivity & Protocol
 
 - [ ] **WebRTC support**: Alternative to WebSocket for lower latency
 - [ ] **QUIC protocol**: Experimental transport layer
 - [ ] **Secure connection**: TLS/SSL for WebSocket connection (v1.6)
-- [ ] **Local network discovery**: Auto-detect PC on same network (v1.5)
+- [x] **Local network discovery**: Auto-detect PC on same network (shipped v1.5)
+- [x] **QR quick connect**: Server tray shows a QR; the phone app scans it and auto-fills IP, port and access token (shipped v1.5)
 
 ### LibreHardwareMonitor Integration
 - [ ] **Sensor coverage**: Add support for more sensors (voltage, power phases, etc.)
