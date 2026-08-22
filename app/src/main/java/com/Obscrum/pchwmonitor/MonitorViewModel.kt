@@ -44,7 +44,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         .map { it.dashboardLayout }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().dashboardLayout)
 
-    val discovery = DiscoveryService(viewModelScope)
+    val discovery = DiscoveryService(viewModelScope, app)
 
     private val controller = MonitorController(
         client = WebSocketClient(parser = StatusParser),

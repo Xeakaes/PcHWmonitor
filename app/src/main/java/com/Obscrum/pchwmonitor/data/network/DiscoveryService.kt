@@ -1,5 +1,7 @@
 package com.Obscrum.pchwmonitor.data.network
 
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,7 @@ import java.net.DatagramSocket
 
 class DiscoveryService(
     private val scope: CoroutineScope,
+    private val context: Context? = null,
 ) {
     companion object {
         private const val TAG = "DiscoveryService"
@@ -46,8 +49,19 @@ class DiscoveryService(
 
             val discovered = mutableListOf<DiscoveredServer>()
             var socket: DatagramSocket? = null
+            var multicastLock: WifiManager.MulticastLock? = null
 
             try {
+                context?.let { ctx ->
+                    val wifiManager = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+                    wifiManager?.let {
+                        multicastLock = it.createMulticastLock("pchw_discovery").apply {
+                            setReferenceCounted(true)
+                            acquire()
+                        }
+                    }
+                }
+
                 socket = DatagramSocket(BROADCAST_PORT)
                 socket.broadcast = true
                 socket.soTimeout = timeoutMs.toInt()
@@ -84,6 +98,7 @@ class DiscoveryService(
                 Log.e(TAG, "Discovery scan failed", e)
             } finally {
                 socket?.close()
+                multicastLock?.release()
                 _isScanning.value = false
                 Log.d(TAG, "Discovery scan complete, found ${discovered.size} servers")
             }
