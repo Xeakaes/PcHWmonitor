@@ -115,7 +115,7 @@ def build_app(
 
     @app.get("/health")
     async def health():
-        return {"ok": True, "source": source_name, "clients": hub.client_count}
+        return {"ok": True, "source": source_name, "clients": hub.client_count, "token_required": token is not None}
 
     async def _authenticated(ws: WebSocket) -> bool:
         try:

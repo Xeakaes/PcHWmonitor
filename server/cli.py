@@ -52,6 +52,10 @@ def main() -> None:
         _run_with_tray(app, args.port)
     else:
         logger.info("token: %s", token)
+        print(f"\n{'='*50}")
+        print(f"  ACCESS TOKEN: {token}")
+        print(f"  Enter this in the Android app's Access Key field")
+        print(f"{'='*50}\n")
         asyncio.run(_run_forever(app, args.port))
 
 
