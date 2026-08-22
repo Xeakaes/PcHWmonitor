@@ -21,7 +21,7 @@
     <string name="server">Sunucu</string>
     <string name="server_ip">Sunucu IP</string>
     <string name="port">Port</string>
-    <string name="settings_token">Erişim anahtarı (isteğe bağlı)</string>
+    <string name="settings_token">Erişim anahtarı</string>
     <string name="theme">Tema</string>
     <string name="theme_system">Sistem varsayılanı</string>
     <string name="theme_light">Açık</string>
@@ -104,4 +104,8 @@
 <string name="notification_waiting_data">Veri bekleniyor…</string>
 <string name="notification_connecting">Bağlanıyor…</string>
 <string name="notification_disconnected">Bağlantı kesildi</string>
+    <string name="connection_method">Bağlantı yöntemi</string>
+    <string name="method_manual">Elle (IP + port)</string>
+    <string name="method_scan">Ağı tara</string>
+    <string name="connect">Bağlan</string>
 </resources>

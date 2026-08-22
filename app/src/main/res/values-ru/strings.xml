@@ -21,7 +21,7 @@
     <string name="server">Сервер</string>
     <string name="server_ip">IP сервера</string>
     <string name="port">Порт</string>
-    <string name="settings_token">Токен доступа (необязательно)</string>
+    <string name="settings_token">Токен доступа</string>
     <string name="theme">Тема</string>
     <string name="theme_system">Системная</string>
     <string name="theme_light">Светлая</string>
@@ -104,4 +104,8 @@
     <string name="notification_waiting_data">Ozhidanie dannyh...</string>
     <string name="notification_connecting">Podklyuchenie...</string>
     <string name="notification_disconnected">Otklyucheno</string>
+    <string name="connection_method">Способ подключения</string>
+    <string name="method_manual">Вручную (IP + порт)</string>
+    <string name="method_scan">Сканировать сеть</string>
+    <string name="connect">Подключить</string>
 </resources>

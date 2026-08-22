@@ -21,7 +21,7 @@
     <string name="server">サーバー</string>
     <string name="server_ip">サーバー IP</string>
     <string name="port">ポート</string>
-    <string name="settings_token">アクセストークン（任意）</string>
+    <string name="settings_token">アクセストークン</string>
     <string name="theme">テーマ</string>
     <string name="theme_system">システム標準</string>
     <string name="theme_light">ライト</string>
@@ -104,4 +104,8 @@
 <string name="notification_waiting_data">データ待ち…</string>
 <string name="notification_connecting">接続中…</string>
 <string name="notification_disconnected">切断済み</string>
+    <string name="connection_method">接続方法</string>
+    <string name="method_manual">手動（IP＋ポート）</string>
+    <string name="method_scan">ネットワークをスキャン</string>
+    <string name="connect">接続</string>
 </resources>

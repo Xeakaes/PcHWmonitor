@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,6 +75,10 @@ fun SettingsScreen(
     labelDiscover: String = "Discover",
     labelDiscovering: String = "Scanning...",
     labelNoServers: String = "No servers found",
+    labelConnectionMethod: String = "Connection method",
+    labelMethodManual: String = "Manual (IP + port)",
+    labelMethodScan: String = "Scan network",
+    labelConnect: String = "Connect",
     discoveredServers: List<Triple<String, String, Int>> = emptyList(),
     isScanning: Boolean = false,
     onDiscover: () -> Unit = {},
@@ -90,6 +95,13 @@ fun SettingsScreen(
     var language by remember { mutableStateOf(settings.language) }
     var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
+    var scanMode by rememberSaveable { mutableStateOf(false) }
+
+    fun connectNow() {
+        val portInt = port.toIntOrNull() ?: 8765
+        saved = true
+        onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
+    }
 
     Column(
         modifier = modifier
@@ -112,28 +124,100 @@ fun SettingsScreen(
             fontWeight = FontWeight.SemiBold,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = ip,
-            onValueChange = {
-                ip = it
-                saved = false
-            },
-            label = { Text(labelIp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = port,
-            onValueChange = {
-                port = it.filter { ch -> ch.isDigit() }.take(5)
-                saved = false
-            },
-            label = { Text(labelPort) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+
+        // Connection method picker
+        var methodExpanded by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(
+            expanded = methodExpanded,
+            onExpandedChange = { methodExpanded = it },
+        ) {
+            OutlinedTextField(
+                value = if (scanMode) labelMethodScan else labelMethodManual,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(labelConnectionMethod) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = methodExpanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            )
+            ExposedDropdownMenu(expanded = methodExpanded, onDismissRequest = { methodExpanded = false }) {
+                DropdownMenuItem(
+                    text = { Text(labelMethodManual) },
+                    onClick = {
+                        scanMode = false
+                        methodExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(labelMethodScan) },
+                    onClick = {
+                        scanMode = true
+                        methodExpanded = false
+                    },
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (!scanMode) {
+            // Manual entry: IP + port
+            OutlinedTextField(
+                value = ip,
+                onValueChange = {
+                    ip = it
+                    saved = false
+                },
+                label = { Text(labelIp) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = port,
+                onValueChange = {
+                    port = it.filter { ch -> ch.isDigit() }.take(5)
+                    saved = false
+                },
+                label = { Text(labelPort) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        } else {
+            // Network scan
+            Button(
+                onClick = onDiscover,
+                enabled = !isScanning,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(if (isScanning) labelDiscovering else labelDiscover)
+            }
+            if (discoveredServers.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                discoveredServers.forEach { (name, serverIp, serverPort) ->
+                    Button(
+                        onClick = {
+                            ip = serverIp
+                            port = serverPort.toString()
+                            saved = false
+                            scanMode = false
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("$name ($serverIp:$serverPort)")
+                    }
+                }
+            } else if (!isScanning) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = labelNoServers,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // Access token is required by every connection path
         OutlinedTextField(
             value = authToken,
             onValueChange = {
@@ -146,16 +230,12 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Manual connect button
+        // Primary action: apply settings and connect immediately
         Button(
-            onClick = {
-                val portInt = port.toIntOrNull() ?: 8765
-                saved = true
-                onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
-            },
+            onClick = { connectNow() },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(labelSave)
+            Text(labelConnect)
         }
         if (saved) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -171,43 +251,6 @@ fun SettingsScreen(
                 text = errorMessage,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Discovery section
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Button(
-                onClick = onDiscover,
-                enabled = !isScanning,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(if (isScanning) labelDiscovering else labelDiscover)
-            }
-        }
-        if (discoveredServers.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            discoveredServers.forEach { (name, serverIp, serverPort) ->
-                Button(
-                    onClick = {
-                        ip = serverIp
-                        port = serverPort.toString()
-                        saved = false
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("$name ($serverIp:$serverPort)")
-                }
-            }
-        } else if (!isScanning) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = labelNoServers,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Spacer(modifier = Modifier.height(20.dp))

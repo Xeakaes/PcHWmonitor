@@ -21,7 +21,7 @@
     <string name="server">伺服器</string>
     <string name="server_ip">伺服器 IP</string>
     <string name="port">連接埠</string>
-    <string name="settings_token">存取權杖（選用）</string>
+    <string name="settings_token">存取權杖</string>
     <string name="theme">主題</string>
     <string name="theme_system">跟隨系統</string>
     <string name="theme_light">淺色</string>
@@ -104,4 +104,8 @@
     <string name="notification_waiting_data">Waiting for data...</string>
     <string name="notification_connecting">Connecting...</string>
     <string name="notification_disconnected">Disconnected</string>
+    <string name="connection_method">連線方式</string>
+    <string name="method_manual">手動（IP + 連接埠）</string>
+    <string name="method_scan">掃描網路</string>
+    <string name="connect">連線</string>
 </resources>

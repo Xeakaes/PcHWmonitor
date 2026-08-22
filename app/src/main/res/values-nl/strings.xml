@@ -21,7 +21,7 @@
     <string name="server">Server</string>
     <string name="server_ip">Server-IP</string>
     <string name="port">Poort</string>
-    <string name="settings_token">Toegangstoken (optioneel)</string>
+    <string name="settings_token">Toegangstoken</string>
     <string name="theme">Thema</string>
     <string name="theme_system">Systeemstandaard</string>
     <string name="theme_light">Licht</string>
@@ -104,4 +104,8 @@
 <string name="notification_waiting_data">Wachten op gegevens…</string>
 <string name="notification_connecting">Verbinden…</string>
 <string name="notification_disconnected">Verbonden</string>
+    <string name="connection_method">Verbindingsmethode</string>
+    <string name="method_manual">Handmatig (IP + poort)</string>
+    <string name="method_scan">Netwerk scannen</string>
+    <string name="connect">Verbinden</string>
 </resources>

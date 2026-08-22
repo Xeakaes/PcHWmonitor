@@ -15,6 +15,7 @@ logger = logging.getLogger("pchw.discovery")
 BROADCAST_PORT = 8766
 BROADCAST_INTERVAL = 2.0
 MAGIC = "PCHW"
+BROADCAST_ADDRESS = "255.255.255.255"
 
 
 def get_local_ip() -> str:
@@ -51,10 +52,17 @@ def start_broadcast(server_port: int, server_name: str | None = None) -> threadi
         logger.info("discovery broadcast started on %s:%d", "0.0.0.0", BROADCAST_PORT)
 
         while not stop_event.is_set():
-            try:
-                sock.sendto(payload, ("255.255.255.255", BROADCAST_PORT))
-            except Exception as e:
-                logger.debug("broadcast send failed: %s", e)
+            targets = [BROADCAST_ADDRESS]
+            # Subnet-directed broadcast (e.g. 192.168.1.255) survives routers
+            # that swallow the global 255.255.255.255 packet.
+            octets = local_ip.split(".")
+            if len(octets) == 4 and local_ip != "127.0.0.1":
+                targets.append(f"{octets[0]}.{octets[1]}.{octets[2]}.255")
+            for target in targets:
+                try:
+                    sock.sendto(payload, (target, BROADCAST_PORT))
+                except Exception as e:
+                    logger.debug("broadcast to %s failed: %s", target, e)
             stop_event.wait(BROADCAST_INTERVAL)
 
         sock.close()

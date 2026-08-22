@@ -33,7 +33,11 @@ class Hub:
             await asyncio.sleep(max(0.05, self._interval - elapsed))
 
     async def _broadcast_current(self) -> None:
-        message = self._sample()
+        # Hardware sampling (LibreHardwareMonitor via pythonnet, psutil) runs
+        # synchronous native calls that can block for seconds; running it on a
+        # worker thread keeps the asyncio loop free so websocket pings, auth
+        # handshakes and sends are never starved.
+        message = await asyncio.to_thread(self._sample)
         if not message.available and time.monotonic() - self._last_error_at < 5.0:
             return
         if not message.available:

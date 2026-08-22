@@ -21,7 +21,7 @@
     <string name="server">Server</string>
     <string name="server_ip">Server-IP</string>
     <string name="port">Port</string>
-    <string name="settings_token">Zugriffstoken (optional)</string>
+    <string name="settings_token">Zugriffstoken</string>
     <string name="theme">Design</string>
     <string name="theme_system">Systemstandard</string>
     <string name="theme_light">Hell</string>
@@ -104,4 +104,8 @@
 <string name="notification_waiting_data">Warte auf Daten…</string>
 <string name="notification_connecting">Verbinden…</string>
 <string name="notification_disconnected">Getrennt</string>
+    <string name="connection_method">Verbindungsmethode</string>
+    <string name="method_manual">Manuell (IP + Port)</string>
+    <string name="method_scan">Netzwerk scannen</string>
+    <string name="connect">Verbinden</string>
 </resources>
