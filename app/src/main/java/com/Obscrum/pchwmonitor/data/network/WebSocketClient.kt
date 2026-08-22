@@ -59,6 +59,9 @@ class WebSocketClient(
     private suspend fun connectLoop(url: String) {
         var backoffMs = 1000L
         while (!closed) {
+            // Drain stale close events left over from a previous socket so the
+            // new connection is not released immediately after opening.
+            while (closedEvents.tryReceive().isSuccess) { /* discard */ }
             _connectionState.value = ConnectionState.CONNECTING
             val socket = tryOpen(url)
             if (socket == null) {
@@ -106,6 +109,9 @@ class WebSocketClient(
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            if (code == 1008) {
+                _messages.tryEmit(WsMessage.ParseFailure("auth", "Token required — check server console for token"))
+            }
             _connectionState.value = ConnectionState.DISCONNECTED
             closedEvents.trySend(Unit)
         }

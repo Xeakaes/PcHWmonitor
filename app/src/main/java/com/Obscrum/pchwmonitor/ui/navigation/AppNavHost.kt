@@ -178,6 +178,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val settings by viewModel.settings.collectAsState()
                     val discoveredServers by viewModel.discovery.servers.collectAsState()
                     val isScanning by viewModel.discovery.isScanning.collectAsState()
+                    val errorMessage by viewModel.lastError.collectAsState()
                     SettingsScreen(
                         settings = settings,
                         connection = connection,
@@ -244,6 +245,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         discoveredServers = discoveredServers.map { Triple(it.name, it.ip, it.port) },
                         isScanning = isScanning,
                         onDiscover = { viewModel.discovery.startScan() },
+                        errorMessage = errorMessage,
                         onServerSelected = { ip, port ->
                             viewModel.saveSettings(ip, port, settings.authToken, settings.theme, settings.language, settings.chartWindowSeconds)
                         },

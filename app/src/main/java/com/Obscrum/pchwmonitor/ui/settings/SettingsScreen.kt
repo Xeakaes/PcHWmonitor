@@ -78,6 +78,7 @@ fun SettingsScreen(
     isScanning: Boolean = false,
     onDiscover: () -> Unit = {},
     onServerSelected: (ip: String, port: Int) -> Unit = { _, _ -> },
+    errorMessage: String? = null,
     modifier: Modifier = Modifier,
     onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
 ) {
@@ -162,6 +163,14 @@ fun SettingsScreen(
                 text = labelSaved,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
