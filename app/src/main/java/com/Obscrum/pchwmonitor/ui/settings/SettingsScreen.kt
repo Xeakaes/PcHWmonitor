@@ -17,12 +17,17 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.platform.LocalContext
 import com.Obscrum.pchwmonitor.util.PATREON_URL
+import com.Obscrum.pchwmonitor.util.QrPayload
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -79,6 +84,7 @@ fun SettingsScreen(
     labelMethodManual: String = "Manual (IP + port)",
     labelMethodScan: String = "Scan network",
     labelConnect: String = "Connect",
+    labelQrScan: String = "Fill via QR",
     discoveredServers: List<Triple<String, String, Int>> = emptyList(),
     isScanning: Boolean = false,
     onDiscover: () -> Unit = {},
@@ -96,6 +102,18 @@ fun SettingsScreen(
     var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
     var scanMode by rememberSaveable { mutableStateOf(false) }
+
+    val qrLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
+        result.contents?.let { text ->
+            QrPayload.parse(text)?.let { (qrIp, qrPort, qrToken) ->
+                ip = qrIp
+                port = qrPort.toString()
+                authToken = qrToken
+                scanMode = false
+                saved = false
+            }
+        }
+    }
 
     fun connectNow() {
         val portInt = port.toIntOrNull() ?: 8765
@@ -155,6 +173,22 @@ fun SettingsScreen(
                     },
                 )
             }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Fill all connection fields from the server's QR code
+        OutlinedButton(
+            onClick = {
+                qrLauncher.launch(ScanOptions().apply {
+                    setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                    setPrompt(labelQrScan)
+                    setBeepEnabled(false)
+                    setOrientationLocked(true)
+                })
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(labelQrScan)
         }
         Spacer(modifier = Modifier.height(12.dp))
 

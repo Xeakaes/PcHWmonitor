@@ -108,4 +108,5 @@
     <string name="method_manual">Вручную (IP + порт)</string>
     <string name="method_scan">Сканировать сеть</string>
     <string name="connect">Подключить</string>
+    <string name="qr_scan">Заполнить по QR</string>
 </resources>

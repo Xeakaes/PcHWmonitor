@@ -108,4 +108,5 @@
     <string name="method_manual">手動（IP＋ポート）</string>
     <string name="method_scan">ネットワークをスキャン</string>
     <string name="connect">接続</string>
+    <string name="qr_scan">QRで入力</string>
 </resources>

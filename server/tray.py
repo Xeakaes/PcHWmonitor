@@ -22,13 +22,44 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
 
     active_token = token or "(restart required)"
 
+    def _connection_payload() -> str:
+        from discovery import get_local_ip
+        return f"pchw://connect?ip={get_local_ip()}&port={port}&token={active_token}"
+
+    def _copy_payload(icon, item):
+        payload = _connection_payload()
+        try:
+            import subprocess
+            subprocess.run("clip", input=payload.encode("utf-16-le"), check=True)
+            icon.notify("Connection info copied to clipboard.", "PC HW Monitor")
+        except Exception:
+            icon.notify(f"Copy failed. Payload:\n{payload}", "PC HW Monitor")
+
+    def _show_qr(icon, item):
+        import io
+        import tkinter as tk
+        import qrcode
+        qr = qrcode.QRCode(box_size=6, border=2)
+        qr.add_data(_connection_payload())
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        root = tk.Tk()
+        root.title("PC HW Monitor — Scan to connect")
+        photo = tk.PhotoImage(data=buf.getvalue())
+        tk.Label(root, image=photo).pack(padx=12, pady=12)
+        tk.Label(root, text="Scan with the PC HW Monitor app\n(Fill via QR button)", justify="center").pack(pady=(0, 12))
+        root.eval("tk::PlaceWindow . center")
+        root.mainloop()
+
     def _show_info(icon, item):
         info_text = (
             f"Port: {port}\n"
             f"Token: {active_token}\n\n"
             f"Enter this token in the Android app's\n"
-            f"Access Key field, then tap Connect.\n\n"
-            f"Server: ws://<YOUR_IP>:{port}/ws"
+            f"Access Key field, then tap Connect.\n"
+            f"(Or use the app's 'Fill via QR' button.)"
         )
         # Use pystray notification — no dialog window, always dismissable
         icon.notify(info_text, "PC HW Monitor")
@@ -38,6 +69,9 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         icon.stop()
 
     menu = pystray.Menu(
+        pystray.MenuItem("Show QR", _show_qr, default=True),
+        pystray.MenuItem("Copy connection info", _copy_payload),
+        pystray.Menu.SEPARATOR,
         pystray.MenuItem("Info", _show_info),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Exit", _show_exit),

@@ -108,4 +108,5 @@
     <string name="method_manual">手动（IP + 端口）</string>
     <string name="method_scan">扫描网络</string>
     <string name="connect">连接</string>
+    <string name="qr_scan">扫码填充</string>
 </resources>

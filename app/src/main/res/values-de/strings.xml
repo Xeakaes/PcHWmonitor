@@ -108,4 +108,5 @@
     <string name="method_manual">Manuell (IP + Port)</string>
     <string name="method_scan">Netzwerk scannen</string>
     <string name="connect">Verbinden</string>
+    <string name="qr_scan">Per QR ausfüllen</string>
 </resources>

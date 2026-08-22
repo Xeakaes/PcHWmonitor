@@ -108,4 +108,5 @@
     <string name="method_manual">Manual (IP + puerto)</string>
     <string name="method_scan">Escanear red</string>
     <string name="connect">Conectar</string>
+    <string name="qr_scan">Rellenar con QR</string>
 </resources>

@@ -108,4 +108,5 @@
     <string name="method_manual">手動（IP + 連接埠）</string>
     <string name="method_scan">掃描網路</string>
     <string name="connect">連線</string>
+    <string name="qr_scan">掃碼填入</string>
 </resources>

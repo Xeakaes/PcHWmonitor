@@ -246,6 +246,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelMethodManual = stringResource(R.string.method_manual),
                         labelMethodScan = stringResource(R.string.method_scan),
                         labelConnect = stringResource(R.string.connect),
+                        labelQrScan = stringResource(R.string.qr_scan),
                         discoveredServers = discoveredServers.map { Triple(it.name, it.ip, it.port) },
                         isScanning = isScanning,
                         onDiscover = { viewModel.discovery.startScan() },

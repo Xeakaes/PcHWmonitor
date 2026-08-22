@@ -108,4 +108,5 @@
     <string name="method_manual">Elle (IP + port)</string>
     <string name="method_scan">Ağı tara</string>
     <string name="connect">Bağlan</string>
+    <string name="qr_scan">QR ile doldur</string>
 </resources>

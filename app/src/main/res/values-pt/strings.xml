@@ -108,4 +108,5 @@
     <string name="method_manual">Manual (IP + porta)</string>
     <string name="method_scan">Procurar na rede</string>
     <string name="connect">Ligar</string>
+    <string name="qr_scan">Preencher via QR</string>
 </resources>
