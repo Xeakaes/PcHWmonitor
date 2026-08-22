@@ -65,13 +65,13 @@ jobs:
 
       - name: Smoke test
         run: |
-          python server/main.py --simulate --port 8765 &
+          python server/main.py --simulate --port 8765 --token ci-smoke-token &
           SERVER_PID=$!
           for i in $(seq 1 20); do
             python -c "import socket; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1', 8765)); s.close(); exit(0)" 2>/dev/null && break
             sleep 1
           done
-          python server/smoke_test.py
+          python server/smoke_test.py ws://127.0.0.1:8765/ws ci-smoke-token
           STATUS=$?
           kill $SERVER_PID 2>/dev/null || true
           exit $STATUS

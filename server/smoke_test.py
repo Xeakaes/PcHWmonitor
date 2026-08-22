@@ -7,7 +7,10 @@ import websockets
 
 async def main() -> None:
     uri = sys.argv[1] if len(sys.argv) > 1 else "ws://127.0.0.1:8765/ws"
+    token = sys.argv[2] if len(sys.argv) > 2 else None
     async with websockets.connect(uri) as ws:
+        if token:
+            await ws.send(json.dumps({"type": "auth", "token": token}))
         welcome = json.loads(await ws.recv())
         assert welcome["type"] == "welcome", f"expected welcome, got {welcome}"
         assert welcome["intervalMs"] > 0
