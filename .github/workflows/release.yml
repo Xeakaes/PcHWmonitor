@@ -50,5 +50,8 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
-          files: app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/release/*.apk
           generate_release_notes: true
+        # NOTE: without ANDROID_KEYSTORE_BASE64/KEYSTORE_PASSWORD/KEY_ALIAS/KEY_PASSWORD
+        # secrets configured, this job produces an UNSIGNED apk named app-release-unsigned.apk.
+        # Signed releases are currently produced manually (see docs/superpowers/plans).
