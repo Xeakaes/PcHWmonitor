@@ -1,10 +1,15 @@
 name: Release
 
+# Releases are SIGNED MANUALLY per project policy: the keystore never leaves
+# the maintainer's machine, so CI must not (and cannot) produce release assets.
+# Pushing a v* tag only opens the release shell with generated notes; attach
+# the signed PcHwMonitor-vX.Y.apk and PcHwMonitor.exe afterwards by hand.
+# See docs/RELEASING.md for the full procedure.
+
 on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,9 +17,9 @@ concurrency:
 
 jobs:
   release:
-    name: Build signed APK and publish release
+    name: Open release shell with notes
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
     permissions:
       contents: write
 
@@ -22,36 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Decode keystore from secrets
-        if: env.HAS_KEYSTORE == 'true'
-        env:
-          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
-        shell: bash
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.keystore"
-          cat > key.properties <<EOF
-          storeFile=$RUNNER_TEMP/release.keystore
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          EOF
-
-      - name: Build release APK
-        env:
-          ORG_GRADLE_PROJECT_ci: "true"
-        run: ./gradlew --no-daemon assembleRelease
-
-      - name: Publish GitHub release
+      - name: Publish GitHub release (no assets)
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
-          files: app/build/outputs/apk/release/*.apk
           generate_release_notes: true
-        # NOTE: without ANDROID_KEYSTORE_BASE64/KEYSTORE_PASSWORD/KEY_ALIAS/KEY_PASSWORD
-        # secrets configured, this job produces an UNSIGNED apk named app-release-unsigned.apk.
-        # Signed releases are currently produced manually (see docs/superpowers/plans).
