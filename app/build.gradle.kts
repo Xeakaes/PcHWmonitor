@@ -19,6 +19,13 @@ android {
         version = release(37)
     }
 
+    dependenciesInfo {
+        // AGP embeds a "Dependency metadata" block into the APK signing block;
+        // F-Droid rejects APKs containing it, so keep it out of release builds.
+        includeInApk = false
+        includeInBundle = false
+    }
+
     defaultConfig {
         applicationId = "com.Obscrum.pchwmonitor"
         minSdk = 24
