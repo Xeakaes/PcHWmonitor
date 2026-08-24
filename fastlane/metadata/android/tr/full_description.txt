@@ -1,21 +1,18 @@
-PC HW Monitor, bilgisayarının anlık donanım istatistiklerini yerel Wi-Fi üzerinden telefonunda gösterir.
+<p>PC HW Monitor, bilgisayarının anlık donanım istatistiklerini yerel Wi-Fi üzerinden telefonunda gösterir.</p>
 
-## Özellikler
+<b>Özellikler</b><br/><br/>
+<ul>
+<li>Sıcaklık, kullanım, saat hızı, güç, VRAM/RAM ve çekirdek yükleriyle CPU, GPU, iGPU ve RAM kartları</li>
+<li>Canlı grafikler ve 1 saatlik geçmiş (cihazda yerel olarak saklanır)</li>
+<li>Açık ve koyu tema</li>
+<li>Yatay mod: tüm kartlar tek ekranda kaydırmasız kompakt 2x2 ızgarada</li>
+<li>Ayarlar'dan seçilebilen 14 dil</li>
+</ul><br/>
 
-- Sıcaklık, kullanım, saat hızı, güç, VRAM/RAM ve çekirdek yükleriyle CPU, GPU, iGPU ve RAM kartları
-- Canlı grafikler ve 1 saatlik geçmiş (cihazda yerel olarak saklanır)
-- Açık ve koyu tema
-- Yatay mod: tüm kartlar tek ekranda kaydırmasız kompakt 2x2 ızgarada
-- Ayarlar'dan seçilebilen 14 dil
+<b>Nasıl çalışır</b><br/><br/>
+<p>PC'nde kurulum gerektirmeyen tek dosyalık Windows sunucusunu çalıştır. Sunucu, donanım verilerini LibreHardwareMonitor'dan okur ve saniyede bir WebSocket üzerinden uygulamaya gönderir. Uygulama yalnızca yerel Wi-Fi ağında sunucuyla konuşur; verilerin ağından dışarı çıkmaz.</p>
+<p>PC donanımın yok mu? Sunucuyu --simulate ile başlatarak gerçekçi sahte veri üretebilirsin.</p><br/>
 
-## Nasıl çalışır
-
-PC'nde kurulum gerektirmeyen tek dosyalık Windows sunucusunu çalıştır. Sunucu, donanım verilerini LibreHardwareMonitor'dan okur ve saniyede bir WebSocket üzerinden uygulamaya gönderir. Uygulama yalnızca yerel Wi-Fi ağında sunucuyla konuşur; verilerin ağından dışarı çıkmaz.
-
-PC donanımın yok mu? Sunucuyu `--simulate` ile başlatarak gerçekçi sahte veri üretebilirsin.
-
-## Lisans
-
-AGPL-3.0. Windows sunucusu LibreHardwareMonitor (AGPL-3.0) paketler.
-
-Bu uygulama işine yaradıysa geliştirmeyi Patreon üzerinden destekleyebilirsin: https://www.patreon.com/cw/Obscrum
+<b>Lisans</b><br/><br/>
+<p>AGPL-3.0. Windows sunucusu LibreHardwareMonitor (AGPL-3.0) paketler.</p>
+<p>Bu uygulama işine yaradıysa geliştirmeyi Patreon üzerinden destekleyebilirsin: <a href="https://www.patreon.com/cw/Obscrum">Patreon</a>.</p>
