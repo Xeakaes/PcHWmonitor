@@ -52,6 +52,13 @@ android {
             optimization {
                 enable = true
             }
+            vcsInfo {
+                // AGP otherwise embeds META-INF/version-control-info.textproto
+                // with the git revision, so the same sources produce different
+                // bytes depending on where the build ran and F-Droid's
+                // reproducible-build verification can never match.
+                include = false
+            }
             if (keystorePropsFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -63,10 +70,6 @@ android {
     }
     buildFeatures {
         compose = true
-        // AGP otherwise embeds META-INF/version-control-info.textproto with
-        // the git revision; the byte then depends on when/where the build ran
-        // and F-Droid's reproducible-build verification can never match.
-        vcsInfo = false
     }
     sourceSets {
         getByName("androidTest").assets.srcDirs(files("$projectDir/schemas"))
