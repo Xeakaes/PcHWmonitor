@@ -6,6 +6,9 @@ import androidx.compose.ui.unit.dp
 // Landscape detection shared by the dashboard layout branches.
 internal fun isLandscapeLayout(maxWidth: Dp, maxHeight: Dp): Boolean = maxWidth > maxHeight
 
+// Upper bound of points drawn per sparkline; LTTB downsampling preserves the shape.
+internal const val CHART_MAX_POINTS = 240
+
 enum class DashboardSizeClass { PHONE, TABLET }
 
 fun sizeClassForWidth(maxWidth: Dp): DashboardSizeClass =
@@ -32,6 +35,7 @@ fun layoutDashboard(
     size: DashboardSizeClass,
     maxWidth: Dp,
     landscape: Boolean,
+    maxHeight: Dp = Dp.Infinity,
 ): RenderPlan {
     val visible = layout.visibleEntries()
     val phoneLandscape = size == DashboardSizeClass.PHONE && landscape
@@ -45,9 +49,17 @@ fun layoutDashboard(
     } else {
         visible.map { it.card }
     }
-    val columns = if (phoneLandscape) 2 else columnCount(size, maxWidth)
+    // Short landscape screens (case-embedded kiosk displays) fit more cards
+    // per row so the first screen shows everything without scrolling.
+    val columns = if (phoneLandscape) phoneLandscapeColumns(maxHeight) else columnCount(size, maxWidth)
     val isGrid = size == DashboardSizeClass.TABLET || phoneLandscape
     return RenderPlan(columns, firstScreen, rest, isGrid)
+}
+
+private fun phoneLandscapeColumns(maxHeight: Dp): Int = when {
+    maxHeight < 400.dp -> 4
+    maxHeight < 550.dp -> 3
+    else -> 2
 }
 
 fun buildRows(plan: RenderPlan, layout: DashboardLayout): List<List<CardId>> {

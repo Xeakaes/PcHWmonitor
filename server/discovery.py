@@ -30,15 +30,6 @@ def get_local_ip() -> str:
 
 
 def best_lan_ip() -> str:
-    """Pick the most likely real-LAN IPv4 address.
-
-    Machines with virtual switches (WSL, Hyper-V, Docker) expose several
-    private addresses; the UDP-routing trick above often lands on one of
-    them, which phones then reject. Enumerate every interface instead and
-    prefer classic home-LAN ranges: 192.168.x.x > 10.x.x.x > 172.16-31.x.x,
-    skipping loopback and link-local (169.254.x.x).
-    """
-def best_lan_ip() -> str:
     """Pick the IPv4 address of the adapter that carries real traffic.
 
     Multi-homed machines (WSL, Hyper-V, Docker) expose several private
@@ -101,6 +92,28 @@ def best_lan_ip() -> str:
     return get_local_ip()
 
 
+def interface_broadcast_addresses() -> list[str]:
+    """Collect the directed broadcast address of every IPv4 interface.
+
+    Virtual adapters (WSL, Hyper-V, VPN, Docker) mean the phone may live on
+    any of several subnets; sending only to the default route's subnet
+    misses phones on the others.
+    """
+    targets = {BROADCAST_ADDRESS}
+    try:
+        import psutil
+
+        for _name, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET:
+                    broadcast = getattr(addr, "broadcast", None)
+                    if broadcast:
+                        targets.add(broadcast)
+    except Exception as e:
+        logger.debug("interface enumeration failed: %s", e)
+    return sorted(targets)
+
+
 def start_broadcast(server_port: int, server_name: str | None = None) -> threading.Thread:
     if server_name is None:
         server_name = platform.node() or "PC-HW-Monitor"
@@ -124,13 +137,14 @@ def start_broadcast(server_port: int, server_name: str | None = None) -> threadi
         logger.info("discovery broadcast started on %s:%d", "0.0.0.0", BROADCAST_PORT)
 
         while not stop_event.is_set():
-            targets = [BROADCAST_ADDRESS]
+            targets = interface_broadcast_addresses()
             # Subnet-directed broadcast (e.g. 192.168.1.255) survives routers
-            # that swallow the global 255.255.255.255 packet.
+            # that swallow the global 255.255.255.255 packet; also cover the
+            # default-route subnet even when psutil is unavailable.
             octets = local_ip.split(".")
             if len(octets) == 4 and local_ip != "127.0.0.1":
                 targets.append(f"{octets[0]}.{octets[1]}.{octets[2]}.255")
-            for target in targets:
+            for target in dict.fromkeys(targets):
                 try:
                     sock.sendto(payload, (target, BROADCAST_PORT))
                 except Exception as e:
@@ -140,5 +154,13 @@ def start_broadcast(server_port: int, server_name: str | None = None) -> threadi
         sock.close()
 
     thread = threading.Thread(target=broadcast_loop, daemon=True, name="discovery-broadcast")
+    thread.stop_event = stop_event  # type: ignore[attr-defined]
     thread.start()
     return thread
+
+
+def stop_broadcast(thread: threading.Thread | None) -> None:
+    """Signal the broadcaster to stop; safe to call with None or twice."""
+    event = getattr(thread, "stop_event", None)
+    if event is not None:
+        event.set()

@@ -44,13 +44,30 @@ class Hub:
             self._last_error_at = time.monotonic()
             logger.warning("data source unavailable: %s", message.error)
         payload = message.model_dump_json()
-        stale = []
-        for ws in list(self._clients):
-            try:
-                await asyncio.wait_for(ws.send_text(payload), timeout=self._send_timeout)
-            except asyncio.TimeoutError:
-                logger.warning("slow client timed out sending; keeping it connected")
-            except Exception:
-                stale.append(ws)
-        for ws in stale:
-            self.unregister(ws)
+        clients = list(self._clients)
+        if not clients:
+            return
+        # Send to every client concurrently: one slow consumer must never
+        # serialize its timeout onto everyone else's tick.
+        results = await asyncio.gather(
+            *(self._send_one(ws, payload) for ws in clients),
+            return_exceptions=True,
+        )
+        for ws, result in zip(clients, results):
+            if isinstance(result, BaseException):
+                logger.debug("client send crashed: %r", result)
+                self.unregister(ws)
+            elif result is False:
+                self.unregister(ws)
+
+    async def _send_one(self, ws: WebSocket, payload: str) -> bool:
+        """Deliver one frame; False marks a dead connection, True keeps it."""
+        try:
+            await asyncio.wait_for(ws.send_text(payload), timeout=self._send_timeout)
+            return True
+        except asyncio.TimeoutError:
+            logger.warning("slow client timed out sending; keeping it connected")
+            return True
+        except Exception as exc:
+            logger.debug("send failed, dropping client: %s", exc)
+            return False

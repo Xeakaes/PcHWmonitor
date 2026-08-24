@@ -40,7 +40,7 @@ fun DiskCard(
         LaunchedEffect(disk?.readMbPerSec, disk?.writeMbPerSec) {
             disk?.readMbPerSec?.let {
                 spark.append(it + (disk.writeMbPerSec ?: 0f))
-                points = spark.snapshot()
+                points = spark.downsample(CHART_MAX_POINTS)
             }
         }
         LaunchedEffect(chartPoints) { spark.clearAndResize(chartPoints) }

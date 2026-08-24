@@ -46,7 +46,7 @@ fun GpuCard(
         LaunchedEffect(gpu?.tempC) {
             gpu?.tempC?.let {
                 spark.append(it)
-                points = spark.snapshot()
+                points = spark.downsample(CHART_MAX_POINTS)
             }
         }
         LaunchedEffect(chartPoints) { spark.clearAndResize(chartPoints) }

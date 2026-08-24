@@ -100,7 +100,7 @@ fun DashboardScreen(
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val landscape = isLandscapeLayout(maxWidth = maxWidth, maxHeight = maxHeight)
         val sizeClass = sizeClassForWidth(maxWidth)
-        val plan = layoutDashboard(layout, sizeClass, maxWidth, landscape)
+        val plan = layoutDashboard(layout, sizeClass, maxWidth, landscape, maxHeight)
         var fpsDetailsOpen by rememberSaveable { mutableStateOf(false) }
         LazyColumn(
             modifier = modifier.fillMaxSize(),

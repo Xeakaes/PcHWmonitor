@@ -96,13 +96,20 @@ class PresentMonFps:
         return compute_fps(list(self._entries), time.time(), self._interval_s, self._window_s)
 
     def stop(self) -> None:
-        if self._proc is not None:
-            self._proc.terminate()
+        proc, self._proc = self._proc, None
+        if proc is not None:
+            proc.terminate()
             try:
-                self._proc.wait(timeout=3)
+                proc.wait(timeout=3)
             except Exception:
-                self._proc.kill()
-            self._proc = None
+                proc.kill()
+            # Close the pipe so the reader thread's stdout loop sees EOF
+            # instead of blocking forever on a dead child.
+            try:
+                if proc.stdout is not None:
+                    proc.stdout.close()
+            except Exception:
+                pass
         if self._thread is not None:
             self._thread.join(timeout=3)
             self._thread = None

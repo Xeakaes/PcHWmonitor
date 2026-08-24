@@ -1,4 +1,5 @@
 import asyncio
+import atexit
 import json
 import logging
 import platform
@@ -15,7 +16,7 @@ from adapters.lhm import LhmAdapter
 from adapters.lhm_lib import LhmLibAdapter
 from adapters.simulator import Simulator
 from adapters.system import SystemAdapter
-from discovery import start_broadcast
+from discovery import start_broadcast, stop_broadcast
 from hub import Hub
 from schema import StatusMessage, WelcomeMessage
 
@@ -91,6 +92,10 @@ def build_app(
         if not fps_adapter.start():
             fps_adapter = None
             logger.warning("PresentMon unavailable; FPS disabled")
+        else:
+            # Safety net: if the process crashes or is killed outright, the
+            # PresentMon child (and its ETW session) must not outlive us.
+            atexit.register(fps_adapter.stop)
         base_sample = sample
 
     def composite() -> StatusMessage:
@@ -168,6 +173,8 @@ async def _run_forever(app: FastAPI, port: int, stop_event: threading.Event | No
         if monitor is not None:
             monitor.cancel()
         task.cancel()
+        # Stop announcing a server that is about to disappear from the LAN.
+        stop_broadcast(broadcast_thread)
         if app.state.fps_adapter is not None:
             app.state.fps_adapter.stop()
 
