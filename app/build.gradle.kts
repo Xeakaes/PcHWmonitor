@@ -63,6 +63,10 @@ android {
     }
     buildFeatures {
         compose = true
+        // AGP otherwise embeds META-INF/version-control-info.textproto with
+        // the git revision; the byte then depends on when/where the build ran
+        // and F-Droid's reproducible-build verification can never match.
+        vcsInfo = false
     }
     sourceSets {
         getByName("androidTest").assets.srcDirs(files("$projectDir/schemas"))
