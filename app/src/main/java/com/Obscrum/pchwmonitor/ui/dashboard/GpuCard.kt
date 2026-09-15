@@ -38,8 +38,9 @@ fun GpuCard(
     compact: Boolean = false,
     chartPoints: Int = 60,
     menu: @Composable RowScope.() -> Unit = {},
+    glassmorphism: Boolean = false,
 ) {
-    MetricCard(title = gpu?.name ?: titleFallback, modifier = modifier, compact = compact, menu = menu) {
+    MetricCard(title = gpu?.name ?: titleFallback, modifier = modifier, compact = compact, menu = menu, glassmorphism = glassmorphism) {
         val tempColor = TemperatureColor.forTemp(gpu?.tempC ?: 0f)
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }

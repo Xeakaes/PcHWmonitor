@@ -109,4 +109,11 @@
     <string name="method_scan">Scan network</string>
     <string name="connect">Connect</string>
     <string name="qr_scan">Fill via QR</string>
+    <string name="custom_background">Custom Background</string>
+    <string name="custom_background_enable">Enable custom background</string>
+    <string name="custom_background_description">Set a background image and auto-extract theme colors</string>
+    <string name="custom_background_pick">Choose image</string>
+    <string name="custom_background_remove">Remove background</string>
+    <string name="custom_background_blur">Glassmorphism cards</string>
+    <string name="custom_background_blur_description">Cards become semi-transparent with blur effect</string>
 </resources>

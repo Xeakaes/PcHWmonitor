@@ -39,8 +39,9 @@ fun FpsCard(
     menu: @Composable RowScope.() -> Unit = {},
     showDetails: Boolean = false,
     onDetailsDismiss: () -> Unit = {},
+    glassmorphism: Boolean = false,
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu, glassmorphism = glassmorphism) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
         LaunchedEffect(fps?.current) {

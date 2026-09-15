@@ -16,10 +16,13 @@
 - [x] **Bağlantı güvenilirliği**: Auth hataları artık ekranda görünür, sunucu örnekleme olay döngüsünü bloklamaz, keşif yayınına subnet broadcast eklendi, gerçek LAN adaptörü seçimi (sanal adaptörler elenir)
 - [x] **Paketli sunucu**: Sürüüm 1.5'e yükseltildi (versionCode 6), PresentMon 1.9.2 tekrar EXE'ye gömüldü (FPS kartı çalışır)
 
-## v1.6 (planlanan)
+## v1.6
 
+- [x] **Custom Background + Glassmorphism**: Kullanıcı galeriden resim seçer → tema renkleri otomatik çıkarılır, kartlar şaffaf + blur modu
 - [ ] **Çoklu PC desteği**: Birden fazla PC'ye aynı anda bağlan
 - [ ] **TLS/SSL güvenli bağlantı**: Şifreli WebSocket
+- [ ] **Cloudflare Tunnel**: Kalıcı URL ile uzaktan erişim
+- [ ] **Güvenlik katmanları**: Rate limiting, cert pinning, connection limit
 
 ## Backlog
 

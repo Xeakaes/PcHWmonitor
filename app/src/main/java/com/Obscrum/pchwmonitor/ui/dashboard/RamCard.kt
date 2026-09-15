@@ -31,8 +31,9 @@ fun RamCard(
     compact: Boolean = false,
     chartPoints: Int = 60,
     menu: @Composable RowScope.() -> Unit = {},
+    glassmorphism: Boolean = false,
 ) {
-    MetricCard(title = labelUsage, modifier = modifier, compact = compact, menu = menu) {
+    MetricCard(title = labelUsage, modifier = modifier, compact = compact, menu = menu, glassmorphism = glassmorphism) {
         val color = TemperatureColor.forUsage(ram?.usagePct ?: 0f)
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }

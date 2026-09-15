@@ -20,6 +20,8 @@ data class AppSettings(
     val chartWindowSeconds: Int = 60,
     val themePaletteId: String = "default",
     val dashboardLayout: DashboardLayout = DashboardLayout.default(),
+    val customBackgroundEnabled: Boolean = false,
+    val customBackgroundUri: String? = null,
 )
 
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
@@ -31,6 +33,8 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyChartWindow = intPreferencesKey("chart_window_seconds")
     private val keyThemePalette = stringPreferencesKey("theme_palette")
     private val keyDashboardLayout = stringPreferencesKey("dashboard_layout")
+    private val keyCustomBackgroundEnabled = stringPreferencesKey("custom_background_enabled")
+    private val keyCustomBackgroundUri = stringPreferencesKey("custom_background_uri")
 
     val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
         AppSettings(
@@ -44,6 +48,8 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             dashboardLayout = prefs[keyDashboardLayout].let {
                 if (it == null) DashboardLayout.default() else DashboardLayout().fromJson(it)
             },
+            customBackgroundEnabled = prefs[keyCustomBackgroundEnabled] == "true",
+            customBackgroundUri = prefs[keyCustomBackgroundUri]?.takeIf { it.isNotBlank() },
         )
     }
 
@@ -81,5 +87,15 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setDashboardLayout(value: DashboardLayout) {
         dataStore.edit { it[keyDashboardLayout] = value.toJson() }
+    }
+
+    suspend fun setCustomBackgroundEnabled(value: Boolean) {
+        dataStore.edit { it[keyCustomBackgroundEnabled] = value.toString() }
+    }
+
+    suspend fun setCustomBackgroundUri(value: String?) {
+        dataStore.edit { prefs ->
+            if (value.isNullOrBlank()) prefs.remove(keyCustomBackgroundUri) else prefs[keyCustomBackgroundUri] = value
+        }
     }
 }

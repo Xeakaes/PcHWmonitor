@@ -12,6 +12,14 @@
 - [x] Visible connection/auth errors, non-blocking hardware sampling on the server
 - [x] PresentMon re-embedded into the packaged EXE (FPS card)
 
+## Shipped — v1.6
+
+- [x] Custom Background + Glassmorphism: User picks an image → auto-extract theme colors, cards become semi-transparent with blur effect
+- [x] Cloudflare Named Tunnel: Persistent URL for remote access (no port forwarding needed)
+- [x] TLS/SSL mandatory for remote connections
+- [x] Multi-PC support: Connect to multiple PCs simultaneously, switch via tabs
+- [x] Security hardening: Rate limiting, cert pinning, connection limits
+
 ## Vision
 
 ### Server-Side Improvements (v1.5+)

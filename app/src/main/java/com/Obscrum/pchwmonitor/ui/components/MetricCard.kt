@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -12,7 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -20,13 +28,24 @@ fun MetricCard(
     title: String,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
+    glassmorphism: Boolean = false,
     menu: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    val containerColor = if (glassmorphism) {
+        Color.White.copy(alpha = 0.15f)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    }
+
     Card(
-        modifier = modifier,
+        modifier = modifier.graphicsLayer {
+            if (glassmorphism) {
+                alpha = 0.95f
+            }
+        },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            containerColor = containerColor,
         ),
     ) {
         Column(modifier = Modifier.padding(if (compact) 10.dp else 16.dp)) {
@@ -39,6 +58,7 @@ fun MetricCard(
                     style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
+                    color = if (glassmorphism) Color.White else MaterialTheme.colorScheme.onSurface,
                 )
                 menu()
             }

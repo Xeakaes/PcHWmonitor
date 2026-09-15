@@ -30,8 +30,9 @@ fun NetCard(
     chartPoints: Int = 60,
     chartMax: Float = 200f,
     menu: @Composable RowScope.() -> Unit = {},
+    glassmorphism: Boolean = false,
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu, glassmorphism = glassmorphism) {
         val spark = remember(chartPoints) { RingBuffer(chartPoints) }
         var points by remember { mutableStateOf(listOf<Float>()) }
         LaunchedEffect(net?.downloadMbPerSec, net?.uploadMbPerSec) {

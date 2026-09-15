@@ -1,6 +1,8 @@
 package com.Obscrum.pchwmonitor
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -17,8 +19,11 @@ import com.Obscrum.pchwmonitor.data.network.StatusParser
 import com.Obscrum.pchwmonitor.data.network.WebSocketClient
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
+import com.Obscrum.pchwmonitor.ui.theme.CustomBackgroundManager
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -44,6 +49,13 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         .map { it.dashboardLayout }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().dashboardLayout)
 
+    // Custom Background state
+    private val _customBackgroundBitmap = MutableStateFlow<Bitmap?>(null)
+    val customBackgroundBitmap: StateFlow<Bitmap?> = _customBackgroundBitmap.asStateFlow()
+
+    private val _glassmorphism = MutableStateFlow(false)
+    val glassmorphism: StateFlow<Boolean> = _glassmorphism.asStateFlow()
+
     val discovery = DiscoveryService(viewModelScope, app)
 
     private val controller = MonitorController(
@@ -59,7 +71,14 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     init {
         controller.start()
         viewModelScope.launch {
-            settings.collect { s -> controller.connect(s.serverIp, s.serverPort, s.authToken) }
+            settings.collect { s ->
+                controller.connect(s.serverIp, s.serverPort, s.authToken)
+                // Load custom background if enabled
+                if (s.customBackgroundEnabled && s.customBackgroundUri != null) {
+                    loadCustomBackground()
+                    _glassmorphism.value = true
+                }
+            }
         }
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             BackgroundConnectionHandler(
@@ -99,5 +118,51 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setDashboardLayout(layout: DashboardLayout) {
         viewModelScope.launch { settingsStore.setDashboardLayout(layout) }
+    }
+
+    // Custom Background methods
+    fun setCustomBackgroundEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsStore.setCustomBackgroundEnabled(enabled)
+            _glassmorphism.value = enabled
+            if (enabled) {
+                loadCustomBackground()
+            } else {
+                _customBackgroundBitmap.value = null
+            }
+        }
+    }
+
+    fun setGlassmorphismEnabled(enabled: Boolean) {
+        _glassmorphism.value = enabled
+    }
+
+    fun pickCustomBackground(uriString: String) {
+        viewModelScope.launch {
+            val uri = Uri.parse(uriString)
+            val context = getApplication<Application>()
+            val saved = CustomBackgroundManager.saveBackground(context, uri)
+            if (saved) {
+                settingsStore.setCustomBackgroundUri(uriString)
+                loadCustomBackground()
+            }
+        }
+    }
+
+    fun removeCustomBackground() {
+        viewModelScope.launch {
+            val context = getApplication<Application>()
+            CustomBackgroundManager.removeBackground(context)
+            settingsStore.setCustomBackgroundUri(null)
+            _customBackgroundBitmap.value = null
+        }
+    }
+
+    private fun loadCustomBackground() {
+        viewModelScope.launch {
+            val context = getApplication<Application>()
+            val bitmap = CustomBackgroundManager.loadBitmap(context)
+            _customBackgroundBitmap.value = bitmap
+        }
     }
 }

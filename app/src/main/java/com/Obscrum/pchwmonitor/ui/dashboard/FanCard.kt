@@ -18,8 +18,9 @@ fun FanCard(
     modifier: Modifier = Modifier,
     compact: Boolean = false,
     menu: @Composable RowScope.() -> Unit = {},
+    glassmorphism: Boolean = false,
 ) {
-    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu) {
+    MetricCard(title = labelTitle, modifier = modifier, compact = compact, menu = menu, glassmorphism = glassmorphism) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (fans.isNullOrEmpty()) {
                 Text("--", style = MaterialTheme.typography.bodyMedium)

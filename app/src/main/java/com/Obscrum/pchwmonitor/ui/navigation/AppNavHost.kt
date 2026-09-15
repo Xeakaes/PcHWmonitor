@@ -106,6 +106,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
             ) {
                 composable("dashboard") {
                     var editMode by rememberSaveable { mutableStateOf(false) }
+                    val customBackgroundBitmap by viewModel.customBackgroundBitmap.collectAsState()
+                    val glassmorphism by viewModel.glassmorphism.collectAsState()
                     DashboardScreen(
                         status = status,
                         connection = connection,
@@ -155,6 +157,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelNetDownload = stringResource(R.string.net_download),
                         labelNetUpload = stringResource(R.string.net_upload),
                         labelFan = stringResource(R.string.fan_card_title),
+                        customBackgroundBitmap = customBackgroundBitmap,
+                        glassmorphism = glassmorphism,
                     )
                 }
                 composable("history") {
@@ -257,6 +261,21 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onSave = { ip, port, authToken, theme, language, chartWindowSeconds ->
                             viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds)
                         },
+                        // Custom Background parameters
+                        labelCustomBackground = stringResource(R.string.custom_background),
+                        labelCustomBackgroundDescription = stringResource(R.string.custom_background_description),
+                        labelCustomBackgroundEnable = stringResource(R.string.custom_background_enable),
+                        labelCustomBackgroundPick = stringResource(R.string.custom_background_pick),
+                        labelCustomBackgroundRemove = stringResource(R.string.custom_background_remove),
+                        labelCustomBackgroundBlur = stringResource(R.string.custom_background_blur),
+                        labelCustomBackgroundBlurDescription = stringResource(R.string.custom_background_blur_description),
+                        customBackgroundEnabled = settings.customBackgroundEnabled,
+                        glassmorphismEnabled = settings.customBackgroundEnabled,
+                        customBackgroundUri = settings.customBackgroundUri,
+                        onCustomBackgroundToggle = viewModel::setCustomBackgroundEnabled,
+                        onGlassmorphismToggle = viewModel::setGlassmorphismEnabled,
+                        onCustomBackgroundPick = viewModel::pickCustomBackground,
+                        onCustomBackgroundRemove = viewModel::removeCustomBackground,
                     )
                 }
             }

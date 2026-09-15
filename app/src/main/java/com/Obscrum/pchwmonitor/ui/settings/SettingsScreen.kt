@@ -92,6 +92,21 @@ fun SettingsScreen(
     errorMessage: String? = null,
     modifier: Modifier = Modifier,
     onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
+    // Custom Background parameters
+    labelCustomBackground: String = "Custom Background",
+    labelCustomBackgroundDescription: String = "Set a background image and auto-extract theme colors",
+    labelCustomBackgroundEnable: String = "Enable custom background",
+    labelCustomBackgroundPick: String = "Choose image",
+    labelCustomBackgroundRemove: String = "Remove background",
+    labelCustomBackgroundBlur: String = "Glassmorphism cards",
+    labelCustomBackgroundBlurDescription: String = "Cards become semi-transparent with blur effect",
+    customBackgroundEnabled: Boolean = false,
+    glassmorphismEnabled: Boolean = false,
+    customBackgroundUri: String? = null,
+    onCustomBackgroundToggle: (Boolean) -> Unit = {},
+    onGlassmorphismToggle: (Boolean) -> Unit = {},
+    onCustomBackgroundPick: (String) -> Unit = {},
+    onCustomBackgroundRemove: () -> Unit = {},
 ) {
     val context = LocalContext.current
     var ip by remember { mutableStateOf(settings.serverIp) }
@@ -102,6 +117,19 @@ fun SettingsScreen(
     var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
     var scanMode by rememberSaveable { mutableStateOf(false) }
+    var customBackgroundEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
+    var glassmorphismEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
+    var currentCustomBackgroundUri by remember { mutableStateOf(settings.customBackgroundUri) }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val uriString = it.toString()
+            currentCustomBackgroundUri = uriString
+            onCustomBackgroundPick(uriString)
+        }
+    }
 
     val qrLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
         result.contents?.let { text ->
@@ -392,6 +420,91 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
+        }
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Custom Background Section
+        Text(
+            text = labelCustomBackground,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = labelCustomBackgroundDescription,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Enable toggle
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = labelCustomBackgroundEnable,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f),
+            )
+            androidx.compose.material3.Switch(
+                checked = customBackgroundEnabled,
+                onCheckedChange = {
+                    customBackgroundEnabled = it
+                    onCustomBackgroundToggle(it)
+                },
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Glassmorphism toggle (only when custom background enabled)
+        if (customBackgroundEnabled) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = labelCustomBackgroundBlur,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                androidx.compose.material3.Switch(
+                    checked = glassmorphismEnabled,
+                    onCheckedChange = {
+                        glassmorphismEnabled = it
+                        onGlassmorphismToggle(it)
+                    },
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = labelCustomBackgroundBlurDescription,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        // Pick image button
+        OutlinedButton(
+            onClick = { imagePicker.launch("image/*") },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(labelCustomBackgroundPick)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Remove background button (if image is set)
+        if (currentCustomBackgroundUri != null) {
+            OutlinedButton(
+                onClick = {
+                    currentCustomBackgroundUri = null
+                    onCustomBackgroundRemove()
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(labelCustomBackgroundRemove)
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
 

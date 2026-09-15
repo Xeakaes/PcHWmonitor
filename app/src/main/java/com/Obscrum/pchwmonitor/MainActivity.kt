@@ -20,10 +20,17 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val viewModel: MonitorViewModel = viewModel()
             val settings by viewModel.settings.collectAsState()
+            val customBackgroundBitmap by viewModel.customBackgroundBitmap.collectAsState()
+            val glassmorphism by viewModel.glassmorphism.collectAsState()
             LaunchedEffect(settings.language) {
                 applyLanguage(settings.language)
             }
-            PcHWMonitorTheme(themeMode = settings.theme, paletteId = settings.themePaletteId) {
+            PcHWMonitorTheme(
+                themeMode = settings.theme,
+                paletteId = settings.themePaletteId,
+                customBackgroundEnabled = settings.customBackgroundEnabled,
+                customBackgroundBitmap = customBackgroundBitmap,
+            ) {
                 AppNavHost(viewModel = viewModel)
             }
         }

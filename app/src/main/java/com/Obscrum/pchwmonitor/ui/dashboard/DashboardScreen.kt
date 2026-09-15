@@ -1,5 +1,7 @@
 package com.Obscrum.pchwmonitor.ui.dashboard
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,6 +36,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -96,12 +104,36 @@ fun DashboardScreen(
     fpsChartMax: Float = 360f,
     diskChartMax: Float = 200f,
     netChartMax: Float = 200f,
+    customBackgroundBitmap: Bitmap? = null,
+    glassmorphism: Boolean = false,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val landscape = isLandscapeLayout(maxWidth = maxWidth, maxHeight = maxHeight)
         val sizeClass = sizeClassForWidth(maxWidth)
         val plan = layoutDashboard(layout, sizeClass, maxWidth, landscape, maxHeight)
         var fpsDetailsOpen by rememberSaveable { mutableStateOf(false) }
+
+        // Background image for glassmorphism
+        if (customBackgroundBitmap != null && glassmorphism) {
+            val imageBitmap = remember(customBackgroundBitmap) { customBackgroundBitmap.asImageBitmap() }
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(20.dp),
+            )
+            // Dark overlay for readability
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .drawBehind {
+                        drawRect(Color.Black.copy(alpha = 0.3f))
+                    }
+            )
+        }
+
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -210,6 +242,7 @@ fun DashboardScreen(
                                         editIndex = vIndex,
                                         editTotal = visibleEntries.size,
                                         globalIndex = globalIndex,
+                                        glassmorphism = glassmorphism,
                                     )
                                 }
                             }
@@ -317,6 +350,7 @@ fun DashboardScreen(
                                         netChartMax = netChartMax,
                                         compact = plan.isGrid,
                                         modifier = Modifier.weight(1f),
+                                        glassmorphism = glassmorphism,
                                     )
                                 }
                             }
@@ -392,6 +426,7 @@ private fun RowScope.CardFor(
     editIndex: Int = -1,
     editTotal: Int = 0,
     globalIndex: Int = -1,
+    glassmorphism: Boolean = false,
 ) {
     val menu: @Composable RowScope.() -> Unit = {
         if (editMode) {
@@ -432,6 +467,7 @@ private fun RowScope.CardFor(
             chartPoints = chartWindowSeconds,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
         CardId.GPU -> GpuCard(
             gpu = status.gpu,
@@ -447,6 +483,7 @@ private fun RowScope.CardFor(
             chartPoints = chartWindowSeconds,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
         CardId.IGPU -> status.igpu?.let {
             GpuCard(
@@ -463,6 +500,7 @@ private fun RowScope.CardFor(
                 chartPoints = chartWindowSeconds,
                 modifier = modifier,
                 menu = menu,
+                glassmorphism = glassmorphism,
             )
         }
         CardId.FPS -> FpsCard(
@@ -479,6 +517,7 @@ private fun RowScope.CardFor(
             menu = menu,
             showDetails = fpsDetailsOpen,
             onDetailsDismiss = onFpsDetailsDismiss,
+            glassmorphism = glassmorphism,
         )
         CardId.RAM -> RamCard(
             ram = status.ram,
@@ -489,6 +528,7 @@ private fun RowScope.CardFor(
             chartPoints = chartWindowSeconds,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
         CardId.DISK -> DiskCard(
             disk = status.disk,
@@ -501,6 +541,7 @@ private fun RowScope.CardFor(
             chartMax = diskChartMax,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
         CardId.NET -> NetCard(
             net = status.net,
@@ -512,6 +553,7 @@ private fun RowScope.CardFor(
             chartMax = netChartMax,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
         CardId.FAN -> FanCard(
             fans = status.fans,
@@ -519,6 +561,7 @@ private fun RowScope.CardFor(
             compact = compact,
             modifier = modifier,
             menu = menu,
+            glassmorphism = glassmorphism,
         )
     }
 }
