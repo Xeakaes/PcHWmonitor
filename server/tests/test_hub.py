@@ -46,8 +46,8 @@ def test_slow_client_does_not_block_fast_clients():
 
     assert fast.sent == [_message().model_dump_json()]
     assert slow.sent == []
-    # slow client stays registered; only hard failures unregister
-    assert hub.client_count == 2
+    # slow client is disconnected on timeout to prevent resource waste
+    assert hub.client_count == 1
 
 
 def test_failed_client_is_unregistered():

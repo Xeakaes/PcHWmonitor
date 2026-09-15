@@ -1,3 +1,4 @@
+import logging
 import platform
 import re
 import time
@@ -5,6 +6,8 @@ import time
 import httpx
 
 from schema import CpuInfo, FanInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
+
+logger = logging.getLogger("pchw.lhm")
 
 _NUMBER = re.compile(r"[-+]?\d+(?:[.,]\d+)?")
 

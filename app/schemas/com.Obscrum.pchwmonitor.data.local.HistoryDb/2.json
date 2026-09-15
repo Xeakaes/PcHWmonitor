@@ -1,0 +1,67 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    "entities": [
+      {
+        "tableName": "history_samples",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `pcId` TEXT NOT NULL DEFAULT 'default', `cpuTempC` REAL, `cpuUsagePct` REAL, `gpuTempC` REAL, `gpuUsagePct` REAL, `gpuHotspotC` REAL, `ramUsagePct` REAL, PRIMARY KEY(`timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pcId",
+            "columnName": "pcId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuTempC",
+            "columnName": "cpuTempC",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "cpuUsagePct",
+            "columnName": "cpuUsagePct",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "gpuTempC",
+            "columnName": "gpuTempC",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "gpuUsagePct",
+            "columnName": "gpuUsagePct",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "gpuHotspotC",
+            "columnName": "gpuHotspotC",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "ramUsagePct",
+            "columnName": "ramUsagePct",
+            "affinity": "REAL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "timestamp"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6')"
+    ]
+  }
+}
