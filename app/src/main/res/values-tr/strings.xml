@@ -109,6 +109,13 @@
     <string name="method_scan">Ağı tara</string>
     <string name="connect">Bağlan</string>
     <string name="qr_scan">QR ile doldur</string>
+    <string name="custom_background">Custom Background</string>
+    <string name="custom_background_enable">Enable custom background</string>
+    <string name="custom_background_description">Set a background image and auto-extract theme colors</string>
+    <string name="custom_background_pick">Choose image</string>
+    <string name="custom_background_remove">Remove background</string>
+    <string name="custom_background_blur">Glassmorphism cards</string>
+    <string name="custom_background_blur_description">Cards become semi-transparent with blur effect</string>
     <string name="cert_trust_title">Sunucu sertifikasına güvenilsin mi?</string>
     <string name="cert_trust_message">Sunucunun sertifikası güvenilir değil.</string>
     <string name="cert_trust_sha">SHA-256: %1$s</string>
