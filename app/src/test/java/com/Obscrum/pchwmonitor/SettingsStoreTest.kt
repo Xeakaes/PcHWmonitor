@@ -14,6 +14,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -42,8 +44,13 @@ class SettingsStoreTest {
     fun defaultsAreApplied() = runTest {
         val handle = store(tmpDir())
         val settings = handle.store.settings.first()
-        assertEquals(AppSettings(), settings)
         assertEquals(ThemeMode.SYSTEM, settings.theme)
+        assertEquals(60, settings.chartWindowSeconds)
+        assertEquals("default", settings.themePaletteId)
+        assertFalse(settings.customBackgroundEnabled)
+        assertFalse(settings.glassmorphismEnabled)
+        assertNull(settings.customBackgroundUri)
+        assertNull(settings.authToken)
         handle.close()
     }
 
