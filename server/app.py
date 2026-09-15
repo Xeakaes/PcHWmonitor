@@ -1,5 +1,6 @@
 import asyncio
 import atexit
+import hmac
 import json
 import logging
 import platform
@@ -131,7 +132,9 @@ def build_app(
             payload = json.loads(raw)
         except json.JSONDecodeError:
             return False
-        return payload.get("type") == "auth" and payload.get("token") == app.state.token
+        return payload.get("type") == "auth" and hmac.compare_digest(
+            str(payload.get("token", "")), str(app.state.token)
+        )
 
     @app.websocket("/ws")
     async def ws_endpoint(ws: WebSocket):

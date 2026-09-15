@@ -22,6 +22,7 @@ import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.service.MonitorNotificationService
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import com.Obscrum.pchwmonitor.ui.theme.CustomBackgroundManager
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -61,6 +62,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     // Cert trust dialog state
     private val _pendingCertHash = MutableStateFlow<String?>(null)
     val pendingCertHash: StateFlow<String?> = _pendingCertHash.asStateFlow()
+
+    // Track collect jobs to cancel on server switch
+    private val activeCollectJobs = mutableListOf<Job>()
 
     // Multi-PC state
     private val _controllers = mutableMapOf<String, MonitorController>()
@@ -122,22 +126,20 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
             val serverName = settings.servers.find { it.id == activeId }?.name
             MonitorNotificationService.updateServerName(serverName)
         }
-        // Re-collect from active controller
-        viewModelScope.launch {
-            val activeId = _activeServerId.value ?: return@launch
-            _controllers[activeId]?.status?.collect { _activeStatus.value = it }
-        }
-        viewModelScope.launch {
-            val activeId = _activeServerId.value ?: return@launch
-            _controllers[activeId]?.connection?.collect { _activeConnection.value = it }
-        }
-        viewModelScope.launch {
-            val activeId = _activeServerId.value ?: return@launch
-            _controllers[activeId]?.lastError?.collect { _lastError.value = it }
-        }
-        viewModelScope.launch {
-            val activeId = _activeServerId.value ?: return@launch
-            _controllers[activeId]?.certHash?.collect { hash ->
+        // Re-collect from active controller (cancel old jobs first)
+        collectFromActiveController()
+    }
+
+    private fun collectFromActiveController() {
+        activeCollectJobs.forEach { it.cancel() }
+        activeCollectJobs.clear()
+        val activeId = _activeServerId.value ?: return
+        val ctrl = _controllers[activeId] ?: return
+        activeCollectJobs += viewModelScope.launch { ctrl.status.collect { _activeStatus.value = it } }
+        activeCollectJobs += viewModelScope.launch { ctrl.connection.collect { _activeConnection.value = it } }
+        activeCollectJobs += viewModelScope.launch { ctrl.lastError.collect { _lastError.value = it } }
+        activeCollectJobs += viewModelScope.launch {
+            ctrl.certHash.collect { hash ->
                 if (hash != null) _pendingCertHash.value = hash
             }
         }
@@ -148,14 +150,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { settingsStore.setActiveServerId(id) }
         val serverName = settings.value.servers.find { it.id == id }?.name
         MonitorNotificationService.updateServerName(serverName)
-        viewModelScope.launch { _controllers[id]?.status?.collect { _activeStatus.value = it } }
-        viewModelScope.launch { _controllers[id]?.connection?.collect { _activeConnection.value = it } }
-        viewModelScope.launch { _controllers[id]?.lastError?.collect { _lastError.value = it } }
-        viewModelScope.launch {
-            _controllers[id]?.certHash?.collect { hash ->
-                if (hash != null) _pendingCertHash.value = hash
-            }
-        }
+        collectFromActiveController()
     }
 
     fun addServer(server: ServerConfig) {

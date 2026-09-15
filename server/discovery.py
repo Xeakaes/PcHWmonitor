@@ -20,11 +20,9 @@ BROADCAST_ADDRESS = "255.255.255.255"
 
 def get_local_ip() -> str:
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("255.255.255.255", 1))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("255.255.255.255", 1))
+            return s.getsockname()[0]
     except Exception:
         return "127.0.0.1"
 
@@ -49,7 +47,7 @@ def best_lan_ip() -> str:
             a, b = int(octets[0]), int(octets[1])
             is_lan_range = (
                 len(octets) == 4
-                and (a == 192 and b == 168 or a == 10 or a == 172 and 16 <= b <= 31)
+                and ((a == 192 and b == 168) or a == 10 or (a == 172 and 16 <= b <= 31))
                 and not ip.startswith("169.254.")
             )
             if is_lan_range:

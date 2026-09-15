@@ -2,9 +2,12 @@ import os
 import platform
 import sys
 import time
+import logging
 from pathlib import Path
 
 from schema import CpuInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
+
+logger = logging.getLogger("pchw.lhm_lib")
 from adapters.lhm import _clock_max, _find, _loads
 
 
@@ -92,7 +95,8 @@ class LhmLibAdapter:
             pc = PcInfo(name=platform.node(), os="Windows", source="lhm-lib")
             return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram)
         except Exception as exc:
-            return StatusMessage(timestamp=int(time.time()), available=False, error=str(exc))
+            logger.warning("lhm-lib read failed: %s", exc)
+            return StatusMessage(timestamp=int(time.time()), available=False, error="hardware read failed")
 
     # -- sensor mapping (shared helpers from adapters.lhm) --
 

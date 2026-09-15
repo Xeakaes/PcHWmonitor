@@ -300,7 +300,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelCustomBackgroundBlur = stringResource(R.string.custom_background_blur),
                         labelCustomBackgroundBlurDescription = stringResource(R.string.custom_background_blur_description),
                         customBackgroundEnabled = settings.customBackgroundEnabled,
-                        glassmorphismEnabled = settings.customBackgroundEnabled,
+                        glassmorphismEnabled = settings.glassmorphismEnabled,
                         customBackgroundUri = settings.customBackgroundUri,
                         onCustomBackgroundToggle = viewModel::setCustomBackgroundEnabled,
                         onGlassmorphismToggle = viewModel::setGlassmorphismEnabled,
@@ -339,27 +339,27 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
         if (pendingCertHash != null) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissCertDialog() },
-                title = { Text("Trust server certificate?") },
+                title = { Text(stringResource(R.string.cert_trust_title)) },
                 text = {
                     Column {
-                        Text("The server's certificate is not trusted.")
+                        Text(stringResource(R.string.cert_trust_message))
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "SHA-256: $pendingCertHash",
+                            text = stringResource(R.string.cert_trust_sha, pendingCertHash ?: ""),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Trust this certificate for future connections?")
+                        Text(stringResource(R.string.cert_trust_confirm_message))
                     }
                 },
                 confirmButton = {
                     Button(onClick = { pendingCertHash?.let { viewModel.trustCert(it) } }) {
-                        Text("Trust")
+                        Text(stringResource(R.string.cert_trust_action))
                     }
                 },
                 dismissButton = {
                     Button(onClick = { viewModel.dismissCertDialog() }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cert_trust_cancel))
                     }
                 },
             )

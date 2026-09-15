@@ -662,7 +662,11 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                context.startActivity(Intent(Intent.ACTION_VIEW, PATREON_URL.toUri()))
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, PATREON_URL.toUri()))
+                } catch (_: android.content.ActivityNotFoundException) {
+                    // No browser available
+                }
             },
         ) {
             Text(labelSupportPatreon)

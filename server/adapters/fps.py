@@ -76,7 +76,8 @@ class PresentMonFps:
         return True
 
     def _read(self) -> None:
-        assert self._proc is not None and self._proc.stdout is not None
+        if self._proc is None or self._proc.stdout is None:
+            return
         header: list[str] | None = None
         for raw in self._proc.stdout:
             line = raw.lstrip("\ufeff").strip()

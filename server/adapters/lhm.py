@@ -121,7 +121,8 @@ class LhmAdapter:
             root = response.json()
             return self._parse(root)
         except Exception as exc:
-            return StatusMessage(timestamp=int(time.time()), available=False, error=str(exc))
+            logger.warning("lhm http fetch failed: %s", exc)
+            return StatusMessage(timestamp=int(time.time()), available=False, error="hardware read failed")
 
     def _parse(self, root: dict) -> StatusMessage:
         nodes = _hardware_nodes(root)

@@ -33,7 +33,7 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         payload = _connection_payload()
         try:
             import subprocess
-            subprocess.run("clip", input=payload.encode("utf-16-le"), check=True)
+            subprocess.run("clip", input=payload.encode("utf-16-le"), shell=True, check=True)
             icon.notify("Connection info copied to clipboard.", "PC HW Monitor")
         except Exception:
             icon.notify(f"Copy failed. Payload:\n{payload}", "PC HW Monitor")

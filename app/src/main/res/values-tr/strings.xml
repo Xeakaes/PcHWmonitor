@@ -109,4 +109,10 @@
     <string name="method_scan">Ağı tara</string>
     <string name="connect">Bağlan</string>
     <string name="qr_scan">QR ile doldur</string>
+    <string name="cert_trust_title">Sunucu sertifikasına güvenilsin mi?</string>
+    <string name="cert_trust_message">Sunucunun sertifikası güvenilir değil.</string>
+    <string name="cert_trust_sha">SHA-256: %1$s</string>
+    <string name="cert_trust_confirm_message">Bu sertifikaya gelecek bağlantılar için güvensin mi?</string>
+    <string name="cert_trust_action">Güven</string>
+    <string name="cert_trust_cancel">İptal</string>
 </resources>

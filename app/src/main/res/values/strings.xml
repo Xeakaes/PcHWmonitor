@@ -116,4 +116,10 @@
     <string name="custom_background_remove">Remove background</string>
     <string name="custom_background_blur">Glassmorphism cards</string>
     <string name="custom_background_blur_description">Cards become semi-transparent with blur effect</string>
+    <string name="cert_trust_title">Trust server certificate?</string>
+    <string name="cert_trust_message">The server\'s certificate is not trusted.</string>
+    <string name="cert_trust_sha">SHA-256: %1$s</string>
+    <string name="cert_trust_confirm_message">Trust this certificate for future connections?</string>
+    <string name="cert_trust_action">Trust</string>
+    <string name="cert_trust_cancel">Cancel</string>
 </resources>

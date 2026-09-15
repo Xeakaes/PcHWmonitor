@@ -26,6 +26,7 @@ data class AppSettings(
     val themePaletteId: String = "default",
     val dashboardLayout: DashboardLayout = DashboardLayout.default(),
     val customBackgroundEnabled: Boolean = false,
+    val glassmorphismEnabled: Boolean = false,
     val customBackgroundUri: String? = null,
 )
 
@@ -39,6 +40,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyThemePalette = stringPreferencesKey("theme_palette")
     private val keyDashboardLayout = stringPreferencesKey("dashboard_layout")
     private val keyCustomBackgroundEnabled = stringPreferencesKey("custom_background_enabled")
+    private val keyGlassmorphismEnabled = stringPreferencesKey("glassmorphism_enabled")
     private val keyCustomBackgroundUri = stringPreferencesKey("custom_background_uri")
     private val keyServersJson = stringPreferencesKey("servers_json")
     private val keyActiveServerId = stringPreferencesKey("active_server_id")
@@ -73,6 +75,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
                 if (it == null) DashboardLayout.default() else DashboardLayout().fromJson(it)
             },
             customBackgroundEnabled = prefs[keyCustomBackgroundEnabled] == "true",
+            glassmorphismEnabled = prefs[keyGlassmorphismEnabled] == "true",
             customBackgroundUri = prefs[keyCustomBackgroundUri]?.takeIf { it.isNotBlank() },
         )
     }
@@ -121,6 +124,10 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { prefs ->
             if (value.isNullOrBlank()) prefs.remove(keyCustomBackgroundUri) else prefs[keyCustomBackgroundUri] = value
         }
+    }
+
+    suspend fun setGlassmorphismEnabled(value: Boolean) {
+        dataStore.edit { it[keyGlassmorphismEnabled] = value.toString() }
     }
 
     // Server list methods

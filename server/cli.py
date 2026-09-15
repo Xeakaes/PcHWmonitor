@@ -29,6 +29,18 @@ def _redirect_noconsole_streams() -> None:
             pass
 
 
+def _cleanup_cert(cert_path, key_path):
+    """Remove temporary cert files on exit."""
+    try:
+        Path(cert_path).unlink(missing_ok=True)
+    except Exception:
+        pass
+    try:
+        Path(key_path).unlink(missing_ok=True)
+    except Exception:
+        pass
+
+
 def main() -> None:
     _redirect_noconsole_streams()
     parser = argparse.ArgumentParser(description="PC HW Monitor bridge server")
@@ -54,17 +66,22 @@ def main() -> None:
     if ssl_cert == "auto":
         import platform
         import subprocess
-        cert_path = Path(tempfile.mktemp(suffix=".pem"))
-        key_path = Path(tempfile.mktemp(suffix=".pem"))
+        import tempfile
+        cert_fd, cert_path = tempfile.mkstemp(suffix=".pem")
+        key_fd, key_path = tempfile.mkstemp(suffix=".pem")
+        os.close(cert_fd)
+        os.close(key_fd)
         subprocess.run([
             "openssl", "req", "-x509", "-newkey", "rsa:2048",
-            "-keyout", str(key_path), "-out", str(cert_path),
+            "-keyout", key_path, "-out", cert_path,
             "-days", "365", "-nodes",
             "-subj", f"/CN={platform.node()}",
         ], check=True)
-        ssl_cert = str(cert_path)
-        ssl_key = str(key_path)
+        ssl_cert = cert_path
+        ssl_key = key_path
         logger.info("auto-generated self-signed cert: %s", ssl_cert)
+        import atexit
+        atexit.register(lambda: _cleanup_cert(ssl_cert, ssl_key))
 
     app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process, token=token)
     if args.simulate:
