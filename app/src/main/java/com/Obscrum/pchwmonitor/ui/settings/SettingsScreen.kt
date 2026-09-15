@@ -46,7 +46,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.Obscrum.pchwmonitor.R
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.Obscrum.pchwmonitor.data.AppSettings
@@ -257,13 +259,13 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = newServerName,
                             onValueChange = { newServerName = it },
-                            label = { Text("Name") },
+                            label = { Text(stringResource(R.string.server_name)) },
                             modifier = Modifier.fillMaxWidth(),
                         )
                         OutlinedTextField(
                             value = newServerIp,
                             onValueChange = { newServerIp = it },
-                            label = { Text("IP Address") },
+                            label = { Text(stringResource(R.string.ip_address)) },
                             modifier = Modifier.fillMaxWidth(),
                         )
                         OutlinedTextField(
@@ -275,7 +277,7 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = newServerToken,
                             onValueChange = { newServerToken = it },
-                            label = { Text("Token (optional)") },
+                            label = { Text(stringResource(R.string.token_optional)) },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -299,12 +301,12 @@ fun SettingsScreen(
                             newServerToken = ""
                         },
                     ) {
-                        Text("Add")
+                        Text(stringResource(R.string.add))
                     }
                 },
                 dismissButton = {
                     Button(onClick = { showAddServerForm = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 },
             )

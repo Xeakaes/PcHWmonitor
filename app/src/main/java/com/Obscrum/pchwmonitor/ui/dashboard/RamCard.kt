@@ -13,8 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.domain.model.RamInfo
 import com.Obscrum.pchwmonitor.ui.components.FilledBar
 import com.Obscrum.pchwmonitor.ui.components.LineChart
@@ -69,7 +71,7 @@ fun RamCard(
             )
             if (summary != null) {
                 Text(
-                    text = "min ${summary.first.toInt()} / ort. ${summary.second.toInt()} / max ${summary.third.toInt()}",
+                    text = stringResource(R.string.summary_format, summary.first, summary.second, summary.third),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),

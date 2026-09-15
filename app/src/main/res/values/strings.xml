@@ -122,4 +122,16 @@
     <string name="cert_trust_confirm_message">Trust this certificate for future connections?</string>
     <string name="cert_trust_action">Trust</string>
     <string name="cert_trust_cancel">Cancel</string>
+    <string name="saved_servers">Saved Servers</string>
+    <string name="select">Select</string>
+    <string name="delete_label">Delete</string>
+    <string name="add_new_server">Add new server</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="server_name">Name</string>
+    <string name="ip_address">IP Address</string>
+    <string name="token_optional">Token (optional)</string>
+    <string name="fan_label">Fan</string>
+    <string name="gpu_label">GPU</string>
+    <string name="summary_format">min %1$.0f / ort. %2$.0f / max %3$.0f</string>
 </resources>

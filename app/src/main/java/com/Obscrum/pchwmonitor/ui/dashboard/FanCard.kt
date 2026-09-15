@@ -7,7 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.domain.model.FanInfo
 import com.Obscrum.pchwmonitor.ui.components.MetricCard
 
@@ -27,7 +29,7 @@ fun FanCard(
             } else {
                 fans.forEach { fan ->
                     Text(
-                        text = "${fan.label ?: "Fan"}: ${fan.rpm?.toInt() ?: "--"} RPM",
+                        text = "${fan.label ?: stringResource(R.string.fan_label)}: ${fan.rpm?.toInt() ?: "--"} RPM",
                         style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodyMedium,
                     )
                 }
