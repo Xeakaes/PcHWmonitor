@@ -120,7 +120,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val activeStatus by viewModel.activeStatus.collectAsState()
                     val activeConnection by viewModel.activeConnection.collectAsState()
                     val activeServerId by viewModel.activeServerId.collectAsState()
-                    val servers by viewModel.settings.map { it.servers }.collectAsState(initial = emptyList())
+                    val servers by viewModel.servers.collectAsState()
                     Column(modifier = Modifier.fillMaxSize()) {
                         if (servers.size > 1) {
                             ScrollableTabRow(

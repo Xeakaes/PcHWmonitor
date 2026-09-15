@@ -51,6 +51,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     val dashboardLayout: StateFlow<DashboardLayout> = settingsStore.settings
         .map { it.dashboardLayout }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().dashboardLayout)
+    val servers: StateFlow<List<ServerConfig>> = settingsStore.settings
+        .map { it.servers }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     // Custom Background state
     private val _customBackgroundBitmap = MutableStateFlow<Bitmap?>(null)
