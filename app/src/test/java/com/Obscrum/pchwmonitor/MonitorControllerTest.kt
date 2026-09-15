@@ -45,11 +45,11 @@ class FakeWsClient : WsClient {
 class FakeHistoryStore : HistoryStore {
     val recorded = mutableListOf<SystemStatus>()
 
-    override suspend fun record(status: SystemStatus) {
+    override suspend fun record(status: SystemStatus, pcId: String) {
         recorded.add(status)
     }
 
-    override suspend fun history(start: Long): List<HistorySample> = emptyList()
+    override suspend fun history(start: Long, pcId: String): List<HistorySample> = emptyList()
 }
 
 class MonitorControllerTest {

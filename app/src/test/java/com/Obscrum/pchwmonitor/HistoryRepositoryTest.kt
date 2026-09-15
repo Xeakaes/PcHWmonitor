@@ -23,7 +23,10 @@ class FakeHistoryDao : HistoryDao {
         rows.removeAll { it.timestamp < cutoff }
     }
 
-    override suspend fun getBetween(start: Long): List<HistorySample> =
+    override suspend fun getBetween(start: Long, pcId: String): List<HistorySample> =
+        rows.filter { it.timestamp >= start && it.pcId == pcId }.sortedBy { it.timestamp }
+
+    override suspend fun getBetweenAll(start: Long): List<HistorySample> =
         rows.filter { it.timestamp >= start }.sortedBy { it.timestamp }
 }
 
