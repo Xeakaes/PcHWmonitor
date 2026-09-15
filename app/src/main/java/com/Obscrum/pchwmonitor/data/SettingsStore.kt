@@ -8,10 +8,15 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 data class AppSettings(
+    val servers: List<ServerConfig> = emptyList(),
+    val activeServerId: String? = null,
+    // Legacy fields kept for migration only
     val serverIp: String = "192.168.1.100",
     val serverPort: Int = 8765,
     val authToken: String? = null,
@@ -35,9 +40,28 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyDashboardLayout = stringPreferencesKey("dashboard_layout")
     private val keyCustomBackgroundEnabled = stringPreferencesKey("custom_background_enabled")
     private val keyCustomBackgroundUri = stringPreferencesKey("custom_background_uri")
+    private val keyServersJson = stringPreferencesKey("servers_json")
+    private val keyActiveServerId = stringPreferencesKey("active_server_id")
 
     val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
+        // Migration: build server list from legacy fields if servers_json is null
+        val servers = prefs[keyServersJson]?.let {
+            runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrNull()
+        } ?: run {
+            val legacyIp = prefs[keyIp] ?: "192.168.1.100"
+            val legacyPort = prefs[keyPort] ?: 8765
+            val legacyToken = prefs[keyAuthToken]?.takeIf { it.isNotBlank() }
+            val migrated = listOf(ServerConfig(id = "default", name = "My PC", ip = legacyIp, port = legacyPort, token = legacyToken))
+            // Write back migration
+            dataStore.edit { it[keyServersJson] = Json.encodeToString(migrated) }
+            migrated
+        }
+        val activeId = prefs[keyActiveServerId]?.takeIf { it.isNotBlank() }
+            ?: servers.firstOrNull()?.id
+
         AppSettings(
+            servers = servers,
+            activeServerId = activeId,
             serverIp = prefs[keyIp] ?: "192.168.1.100",
             serverPort = prefs[keyPort] ?: 8765,
             authToken = prefs[keyAuthToken]?.takeIf { it.isNotBlank() },
@@ -96,6 +120,53 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     suspend fun setCustomBackgroundUri(value: String?) {
         dataStore.edit { prefs ->
             if (value.isNullOrBlank()) prefs.remove(keyCustomBackgroundUri) else prefs[keyCustomBackgroundUri] = value
+        }
+    }
+
+    // Server list methods
+    suspend fun setServers(servers: List<ServerConfig>) {
+        dataStore.edit { it[keyServersJson] = Json.encodeToString(servers) }
+    }
+
+    suspend fun setActiveServerId(id: String?) {
+        dataStore.edit { prefs ->
+            if (id == null) prefs.remove(keyActiveServerId) else prefs[keyActiveServerId] = id
+        }
+    }
+
+    suspend fun addServer(server: ServerConfig) {
+        dataStore.edit { prefs ->
+            val current = prefs[keyServersJson]?.let {
+                runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrDefault(emptyList())
+            } ?: emptyList()
+            val updated = current + server
+            prefs[keyServersJson] = Json.encodeToString(updated)
+            if (updated.size == 1) prefs[keyActiveServerId] = server.id
+        }
+    }
+
+    suspend fun removeServer(id: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[keyServersJson]?.let {
+                runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrDefault(emptyList())
+            } ?: emptyList()
+            val updated = current.filter { it.id != id }
+            prefs[keyServersJson] = Json.encodeToString(updated)
+            if (prefs[keyActiveServerId] == id) {
+                val newActive = updated.firstOrNull()?.id
+                if (newActive != null) prefs[keyActiveServerId] = newActive
+                else prefs.remove(keyActiveServerId)
+            }
+        }
+    }
+
+    suspend fun updateServerCertHash(id: String, certHash: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[keyServersJson]?.let {
+                runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrDefault(emptyList())
+            } ?: emptyList()
+            val updated = current.map { if (it.id == id) it.copy(trustedCertHash = certHash, useTls = true) else it }
+            prefs[keyServersJson] = Json.encodeToString(updated)
         }
     }
 }

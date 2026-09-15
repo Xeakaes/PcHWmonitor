@@ -15,6 +15,7 @@ class MonitorController(
     private val client: WsClient,
     private val history: HistoryStore,
     private val scope: CoroutineScope,
+    private val pcId: String = "default",
     private val recordIntervalMs: Long = 5_000L,
 ) {
     val connection: StateFlow<ConnectionState> = client.connectionState
@@ -24,6 +25,9 @@ class MonitorController(
 
     private val _lastError = MutableStateFlow<String?>(null)
     val lastError: StateFlow<String?> = _lastError.asStateFlow()
+
+    private val _certHash = MutableStateFlow<String?>(null)
+    val certHash: StateFlow<String?> = _certHash.asStateFlow()
 
     private var currentUrl: String? = null
     private var currentToken: String? = null
@@ -40,7 +44,7 @@ class MonitorController(
                             val now = message.status.timestamp
                             val firstRecord = lastRecordedAt == Long.MIN_VALUE
                             if (firstRecord || now - lastRecordedAt >= recordIntervalMs) {
-                                history.record(message.status)
+                                history.record(message.status, pcId)
                                 lastRecordedAt = now
                             }
                         } else {
@@ -49,17 +53,19 @@ class MonitorController(
                     }
                     is WsMessage.Welcome -> Unit
                     is WsMessage.ParseFailure -> _lastError.value = message.reason
+                    is WsMessage.CertUntrusted -> _certHash.value = message.certHash
                 }
             }
         }
     }
 
-    fun connect(ip: String, port: Int, token: String? = null) {
+    fun connect(ip: String, port: Int, token: String? = null, useTls: Boolean = false) {
         if (!isPrivateIp(ip)) {
             _lastError.value = "server IP must be in a private range"
             return
         }
-        val url = "ws://$ip:$port/ws"
+        val scheme = if (useTls) "wss" else "ws"
+        val url = "$scheme://$ip:$port/ws"
         if (url == currentUrl && token == currentToken) return
         currentUrl = url
         currentToken = token
@@ -83,5 +89,5 @@ class MonitorController(
         }
     }
 
-    suspend fun historySamples(start: Long) = history.history(start)
+    suspend fun historySamples(start: Long) = history.history(start, pcId)
 }

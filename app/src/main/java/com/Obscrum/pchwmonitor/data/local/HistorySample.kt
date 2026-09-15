@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "history_samples")
 data class HistorySample(
     @PrimaryKey val timestamp: Long,
+    val pcId: String = "default",
     val cpuTempC: Float? = null,
     val cpuUsagePct: Float? = null,
     val gpuTempC: Float? = null,

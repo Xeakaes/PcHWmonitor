@@ -4,6 +4,7 @@ import logging
 import os
 import secrets
 import sys
+import tempfile
 from pathlib import Path
 
 from app import _run_forever, build_app
@@ -37,10 +38,30 @@ def main() -> None:
     parser.add_argument("--interval", type=int, default=1000, help="broadcast interval in ms")
     parser.add_argument("--fps-process", default=None, help="process name to measure FPS for (empty = auto)")
     parser.add_argument("--token", default=None, help="require clients to authenticate with this token")
+    parser.add_argument("--ssl-cert", default=None, help="path to PEM certificate file for WSS, or 'auto' for self-signed")
+    parser.add_argument("--ssl-key", default=None, help="path to PEM private key file for WSS")
     args = parser.parse_args()
 
     # Always require auth: auto-generate if not provided
     token = args.token if args.token else secrets.token_urlsafe(16)
+
+    # SSL setup
+    ssl_cert = args.ssl_cert
+    ssl_key = args.ssl_key
+    if ssl_cert == "auto":
+        import platform
+        import subprocess
+        cert_path = Path(tempfile.mktemp(suffix=".pem"))
+        key_path = Path(tempfile.mktemp(suffix=".pem"))
+        subprocess.run([
+            "openssl", "req", "-x509", "-newkey", "rsa:2048",
+            "-keyout", str(key_path), "-out", str(cert_path),
+            "-days", "365", "-nodes",
+            "-subj", f"/CN={platform.node()}",
+        ], check=True)
+        ssl_cert = str(cert_path)
+        ssl_key = str(key_path)
+        logger.info("auto-generated self-signed cert: %s", ssl_cert)
 
     app = build_app(simulate=args.simulate, lhm_url=args.lhm_url, interval_ms=args.interval, source=args.source, fps_process=args.fps_process, token=token)
     if args.simulate:
@@ -49,14 +70,17 @@ def main() -> None:
         logger.info("running with source=%s on 0.0.0.0:%d", args.source, args.port)
 
     if getattr(sys, "frozen", False) and not args.simulate:
-        _run_with_tray(app, args.port)
+        _run_with_tray(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key)
     else:
+        scheme = "wss" if ssl_cert else "ws"
         logger.info("token: %s", token)
         print(f"\n{'='*50}")
         print(f"  ACCESS TOKEN: {token}")
         print(f"  Enter this in the Android app's Access Key field")
+        if ssl_cert:
+            print(f"  SSL: enabled ({scheme}://)")
         print(f"{'='*50}\n")
-        asyncio.run(_run_forever(app, args.port))
+        asyncio.run(_run_forever(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key))
 
 
 if __name__ == "__main__":

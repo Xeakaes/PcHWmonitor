@@ -14,18 +14,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLPeerUnverifiedException
 
 enum class ConnectionState { DISCONNECTED, CONNECTING, CONNECTED }
 
 class WebSocketClient(
     private val parser: StatusParser = StatusParser,
     private val okHttp: OkHttpClient = defaultClient(),
+    private val trustedCertHash: String? = null,
 ) : WsClient {
     private val _messages = MutableSharedFlow<WsMessage>(extraBufferCapacity = 64)
     override val messages: SharedFlow<WsMessage> = _messages.asSharedFlow()
@@ -59,8 +63,6 @@ class WebSocketClient(
     private suspend fun connectLoop(url: String) {
         var backoffMs = 1000L
         while (!closed) {
-            // Drain stale close events left over from a previous socket so the
-            // new connection is not released immediately after opening.
             while (closedEvents.tryReceive().isSuccess) { /* discard */ }
             _connectionState.value = ConnectionState.CONNECTING
             val socket = tryOpen(url)
@@ -82,8 +84,13 @@ class WebSocketClient(
 
     private fun tryOpen(url: String): WebSocket? {
         return try {
+            val client = if (trustedCertHash != null) {
+                buildTrustedClient(trustedCertHash)
+            } else {
+                okHttp
+            }
             val request = Request.Builder().url(url).build()
-            okHttp.newWebSocket(request, listener())
+            client.newWebSocket(request, listener())
         } catch (e: Exception) {
             _messages.tryEmit(WsMessage.ParseFailure(url, e.message ?: "connect failed"))
             null
@@ -103,6 +110,15 @@ class WebSocketClient(
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            if (t is SSLPeerUnverifiedException) {
+                val cert = response?.handshake?.peerCertificates?.firstOrNull()
+                if (cert != null) {
+                    val hash = MessageDigest.getInstance("SHA-256")
+                        .digest(cert.encoded)
+                        .joinToString("") { "%02x".format(it) }
+                    _messages.tryEmit(WsMessage.CertUntrusted(hash, null))
+                }
+            }
             _messages.tryEmit(WsMessage.ParseFailure("socket", t.message ?: "socket failure"))
             _connectionState.value = ConnectionState.DISCONNECTED
             closedEvents.trySend(Unit)
@@ -123,5 +139,14 @@ class WebSocketClient(
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
             .build()
+
+        fun buildTrustedClient(certHash: String): OkHttpClient {
+            val certificatePinner = CertificatePinner.Builder()
+                .add("*", "sha256/$certHash")
+                .build()
+            return defaultClient().newBuilder()
+                .certificatePinner(certificatePinner)
+                .build()
+        }
     }
 }

@@ -10,22 +10,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.platform.LocalContext
+import com.Obscrum.pchwmonitor.data.ServerConfig
 import com.Obscrum.pchwmonitor.util.PATREON_URL
 import com.Obscrum.pchwmonitor.util.QrPayload
+import java.util.UUID
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import androidx.compose.runtime.Composable
@@ -107,6 +116,16 @@ fun SettingsScreen(
     onGlassmorphismToggle: (Boolean) -> Unit = {},
     onCustomBackgroundPick: (String) -> Unit = {},
     onCustomBackgroundRemove: () -> Unit = {},
+    // Multi-PC parameters
+    labelSavedServers: String = "Saved Servers",
+    labelSelect: String = "Select",
+    labelDelete: String = "Delete",
+    labelAddServer: String = "Add new server",
+    savedServers: List<ServerConfig> = emptyList(),
+    activeServerId: String? = null,
+    onSelectSavedServer: (String) -> Unit = {},
+    onDeleteSavedServer: (String) -> Unit = {},
+    onAddServer: (ServerConfig) -> Unit = {},
 ) {
     val context = LocalContext.current
     var ip by remember { mutableStateOf(settings.serverIp) }
@@ -120,6 +139,11 @@ fun SettingsScreen(
     var customBackgroundEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
     var glassmorphismEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
     var currentCustomBackgroundUri by remember { mutableStateOf(settings.customBackgroundUri) }
+    var showAddServerForm by remember { mutableStateOf(false) }
+    var newServerName by remember { mutableStateOf("") }
+    var newServerIp by remember { mutableStateOf("") }
+    var newServerPort by remember { mutableStateOf("8765") }
+    var newServerToken by remember { mutableStateOf("") }
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
@@ -164,12 +188,128 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Server List Section (Multi-PC)
         Text(
-            text = labelServer,
+            text = labelSavedServers,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Show saved servers
+        savedServers.forEach { server ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Active indicator
+                if (server.id == activeServerId) {
+                    Icon(
+                        Icons.Filled.Check,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = server.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (server.id == activeServerId) FontWeight.Bold else FontWeight.Normal,
+                    )
+                    Text(
+                        text = "${server.ip}:${server.port}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                // Select button
+                    if (server.id != activeServerId) {
+                        TextButton(onClick = { onSelectSavedServer(server.id) }) {
+                            Text(labelSelect)
+                        }
+                    }
+                    // Delete button
+                    IconButton(onClick = { onDeleteSavedServer(server.id) }) {
+                        Icon(Icons.Filled.Delete, contentDescription = labelDelete)
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(12.dp))
+
+        // Add new server button
+        OutlinedButton(
+            onClick = { showAddServerForm = true },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(labelAddServer)
+        }
+
+        // Add server dialog
+        if (showAddServerForm) {
+            AlertDialog(
+                onDismissRequest = { showAddServerForm = false },
+                title = { Text(labelAddServer) },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = newServerName,
+                            onValueChange = { newServerName = it },
+                            label = { Text("Name") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = newServerIp,
+                            onValueChange = { newServerIp = it },
+                            label = { Text("IP Address") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = newServerPort,
+                            onValueChange = { newServerPort = it },
+                            label = { Text("Port") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = newServerToken,
+                            onValueChange = { newServerToken = it },
+                            label = { Text("Token (optional)") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val portInt = newServerPort.toIntOrNull() ?: 8765
+                            val server = ServerConfig(
+                                id = UUID.randomUUID().toString(),
+                                name = newServerName.ifBlank { "PC" },
+                                ip = newServerIp.trim(),
+                                port = portInt,
+                                token = newServerToken.trim().ifBlank { null },
+                            )
+                            onAddServer(server)
+                            showAddServerForm = false
+                            newServerName = ""
+                            newServerIp = ""
+                            newServerPort = "8765"
+                            newServerToken = ""
+                        },
+                    ) {
+                        Text("Add")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showAddServerForm = false }) {
+                        Text("Cancel")
+                    }
+                },
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Connection method picker
         var methodExpanded by remember { mutableStateOf(false) }

@@ -2,7 +2,11 @@ package com.Obscrum.pchwmonitor.ui.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -10,12 +14,16 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +52,7 @@ import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
 import com.Obscrum.pchwmonitor.ui.settings.SettingsScreen
+import kotlinx.coroutines.flow.map
 
 private data class NavItem(
     val route: String,
@@ -60,8 +69,8 @@ private val items = listOf(
 @Composable
 fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val status by viewModel.status.collectAsState()
-    val connection by viewModel.connection.collectAsState()
+    val status by viewModel.activeStatus.collectAsState()
+    val connection by viewModel.activeConnection.collectAsState()
     val chartWindowSeconds by viewModel.chartWindowSeconds.collectAsState()
     val dashboardLayout by viewModel.dashboardLayout.collectAsState()
     val windowSize = LocalWindowInfo.current.containerSize
@@ -108,58 +117,78 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     var editMode by rememberSaveable { mutableStateOf(false) }
                     val customBackgroundBitmap by viewModel.customBackgroundBitmap.collectAsState()
                     val glassmorphism by viewModel.glassmorphism.collectAsState()
-                    DashboardScreen(
-                        status = status,
-                        connection = connection,
-                        chartWindowSeconds = chartWindowSeconds,
-                        layout = dashboardLayout,
-                        onLayoutChange = viewModel::setDashboardLayout,
-                        editMode = editMode,
-                        onEditModeChange = { editMode = it },
-                        labelMenuHide = stringResource(R.string.menu_hide),
-                        labelMenuPin = stringResource(R.string.menu_pin),
-                        labelMenuUnpin = stringResource(R.string.menu_unpin),
-                        labelMenuEdit = stringResource(R.string.menu_edit_layout),
-                        labelMenuFpsDetails = stringResource(R.string.fps_details_title),
-                        labelEditDone = stringResource(R.string.edit_done),
-                        labelEditCancel = stringResource(R.string.edit_cancel),
-                        labelHiddenCards = stringResource(R.string.hidden_cards),
-                        labelCardWidthHalf = stringResource(R.string.card_width_half),
-                        labelCardWidthFull = stringResource(R.string.card_width_full),
-                        labelConnecting = stringResource(R.string.connecting),
-                        labelConnected = stringResource(R.string.connected),
-                        labelDisconnected = stringResource(R.string.disconnected),
-                        labelCpu = stringResource(R.string.cpu),
-                        labelCpuTemp = stringResource(R.string.cpu_temp),
-                        labelUsage = stringResource(R.string.usage),
-                        labelClock = stringResource(R.string.core_clock),
-                        labelPower = stringResource(R.string.power),
-                        labelCores = stringResource(R.string.cores),
-                        labelGpuTemp = stringResource(R.string.gpu_temp),
-                        labelHotspot = stringResource(R.string.gpu_hotspot),
-                        labelVram = stringResource(R.string.vram),
-                        labelCoreClock = stringResource(R.string.core_clock),
-                        labelMemClock = stringResource(R.string.mem_clock),
-                        labelIntegratedGpu = stringResource(R.string.label_integrated_gpu),
-                        labelRam = stringResource(R.string.ram),
-                        labelRamUsed = stringResource(R.string.ram_used),
-                        labelNoData = stringResource(R.string.no_data),
-                        labelFps = stringResource(R.string.fps_card_title),
-                        labelFpsAvg = stringResource(R.string.fps_avg),
-                        labelFpsOnePercentLow = stringResource(R.string.fps_1pct_low),
-                        labelFpsDetails = stringResource(R.string.fps_details_title),
-                        labelFpsHint = stringResource(R.string.fps_hint),
-                        labelDisk = stringResource(R.string.disk_card_title),
-                        labelDiskRead = stringResource(R.string.disk_read),
-                        labelDiskWrite = stringResource(R.string.disk_write),
-                        labelDiskUsage = stringResource(R.string.disk_usage),
-                        labelNet = stringResource(R.string.net_card_title),
-                        labelNetDownload = stringResource(R.string.net_download),
-                        labelNetUpload = stringResource(R.string.net_upload),
-                        labelFan = stringResource(R.string.fan_card_title),
-                        customBackgroundBitmap = customBackgroundBitmap,
-                        glassmorphism = glassmorphism,
-                    )
+                    val activeStatus by viewModel.activeStatus.collectAsState()
+                    val activeConnection by viewModel.activeConnection.collectAsState()
+                    val activeServerId by viewModel.activeServerId.collectAsState()
+                    val servers by viewModel.settings.map { it.servers }.collectAsState(initial = emptyList())
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (servers.size > 1) {
+                            ScrollableTabRow(
+                                selectedTabIndex = servers.indexOfFirst { it.id == activeServerId }.coerceAtLeast(0),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                servers.forEach { server ->
+                                    Tab(
+                                        selected = server.id == activeServerId,
+                                        onClick = { viewModel.setActiveServer(server.id) },
+                                        text = { Text(server.name) },
+                                    )
+                                }
+                            }
+                        }
+                        DashboardScreen(
+                            status = activeStatus,
+                            connection = activeConnection,
+                            chartWindowSeconds = chartWindowSeconds,
+                            layout = dashboardLayout,
+                            onLayoutChange = viewModel::setDashboardLayout,
+                            editMode = editMode,
+                            onEditModeChange = { editMode = it },
+                            labelMenuHide = stringResource(R.string.menu_hide),
+                            labelMenuPin = stringResource(R.string.menu_pin),
+                            labelMenuUnpin = stringResource(R.string.menu_unpin),
+                            labelMenuEdit = stringResource(R.string.menu_edit_layout),
+                            labelMenuFpsDetails = stringResource(R.string.fps_details_title),
+                            labelEditDone = stringResource(R.string.edit_done),
+                            labelEditCancel = stringResource(R.string.edit_cancel),
+                            labelHiddenCards = stringResource(R.string.hidden_cards),
+                            labelCardWidthHalf = stringResource(R.string.card_width_half),
+                            labelCardWidthFull = stringResource(R.string.card_width_full),
+                            labelConnecting = stringResource(R.string.connecting),
+                            labelConnected = stringResource(R.string.connected),
+                            labelDisconnected = stringResource(R.string.disconnected),
+                            labelCpu = stringResource(R.string.cpu),
+                            labelCpuTemp = stringResource(R.string.cpu_temp),
+                            labelUsage = stringResource(R.string.usage),
+                            labelClock = stringResource(R.string.core_clock),
+                            labelPower = stringResource(R.string.power),
+                            labelCores = stringResource(R.string.cores),
+                            labelGpuTemp = stringResource(R.string.gpu_temp),
+                            labelHotspot = stringResource(R.string.gpu_hotspot),
+                            labelVram = stringResource(R.string.vram),
+                            labelCoreClock = stringResource(R.string.core_clock),
+                            labelMemClock = stringResource(R.string.mem_clock),
+                            labelIntegratedGpu = stringResource(R.string.label_integrated_gpu),
+                            labelRam = stringResource(R.string.ram),
+                            labelRamUsed = stringResource(R.string.ram_used),
+                            labelNoData = stringResource(R.string.no_data),
+                            labelFps = stringResource(R.string.fps_card_title),
+                            labelFpsAvg = stringResource(R.string.fps_avg),
+                            labelFpsOnePercentLow = stringResource(R.string.fps_1pct_low),
+                            labelFpsDetails = stringResource(R.string.fps_details_title),
+                            labelFpsHint = stringResource(R.string.fps_hint),
+                            labelDisk = stringResource(R.string.disk_card_title),
+                            labelDiskRead = stringResource(R.string.disk_read),
+                            labelDiskWrite = stringResource(R.string.disk_write),
+                            labelDiskUsage = stringResource(R.string.disk_usage),
+                            labelNet = stringResource(R.string.net_card_title),
+                            labelNetDownload = stringResource(R.string.net_download),
+                            labelNetUpload = stringResource(R.string.net_upload),
+                            labelFan = stringResource(R.string.fan_card_title),
+                            customBackgroundBitmap = customBackgroundBitmap,
+                            glassmorphism = glassmorphism,
+                        )
+                    }
                 }
                 composable("history") {
                     HistoryScreen(
@@ -183,6 +212,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val discoveredServers by viewModel.discovery.servers.collectAsState()
                     val isScanning by viewModel.discovery.isScanning.collectAsState()
                     val errorMessage by viewModel.lastError.collectAsState()
+                    val activeServerId by viewModel.activeServerId.collectAsState()
                     SettingsScreen(
                         settings = settings,
                         connection = connection,
@@ -276,6 +306,16 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onGlassmorphismToggle = viewModel::setGlassmorphismEnabled,
                         onCustomBackgroundPick = viewModel::pickCustomBackground,
                         onCustomBackgroundRemove = viewModel::removeCustomBackground,
+                        // Multi-PC parameters
+                        labelSavedServers = "Saved Servers",
+                        labelSelect = "Select",
+                        labelDelete = "Delete",
+                        labelAddServer = "Add new server",
+                        savedServers = settings.servers,
+                        activeServerId = activeServerId,
+                        onSelectSavedServer = viewModel::setActiveServer,
+                        onDeleteSavedServer = viewModel::removeServer,
+                        onAddServer = viewModel::addServer,
                     )
                 }
             }
@@ -293,6 +333,36 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     contentDescription = stringResource(R.string.nav_show),
                 )
             }
+        }
+        // Cert trust dialog
+        val pendingCertHash by viewModel.pendingCertHash.collectAsState()
+        if (pendingCertHash != null) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissCertDialog() },
+                title = { Text("Trust server certificate?") },
+                text = {
+                    Column {
+                        Text("The server's certificate is not trusted.")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "SHA-256: $pendingCertHash",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Trust this certificate for future connections?")
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { pendingCertHash?.let { viewModel.trustCert(it) } }) {
+                        Text("Trust")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { viewModel.dismissCertDialog() }) {
+                        Text("Cancel")
+                    }
+                },
+            )
         }
     }
 }

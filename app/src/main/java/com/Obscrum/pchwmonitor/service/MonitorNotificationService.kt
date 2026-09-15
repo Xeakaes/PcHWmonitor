@@ -32,6 +32,7 @@ class MonitorNotificationService : Service() {
 
         private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
         private val _currentStatus = MutableStateFlow<SystemStatus?>(null)
+        private val _serverName = MutableStateFlow<String?>(null)
         private var _instance: MonitorNotificationService? = null
 
         fun start(context: Context) {
@@ -54,6 +55,11 @@ class MonitorNotificationService : Service() {
 
         fun updateStatus(status: SystemStatus?) {
             _currentStatus.value = status
+            _instance?.updateNotification()
+        }
+
+        fun updateServerName(name: String?) {
+            _serverName.value = name
             _instance?.updateNotification()
         }
     }
@@ -126,7 +132,7 @@ class MonitorNotificationService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.app_name))
+            .setContentTitle(_serverName.value ?: getString(R.string.app_name))
             .setContentText(contentText)
             .setStyle(NotificationCompat.BigTextStyle().bigText(expandedText))
             .setOngoing(true)

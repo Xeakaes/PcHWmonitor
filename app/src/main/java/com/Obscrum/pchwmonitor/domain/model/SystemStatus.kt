@@ -98,4 +98,5 @@ sealed class WsMessage {
     data class Welcome(val info: WelcomeInfo) : WsMessage()
     data class Status(val status: SystemStatus) : WsMessage()
     data class ParseFailure(val raw: String, val reason: String) : WsMessage()
+    data class CertUntrusted(val certHash: String, val serverName: String?) : WsMessage()
 }

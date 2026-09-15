@@ -12,6 +12,9 @@ interface HistoryDao {
     @Query("DELETE FROM history_samples WHERE timestamp < :cutoff")
     suspend fun pruneOlderThan(cutoff: Long)
 
+    @Query("SELECT * FROM history_samples WHERE timestamp >= :start AND pcId = :pcId ORDER BY timestamp ASC")
+    suspend fun getBetween(start: Long, pcId: String): List<HistorySample>
+
     @Query("SELECT * FROM history_samples WHERE timestamp >= :start ORDER BY timestamp ASC")
-    suspend fun getBetween(start: Long): List<HistorySample>
+    suspend fun getBetweenAll(start: Long): List<HistorySample>
 }

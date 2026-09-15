@@ -158,13 +158,17 @@ def build_app(
     return app
 
 
-async def _run_forever(app: FastAPI, port: int, stop_event: threading.Event | None = None) -> None:
+async def _run_forever(app: FastAPI, port: int, stop_event: threading.Event | None = None, ssl_cert: str | None = None, ssl_key: str | None = None) -> None:
     task = asyncio.create_task(app.state.hub.tick_forever())
     # Start UDP broadcast for LAN discovery
     broadcast_thread = start_broadcast(port, app.state.welcome.serverName)
     monitor = None
     try:
-        config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info", log_config=None, access_log=False)
+        config = uvicorn.Config(
+            app, host="0.0.0.0", port=port,
+            log_level="info", log_config=None, access_log=False,
+            ssl_keyfile=ssl_key, ssl_certfile=ssl_cert,
+        )
         server = uvicorn.Server(config)
         if stop_event is not None:
             monitor = asyncio.create_task(_wait_for_stop(server, stop_event))

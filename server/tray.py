@@ -95,18 +95,18 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
     icon.run()
 
 
-def _serve_in_thread(app: FastAPI, port: int, stop_event: threading.Event) -> None:
+def _serve_in_thread(app: FastAPI, port: int, stop_event: threading.Event, ssl_cert: str | None = None, ssl_key: str | None = None) -> None:
     try:
-        asyncio.run(_run_forever(app, port, stop_event))
+        asyncio.run(_run_forever(app, port, stop_event, ssl_cert=ssl_cert, ssl_key=ssl_key))
     except asyncio.CancelledError:
         pass
     finally:
         stop_event.set()
 
 
-def _run_with_tray(app: FastAPI, port: int) -> None:
+def _run_with_tray(app: FastAPI, port: int, ssl_cert: str | None = None, ssl_key: str | None = None) -> None:
     stop_event = threading.Event()
-    thread = threading.Thread(target=_serve_in_thread, args=(app, port, stop_event), daemon=True)
+    thread = threading.Thread(target=_serve_in_thread, args=(app, port, stop_event, ssl_cert, ssl_key), daemon=True)
     thread.start()
     _run_tray(stop_event, token=app.state.token, port=port)
     thread.join(timeout=5)
