@@ -286,10 +286,10 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onDiscover = { viewModel.discovery.startScan() },
                         errorMessage = errorMessage,
                         onServerSelected = { ip, port ->
-                            viewModel.saveSettings(ip, port, settings.authToken, settings.theme, settings.language, settings.chartWindowSeconds)
+                            viewModel.saveSettings(ip, port, settings.authToken, settings.theme, settings.language, settings.chartWindowSeconds, settings.hostname)
                         },
-                        onSave = { ip, port, authToken, theme, language, chartWindowSeconds ->
-                            viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds)
+                        onSave = { ip, port, authToken, theme, language, chartWindowSeconds, hostname ->
+                            viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds, hostname)
                         },
                         // Custom Background parameters
                         labelCustomBackground = stringResource(R.string.custom_background),

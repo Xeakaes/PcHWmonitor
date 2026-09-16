@@ -9,8 +9,19 @@ class QrPayloadTest {
 
     @Test
     fun parse_validPayload_returnsFields() {
-        val result = QrPayload.parse("pchw://connect?ip=192.168.1.50&port=8765&token=abc_123")
-        assertEquals(Triple("192.168.1.50", 8765, "abc_123"), result)
+        val result = QrPayload.parse("pchw://connect?ip=192.168.1.50&port=8765&token=abc_123")!!
+        assertEquals("192.168.1.50", result.ip)
+        assertEquals(8765, result.port)
+        assertEquals("abc_123", result.token)
+        assertNull(result.hostname)
+    }
+
+    @Test
+    fun parse_validPayloadWithHostname_returnsHostname() {
+        val result = QrPayload.parse("pchw://connect?hostname=my-tunnel.trycloudflare.com&token=abc_123")!!
+        assertEquals("my-tunnel.trycloudflare.com", result.hostname)
+        assertEquals("abc_123", result.token)
+        assertEquals(8765, result.port)
     }
 
     @Test

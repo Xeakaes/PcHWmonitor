@@ -3,6 +3,7 @@ import logging
 import subprocess
 import threading
 import time
+from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -191,6 +192,13 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
 
     def _connection_payload() -> str:
         from discovery import best_lan_ip
+        tunnel_url = tunnel.url
+        if tunnel_url:
+            # Extract hostname from https://xxx.trycloudflare.com
+            from urllib.parse import urlparse
+            host = urlparse(tunnel_url).hostname
+            if host:
+                return f"pchw://connect?hostname={host}&token={active_token}"
         return f"pchw://connect?ip={best_lan_ip()}&port={port}&token={active_token}"
 
     def _copy_payload(icon, item):
@@ -425,8 +433,6 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
                     logger.info("cloudflared authentication successful")
                 else:
                     logger.warning("cloudflared auth may have failed — check cert.pem")
-            except Exception as e:
-                logger.error("cloudflared login failed: %s", e)
             except Exception as e:
                 logger.error("cloudflared login failed: %s", e)
         threading.Thread(target=_run_login, daemon=True).start()

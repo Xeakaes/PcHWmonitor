@@ -20,6 +20,7 @@ data class AppSettings(
     val serverIp: String = "192.168.1.100",
     val serverPort: Int = 8765,
     val authToken: String? = null,
+    val hostname: String? = null,
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val language: String? = null,
     val chartWindowSeconds: Int = 60,
@@ -34,6 +35,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyIp = stringPreferencesKey("server_ip")
     private val keyPort = intPreferencesKey("server_port")
     private val keyAuthToken = stringPreferencesKey("auth_token")
+    private val keyHostname = stringPreferencesKey("hostname")
     private val keyTheme = stringPreferencesKey("theme")
     private val keyLanguage = stringPreferencesKey("language")
     private val keyChartWindow = intPreferencesKey("chart_window_seconds")
@@ -67,6 +69,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             serverIp = prefs[keyIp] ?: "192.168.1.100",
             serverPort = prefs[keyPort] ?: 8765,
             authToken = prefs[keyAuthToken]?.takeIf { it.isNotBlank() },
+            hostname = prefs[keyHostname]?.takeIf { it.isNotBlank() },
             theme = runCatching { ThemeMode.valueOf(prefs[keyTheme] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
             language = prefs[keyLanguage],
             chartWindowSeconds = prefs[keyChartWindow] ?: 60,
@@ -91,6 +94,12 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     suspend fun setAuthToken(value: String?) {
         dataStore.edit { prefs ->
             if (value.isNullOrBlank()) prefs.remove(keyAuthToken) else prefs[keyAuthToken] = value
+        }
+    }
+
+    suspend fun setHostname(value: String?) {
+        dataStore.edit { prefs ->
+            if (value.isNullOrBlank()) prefs.remove(keyHostname) else prefs[keyHostname] = value
         }
     }
 
@@ -173,6 +182,16 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
                 runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrDefault(emptyList())
             } ?: emptyList()
             val updated = current.map { if (it.id == id) it.copy(trustedCertHash = certHash, useTls = true) else it }
+            prefs[keyServersJson] = Json.encodeToString(updated)
+        }
+    }
+
+    suspend fun updateServerHostname(id: String, hostname: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[keyServersJson]?.let {
+                runCatching { Json.decodeFromString<List<ServerConfig>>(it) }.getOrDefault(emptyList())
+            } ?: emptyList()
+            val updated = current.map { if (it.id == id) it.copy(hostname = hostname) else it }
             prefs[keyServersJson] = Json.encodeToString(updated)
         }
     }

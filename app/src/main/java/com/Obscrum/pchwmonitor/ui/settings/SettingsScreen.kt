@@ -102,7 +102,7 @@ fun SettingsScreen(
     onServerSelected: (ip: String, port: Int) -> Unit = { _, _ -> },
     errorMessage: String? = null,
     modifier: Modifier = Modifier,
-    onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int) -> Unit,
+    onSave: (ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?, chartWindowSeconds: Int, hostname: String?) -> Unit,
     // Custom Background parameters
     labelCustomBackground: String = "Custom Background",
     labelCustomBackgroundDescription: String = "Set a background image and auto-extract theme colors",
@@ -133,13 +133,14 @@ fun SettingsScreen(
     var ip by remember { mutableStateOf(settings.serverIp) }
     var port by remember { mutableStateOf(settings.serverPort.toString()) }
     var authToken by remember { mutableStateOf(settings.authToken ?: "") }
+    var hostname by remember { mutableStateOf(settings.hostname ?: "") }
     var theme by remember { mutableStateOf(settings.theme) }
     var language by remember { mutableStateOf(settings.language) }
     var chartWindowSeconds by remember { mutableIntStateOf(settings.chartWindowSeconds) }
     var saved by remember { mutableStateOf(false) }
     var scanMode by rememberSaveable { mutableStateOf(false) }
     var customBackgroundEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
-    var glassmorphismEnabled by remember { mutableStateOf(settings.customBackgroundEnabled) }
+    var glassmorphismEnabled by remember { mutableStateOf(settings.glassmorphismEnabled) }
     var currentCustomBackgroundUri by remember { mutableStateOf(settings.customBackgroundUri) }
     var showAddServerForm by remember { mutableStateOf(false) }
     var newServerName by remember { mutableStateOf("") }
@@ -160,10 +161,11 @@ fun SettingsScreen(
 
     val qrLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
         result.contents?.let { text ->
-            QrPayload.parse(text)?.let { (qrIp, qrPort, qrToken) ->
-                ip = qrIp
-                port = qrPort.toString()
-                authToken = qrToken
+            QrPayload.parse(text)?.let { qr ->
+                ip = qr.ip
+                port = qr.port.toString()
+                authToken = qr.token
+                hostname = qr.hostname ?: ""
                 scanMode = false
                 saved = false
             }
@@ -173,7 +175,7 @@ fun SettingsScreen(
     fun connectNow() {
         val portInt = port.toIntOrNull() ?: 8765
         saved = true
-        onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
+        onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds, hostname.trim().ifBlank { null })
     }
 
     Column(
@@ -396,6 +398,18 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = hostname,
+                onValueChange = {
+                    hostname = it
+                    saved = false
+                },
+                label = { Text("Cloudflare Tunnel URL (optional)") },
+                singleLine = true,
+                placeholder = { Text("my-tunnel.trycloudflare.com") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         } else {
             // Network scan
             Button(
@@ -558,7 +572,7 @@ fun SettingsScreen(
                 onClick = {
                     val portInt = port.toIntOrNull() ?: 8765
                     saved = true
-                    onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds)
+                    onSave(ip.trim(), portInt, authToken.trim().ifBlank { null }, theme, language, chartWindowSeconds, hostname.trim().ifBlank { null })
                 },
                 modifier = Modifier.weight(1f),
             ) {
