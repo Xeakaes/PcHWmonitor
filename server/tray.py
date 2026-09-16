@@ -58,14 +58,50 @@ class TunnelManager:
         return self._start(cmd, "quick")
 
     def start_named(self, tunnel_name: str, port: int) -> bool:
-        """Start a named (persistent) tunnel."""
+        """Start a named (persistent) tunnel. Creates it first if needed."""
         if self.is_running:
             return False
         cloudflared = _find_cloudflared()
         if cloudflared is None:
             return False
+        # Create tunnel if it doesn't exist
+        tunnel_id = self.create_tunnel(cloudflared, tunnel_name)
+        if tunnel_id is None:
+            # Tunnel might already exist — try to run it anyway
+            logger.info("tunnel '%s' may already exist, attempting to run", tunnel_name)
+        else:
+            logger.info("created tunnel '%s' (id: %s)", tunnel_name, tunnel_id)
         cmd = [str(cloudflared), "tunnel", "run", tunnel_name]
         return self._start(cmd, tunnel_name)
+
+    def create_tunnel(self, cloudflared_path, tunnel_name: str) -> str | None:
+        """Create a cloudflare tunnel. Returns tunnel ID or None on failure."""
+        try:
+            result = subprocess.run(
+                [str(cloudflared_path), "tunnel", "create", tunnel_name],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode != 0:
+                logger.error("tunnel create failed: %s", result.stderr.strip() or result.stdout.strip())
+                return None
+            # Parse tunnel ID from output like: Created tunnel <name> id=<id>
+            for line in result.stdout.splitlines():
+                if "id=" in line:
+                    return line.split("id=")[-1].strip()
+                # Also handle: "Created tunnel ... with id ... "
+                if "Created tunnel" in line:
+                    parts = line.split()
+                    for i, p in enumerate(parts):
+                        if p == "id" and i + 1 < len(parts):
+                            return parts[i + 1]
+            # Fallback: last line might be the ID
+            lines = [l.strip() for l in result.stdout.strip().splitlines() if l.strip()]
+            if lines:
+                return lines[-1]
+            return None
+        except Exception as e:
+            logger.error("tunnel create exception: %s", e)
+            return None
 
     def _start(self, cmd: list[str], name: str) -> bool:
         try:
@@ -242,20 +278,120 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         if not _is_cloudflared_authenticated(cf):
             icon.notify("Not authenticated with Cloudflare.\nPlease run 'Cloudflare Login' first.", "PC HW Monitor")
             return
-        # Open a simple Tk dialog to ask for tunnel name
-        threading.Thread(target=_ask_tunnel_name, daemon=True).start()
+        # Check if there are existing tunnels to offer as choices
+        existing = _list_existing_tunnels(cf)
+        if existing:
+            threading.Thread(target=_pick_tunnel, args=(existing,), daemon=True).start()
+        else:
+            threading.Thread(target=_ask_new_tunnel_name, daemon=True).start()
 
     def _is_cloudflared_authenticated(cf_path):
         """Check if cloudflared has a cert.pem (means user has logged in)."""
-        import sys
-        from pathlib import Path
-        if getattr(sys, "frozen", False):
-            base = Path(sys.executable).parent
-        else:
-            base = Path(__file__).resolve().parent
-        # cloudflared stores cert in ~/.cloudflared/cert.pem
         cert_path = Path.home() / ".cloudflared" / "cert.pem"
         return cert_path.exists()
+
+    def _list_existing_tunnels(cf_path):
+        """List existing cloudflare tunnels. Returns list of (name, id) tuples."""
+        try:
+            result = subprocess.run(
+                [str(cf_path), "tunnel", "list"],
+                capture_output=True, text=True, timeout=15,
+            )
+            if result.returncode != 0:
+                return []
+            tunnels = []
+            for line in result.stdout.splitlines():
+                # Skip header and separator lines
+                if line.startswith("ID") or line.startswith("---") or not line.strip():
+                    continue
+                parts = line.split()
+                if len(parts) >= 2:
+                    # Format: <id> <name> ... 
+                    tunnels.append((parts[1] if len(parts) > 1 else parts[0], parts[0]))
+            return tunnels
+        except Exception as e:
+            logger.debug("tunnel list failed: %s", e)
+            return []
+
+    def _pick_tunnel(existing):
+        """Show dialog to pick existing tunnel or create new one."""
+        import tkinter as tk
+        from tkinter import simpledialog
+        root = tk.Tk()
+        root.withdraw()
+        # Build choices
+        choices = [name for name, tid in existing]
+        choices.append("+ Create new tunnel")
+        # Simple selection dialog
+        from tkinter import ttk
+        dialog = tk.Toplevel(root)
+        dialog.title("Cloudflare Tunnel")
+        dialog.geometry("350x200")
+        dialog.resizable(False, False)
+        tk.Label(dialog, text="Select a tunnel to run:", font=("Segoe UI", 10)).pack(padx=10, pady=(10, 5))
+        listbox = tk.Listbox(dialog, font=("Consolas", 10))
+        for c in choices:
+            listbox.insert(tk.END, c)
+        listbox.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        selected = [None]
+        def on_ok(event=None):
+            sel = listbox.curselection()
+            if sel:
+                selected[0] = choices[sel[0]]
+            dialog.destroy()
+        def on_cancel():
+            dialog.destroy()
+        btn_frame = tk.Frame(dialog)
+        btn_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        tk.Button(btn_frame, text="Run", width=8, command=on_ok).pack(side=tk.RIGHT, padx=(5, 0))
+        tk.Button(btn_frame, text="Cancel", width=8, command=on_cancel).pack(side=tk.RIGHT)
+        listbox.bind("<Double-Button-1>", on_ok)
+        listbox.focus_set()
+        dialog.protocol("WM_DELETE_WINDOW", on_cancel)
+        dialog.eval("tk::PlaceWindow . center")
+        root.destroy()
+        dialog.mainloop()
+        if selected[0] is None:
+            return
+        if selected[0] == "+ Create new tunnel":
+            threading.Thread(target=_ask_new_tunnel_name, daemon=True).start()
+        else:
+            # Run existing tunnel
+            def _on_url(url):
+                logger.info("named tunnel URL: %s", url)
+            tunnel.set_on_url_callback(_on_url)
+            ok = tunnel.start_named(selected[0], port)
+            if not ok:
+                logger.error("failed to start tunnel: %s", selected[0])
+
+    def _ask_new_tunnel_name():
+        """Ask for a new tunnel name, create it, and start it."""
+        import tkinter as tk
+        from tkinter import simpledialog
+        root = tk.Tk()
+        root.withdraw()
+        name = simpledialog.askstring("Create Cloudflare Tunnel", "Enter tunnel name:", parent=root)
+        root.destroy()
+        if not name or not name.strip():
+            return
+        tunnel_name = name.strip()
+        cf = _find_cloudflared()
+        if not cf:
+            return
+        # Create tunnel first
+        logger.info("creating tunnel '%s'...", tunnel_name)
+        tunnel_id = tunnel.create_tunnel(cf, tunnel_name)
+        if tunnel_id:
+            logger.info("tunnel '%s' created (id: %s)", tunnel_name, tunnel_id)
+        else:
+            logger.info("tunnel '%s' may already exist, trying to run", tunnel_name)
+        # Start running it
+        def _on_url(url):
+            logger.info("named tunnel URL: %s", url)
+        tunnel.set_on_url_callback(_on_url)
+        ok = tunnel.start_named(tunnel_name, port)
+        if not ok:
+            logger.error("failed to start tunnel: %s", tunnel_name)
 
     def _cloudflare_login(icon, item):
         cf = _find_cloudflared()
@@ -288,23 +424,6 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
             except Exception as e:
                 logger.error("cloudflared login failed: %s", e)
         threading.Thread(target=_run_login, daemon=True).start()
-
-    def _ask_tunnel_name():
-        import tkinter as tk
-        from tkinter import simpledialog
-        root = tk.Tk()
-        root.withdraw()
-        name = simpledialog.askstring("Cloudflare Tunnel", "Enter tunnel name:", parent=root)
-        root.destroy()
-        if not name or not name.strip():
-            return
-        def _on_url(url):
-            # Can't notify from here since icon isn't accessible; logger handles it
-            pass
-        tunnel.set_on_url_callback(_on_url)
-        ok = tunnel.start_named(name.strip(), port)
-        if not ok:
-            logger.error("failed to start named tunnel: %s", name)
 
     def _stop_tunnel(icon, item):
         if not tunnel.is_running:
