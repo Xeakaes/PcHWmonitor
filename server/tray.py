@@ -227,11 +227,60 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         if tunnel.is_running:
             icon.notify("Tunnel already running.", "PC HW Monitor")
             return
-        if not _find_cloudflared():
-            icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe.", "PC HW Monitor")
+        cf = _find_cloudflared()
+        if not cf:
+            icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe or in vendor/.", "PC HW Monitor")
+            return
+        # Check if authenticated
+        if not _is_cloudflared_authenticated(cf):
+            icon.notify("Not authenticated with Cloudflare.\nPlease run 'Cloudflare Login' first.", "PC HW Monitor")
             return
         # Open a simple Tk dialog to ask for tunnel name
         threading.Thread(target=_ask_tunnel_name, daemon=True).start()
+
+    def _is_cloudflared_authenticated(cf_path):
+        """Check if cloudflared has a cert.pem (means user has logged in)."""
+        import sys
+        from pathlib import Path
+        if getattr(sys, "frozen", False):
+            base = Path(sys.executable).parent
+        else:
+            base = Path(__file__).resolve().parent
+        # cloudflared stores cert in ~/.cloudflared/cert.pem
+        cert_path = Path.home() / ".cloudflared" / "cert.pem"
+        return cert_path.exists()
+
+    def _cloudflare_login(icon, item):
+        cf = _find_cloudflared()
+        if not cf:
+            icon.notify("cloudflared.exe not found.", "PC HW Monitor")
+            return
+        icon.notify("Opening Cloudflare login page...\nAuthenticate in your browser.", "PC HW Monitor")
+        def _run_login():
+            try:
+                proc = subprocess.Popen(
+                    [str(cf), "tunnel", "login"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+                for line in proc.stdout:
+                    line = line.strip()
+                    logger.info("cloudflared login: %s", line)
+                    if "https://" in line and "cloudflareaccess" in line:
+                        for word in line.split():
+                            if word.startswith("https://"):
+                                import webbrowser
+                                webbrowser.open(word.rstrip(",/.;"))
+                                break
+                proc.wait()
+                if _is_cloudflared_authenticated(cf):
+                    logger.info("cloudflared authentication successful")
+                else:
+                    logger.warning("cloudflared authentication may have failed")
+            except Exception as e:
+                logger.error("cloudflared login failed: %s", e)
+        threading.Thread(target=_run_login, daemon=True).start()
 
     def _ask_tunnel_name():
         import tkinter as tk
@@ -309,6 +358,8 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem("Copy Tunnel URL", _copy_tunnel_url),
                 pystray.MenuItem("Show Tunnel URL", _show_tunnel_url),
+                pystray.Menu.SEPARATOR,
+                pystray.MenuItem("Cloudflare Login", _cloudflare_login),
             ),
         ),
         pystray.Menu.SEPARATOR,
