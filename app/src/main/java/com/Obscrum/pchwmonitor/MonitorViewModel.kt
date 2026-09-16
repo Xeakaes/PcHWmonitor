@@ -194,20 +194,10 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     fun saveSettings(ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?,
                      chartWindowSeconds: Int, hostname: String? = null) {
         viewModelScope.launch {
-            settingsStore.setServerIp(ip)
-            settingsStore.setServerPort(port)
-            settingsStore.setAuthToken(authToken)
-            settingsStore.setHostname(hostname)
-            settingsStore.setTheme(theme)
-            settingsStore.setLanguage(language)
-            settingsStore.setChartWindowSeconds(chartWindowSeconds)
-            // Also update active server's hostname if set
-            if (!hostname.isNullOrBlank()) {
-                val activeId = _activeServerId.value
-                if (activeId != null) {
-                    settingsStore.updateServerHostname(activeId, hostname)
-                }
-            }
+            settingsStore.saveConnectionAndPreferences(
+                ip = ip, port = port, token = authToken, hostname = hostname,
+                theme = theme, language = language, chartWindowSeconds = chartWindowSeconds,
+            )
         }
     }
 

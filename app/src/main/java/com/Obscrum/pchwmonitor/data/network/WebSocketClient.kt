@@ -84,6 +84,10 @@ class WebSocketClient(
             while (closedEvents.tryReceive().isSuccess) {
                 closedEvents.tryReceive()
             }
+            // Apply backoff after any disconnection to avoid tight retry loops
+            // (e.g. auth failure → connect → fail → connect → fail …)
+            delay(backoffMs)
+            backoffMs = (backoffMs * 2).coerceAtMost(30_000L)
         }
     }
 
