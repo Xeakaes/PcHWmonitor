@@ -1,6 +1,8 @@
 import asyncio
 import logging
+import subprocess
 import threading
+import time
 
 from fastapi import FastAPI
 
@@ -20,10 +22,129 @@ def _tray_image():
     return img
 
 
+class TunnelManager:
+    """Manages a cloudflared tunnel subprocess."""
+
+    def __init__(self):
+        self._process: subprocess.Popen | None = None
+        self._url: str | None = None
+        self._name: str | None = None
+        self._reader_thread: threading.Thread | None = None
+        self._on_url_callback = None
+
+    @property
+    def is_running(self) -> bool:
+        return self._process is not None and self._process.poll() is None
+
+    @property
+    def url(self) -> str | None:
+        return self._url
+
+    @property
+    def name(self) -> str | None:
+        return self._name
+
+    def set_on_url_callback(self, callback):
+        self._on_url_callback = callback
+
+    def start_quick(self, port: int) -> bool:
+        """Start a temporary quick tunnel."""
+        if self.is_running:
+            return False
+        cloudflared = _find_cloudflared()
+        if cloudflared is None:
+            return False
+        cmd = [str(cloudflared), "tunnel", "--url", f"http://localhost:{port}"]
+        return self._start(cmd, "quick")
+
+    def start_named(self, tunnel_name: str, port: int) -> bool:
+        """Start a named (persistent) tunnel."""
+        if self.is_running:
+            return False
+        cloudflared = _find_cloudflared()
+        if cloudflared is None:
+            return False
+        cmd = [str(cloudflared), "tunnel", "run", tunnel_name]
+        return self._start(cmd, tunnel_name)
+
+    def _start(self, cmd: list[str], name: str) -> bool:
+        try:
+            logger.info("starting cloudflare tunnel: %s", " ".join(cmd))
+            self._process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            self._name = name
+            self._url = None
+            self._reader_thread = threading.Thread(
+                target=self._read_output, daemon=True, name="tunnel-reader"
+            )
+            self._reader_thread.start()
+            return True
+        except Exception as e:
+            logger.error("failed to start tunnel: %s", e)
+            return False
+
+    def _read_output(self):
+        proc = self._process
+        if proc is None or proc.stdout is None:
+            return
+        for line in proc.stdout:
+            line = line.strip()
+            logger.info("cloudflared: %s", line)
+            if "trycloudflare.com" in line or "https://" in line:
+                for word in line.split():
+                    if word.startswith("https://"):
+                        self._url = word.rstrip(",/.;")
+                        logger.info("tunnel URL: %s", self._url)
+                        if self._on_url_callback:
+                            self._on_url_callback(self._url)
+                        break
+
+    def stop(self):
+        if self._process is not None:
+            try:
+                self._process.terminate()
+                self._process.wait(timeout=5)
+            except Exception:
+                try:
+                    self._process.kill()
+                except Exception:
+                    pass
+            self._process = None
+            self._url = None
+            self._name = None
+            logger.info("tunnel stopped")
+
+
+def _find_cloudflared():
+    """Find cloudflared.exe - check next to exe, then in vendor dir."""
+    import sys
+    from pathlib import Path
+    if getattr(sys, "frozen", False):
+        base = Path(sys.executable).parent
+    else:
+        base = Path(__file__).resolve().parent
+    candidate = base / "cloudflared.exe"
+    if candidate.exists():
+        return candidate
+    candidate = base / "vendor" / "cloudflared.exe"
+    if candidate.exists():
+        return candidate
+    if getattr(sys, "frozen", False):
+        candidate = Path(sys._MEIPASS) / "cloudflared.exe"
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def _run_tray(stop_event: threading.Event, token: str | None = None, port: int = 8765) -> None:
     import pystray
 
     active_token = token or "(restart required)"
+    tunnel = TunnelManager()
 
     def _connection_payload() -> str:
         from discovery import best_lan_ip
@@ -33,7 +154,6 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         payload = _connection_payload()
         try:
             import subprocess
-            # Use xclip if available, fall back to clip.exe on Windows
             import shutil
             if shutil.which("xclip"):
                 subprocess.run(
@@ -49,8 +169,6 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
             icon.notify(f"Copy failed. Payload:\n{payload}", "PC HW Monitor")
 
     def _show_qr(icon, item):
-        # Run Tk in its own daemon thread so the tray stays responsive and the
-        # window can always be closed with its [X] button.
         threading.Thread(target=_open_qr_window, args=(_connection_payload(),), daemon=True).start()
 
     def _open_qr_window(payload: str) -> None:
@@ -86,18 +204,115 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
             f"Access Key field, then tap Connect.\n"
             f"(Or use the app's 'Fill via QR' button.)"
         )
-        # Use pystray notification — no dialog window, always dismissable
+        if tunnel.is_running and tunnel.url:
+            info_text += f"\n\nTunnel: {tunnel.url}"
         icon.notify(info_text, "PC HW Monitor")
 
+    # --- Tunnel actions ---
+    def _start_quick_tunnel(icon, item):
+        if tunnel.is_running:
+            icon.notify("Tunnel already running.", "PC HW Monitor")
+            return
+        if not _find_cloudflared():
+            icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe.", "PC HW Monitor")
+            return
+        def _on_url(url):
+            icon.notify(f"Quick tunnel started:\n{url}", "PC HW Monitor")
+        tunnel.set_on_url_callback(_on_url)
+        ok = tunnel.start_quick(port)
+        if not ok:
+            icon.notify("Failed to start tunnel.", "PC HW Monitor")
+
+    def _start_named_tunnel(icon, item):
+        if tunnel.is_running:
+            icon.notify("Tunnel already running.", "PC HW Monitor")
+            return
+        if not _find_cloudflared():
+            icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe.", "PC HW Monitor")
+            return
+        # Open a simple Tk dialog to ask for tunnel name
+        threading.Thread(target=_ask_tunnel_name, daemon=True).start()
+
+    def _ask_tunnel_name():
+        import tkinter as tk
+        from tkinter import simpledialog
+        root = tk.Tk()
+        root.withdraw()
+        name = simpledialog.askstring("Cloudflare Tunnel", "Enter tunnel name:", parent=root)
+        root.destroy()
+        if not name or not name.strip():
+            return
+        def _on_url(url):
+            # Can't notify from here since icon isn't accessible; logger handles it
+            pass
+        tunnel.set_on_url_callback(_on_url)
+        ok = tunnel.start_named(name.strip(), port)
+        if not ok:
+            logger.error("failed to start named tunnel: %s", name)
+
+    def _stop_tunnel(icon, item):
+        if not tunnel.is_running:
+            icon.notify("No tunnel running.", "PC HW Monitor")
+            return
+        tunnel.stop()
+        icon.notify("Tunnel stopped.", "PC HW Monitor")
+
+    def _copy_tunnel_url(icon, item):
+        if not tunnel.is_running or not tunnel.url:
+            icon.notify("No active tunnel URL to copy.", "PC HW Monitor")
+            return
+        try:
+            import subprocess
+            import shutil
+            if shutil.which("xclip"):
+                subprocess.run(
+                    ["xclip", "-selection", "clipboard"],
+                    input=tunnel.url.encode("utf-8"), check=True,
+                )
+            else:
+                subprocess.run(
+                    ["clip"], input=tunnel.url.encode("utf-16-le"), check=True,
+                )
+            icon.notify(f"Tunnel URL copied:\n{tunnel.url}", "PC HW Monitor")
+        except Exception:
+            icon.notify(f"Tunnel URL:\n{tunnel.url}", "PC HW Monitor")
+
+    def _show_tunnel_url(icon, item):
+        if not tunnel.is_running or not tunnel.url:
+            icon.notify("No active tunnel.", "PC HW Monitor")
+            return
+        icon.notify(f"Tunnel URL:\n{tunnel.url}", "PC HW Monitor")
+
     def _show_exit(icon, item):
+        tunnel.stop()
         stop_event.set()
         icon.stop()
+
+    # Dynamic menu: show tunnel status
+    def _tunnel_status_text():
+        if tunnel.is_running:
+            label = f"Tunnel: {tunnel.url or tunnel.name or 'starting...'}"
+        else:
+            label = "Tunnel: off"
+        return label
 
     menu = pystray.Menu(
         pystray.MenuItem("Show QR", _show_qr, default=True),
         pystray.MenuItem("Copy connection info", _copy_payload),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Info", _show_info),
+        pystray.Menu.SEPARATOR,
+        pystray.MenuItem(
+            lambda: _tunnel_status_text(),
+            pystray.Menu(
+                pystray.MenuItem("Start Quick Tunnel", _start_quick_tunnel),
+                pystray.MenuItem("Start Named Tunnel...", _start_named_tunnel),
+                pystray.MenuItem("Stop Tunnel", _stop_tunnel),
+                pystray.Menu.SEPARATOR,
+                pystray.MenuItem("Copy Tunnel URL", _copy_tunnel_url),
+                pystray.MenuItem("Show Tunnel URL", _show_tunnel_url),
+            ),
+        ),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Exit", _show_exit),
     )
