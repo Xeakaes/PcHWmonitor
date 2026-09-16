@@ -21,7 +21,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import java.security.MessageDigest
 import java.security.cert.X509Certificate
-import java.util.Base64
+import android.util.Base64
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLHandshakeException
@@ -152,7 +152,7 @@ class WebSocketClient(
             val x509 = cert as X509Certificate
             val subjectPublicKeyInfo = x509.publicKey.encoded
             val spkiSha256 = MessageDigest.getInstance("SHA-256").digest(subjectPublicKeyInfo)
-            return Base64.getEncoder().encodeToString(spkiSha256)
+            return Base64.encodeToString(spkiSha256, Base64.NO_WRAP)
         }
 
         fun defaultClient(): OkHttpClient = OkHttpClient.Builder()
