@@ -16,65 +16,58 @@
 
 - [x] Custom Background + Glassmorphism: User picks an image → auto-extract theme colors, cards become semi-transparent with blur effect
 - [x] Cloudflare Named Tunnel: Persistent URL for remote access (no port forwarding needed)
-- [x] TLS/SSL mandatory for remote connections
-- [x] Multi-PC support: Connect to multiple PCs simultaneously, switch via tabs
-- [x] Security hardening: Rate limiting, cert pinning, connection limits
+- [x] TLS/SSL support: optional encrypted WebSocket connections (`wss://`) with self-signed cert trust dialog
+- [x] Multi-PC support: Connect to multiple PCs simultaneously, switch via tabs on the dashboard
+- [x] Security hardening: HMAC timing-safe token comparison, cert trust dialog, connection limits
+- [x] 9 color palettes (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic)
+- [x] Dashboard edit mode: reorder, hide, pin cards; toggle half/full width
+- [x] Landscape mode: compact scroll-free grid, auto-hiding nav bar
+- [x] F-Droid submission: MR !44635, CI passing, awaiting merge
+- [x] Bug fixes: server switch race condition, temp file race, clipboard injection, WebSocket slow client, socket leak, Room DB migration v2
+- [x] Localization: 14 languages, all strings translated
 
-## Vision
+## Vision — v1.7+
 
-### Server-Side Improvements (v1.5+)
+### Server-Side
 
 - [ ] **Better simulation mode**: Enhance `--simulate` mode with more realistic hardware profiles
-- [ ] **FPS improvements**: Add `--fps-process` auto-detection for common games, improve PresentMon integration (PresentMon 1.9.2 re-embedded in v1.5)
+- [ ] **FPS improvements**: Add `--fps-process` auto-detection for common games
 - [ ] **Disk I/O improvements**: Add read/write latency metrics, SMART data support
 - [ ] **Network enhancements**: Add bandwidth history, per-interface statistics
-- [ ] **Web API v2**: Add new endpoints for historical data, push notifications (v1.6: TLS/SSL)
+- [ ] **Web API v2**: Add new endpoints for historical data, push notifications
 
-### Android App Features (v1.5 since: Material You, local discovery, notifications, new palettes)
+### Android App
 
 - [ ] **Custom widget**: Add home screen widget for quick stats
-- [x] **Notification improvements**: Add ongoing notification with key metrics, expandable notification details (shipped v1.5)
-- [x] **Material You theming**: Dynamic color extraction from wallpaper (shipped v1.5)
 - [ ] **Offline mode**: Cache last known stats, work without server connection
-- [ ] **Multiple PC support**: Connect to multiple PCs simultaneously (v1.6)
 - [ ] **Background updates**: Keep connection alive when app is in background
-- [x] **Local network discovery**: Auto-detect PC on same network (shipped v1.5)
-
-### Dashboard & UI Enhancements
-
 - [ ] **Custom card layouts**: User-defined card positions and sizes
 - [ ] **Advanced chart options**: Logarithmic scale, comparative charts, per-sensor filtering
-- [ ] **Widget options**: Configurable what appears on widget/home screen
-- [x] **Landscape improvements**: Better multi-column layout for tablets
-- [x] **Dark mode palette deepening**: More color palette options, user-customizable palettes (shipped v1.5: 8 palettes)
 
 ### Connectivity & Protocol
 
 - [ ] **WebRTC support**: Alternative to WebSocket for lower latency
 - [ ] **QUIC protocol**: Experimental transport layer
-- [ ] **Secure connection**: TLS/SSL for WebSocket connection (v1.6)
-- [x] **Local network discovery**: Auto-detect PC on same network (shipped v1.5)
-- [x] **QR quick connect**: Server tray shows a QR; the phone app scans it and auto-fills IP, port and access token (shipped v1.5)
 
 ### LibreHardwareMonitor Integration
+
 - [ ] **Sensor coverage**: Add support for more sensors (voltage, power phases, etc.)
 - [ ] **DLL updates**: Update embedded LibreHardwareMonitorLib.dll to latest version
 - [ ] **New sensor types**: Support for newer hardware monitoring features
 
 ### Build & Distribution
-- [x] **Fdroid support**: Add Fdroid metadata and reproducible builds (in progress: MR !44635, TODO.md'de takip)
-- [x] **GitHub Actions CI**: Enhance CI for both Android and server
+
 - [ ] **Multiple architecture support**: ARM64, x86_64 builds
-- [x] **ProGuard/R8 optimization**: Release builds optimization
-- [x] **Automated testing**: Expand test coverage
+- [ ] **Automated testing**: Expand test coverage (currently 127 tests)
 
 ### Documentation
+
 - [ ] **Video tutorials**: Setup guides for Windows and Android
 - [ ] **API documentation**: Complete WebSocket protocol reference
 - [ ] **Troubleshooting guide**: Expanded FAQ with common solutions
-- [ ] **Localization**: Add more language translations
 
 ### Long-term Vision (v2.0)
+
 - [ ] **Cross-platform host**: Linux and macOS support for the server
 - [ ] **Browser-based config**: Web interface for PC server configuration
 - [ ] **Cloud sync**: Optional encrypted sync of historical data

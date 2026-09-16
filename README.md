@@ -48,7 +48,7 @@
    - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
    - Disk, Network, Fan, and FPS cards — disk usage & throughput, net up/down, fan RPM, game FPS with 1% low
    - Live charts, configurable chart window (30s / 60s / 300s), 1-hour history (Room DB), custom logo
-   - **5 color palettes** (Default, Ocean, Ember, Forest, Black & Gold) — light/dark variants, applies instantly from Settings
+   - **9 color palettes** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — light/dark variants, applies instantly from Settings
    - **Dashboard edit mode**: reorder cards, hide/unhide cards, pin cards to the first screen, and toggle each card between half/full width
    - **Landscape mode: compact scroll-free grid on one screen**, with the nav bar auto-hiding and reappearing on tap; tablets get a wider multi-column layout
    - **Custom Background**: set any image as app background; Material You palette auto-extracted via Palette API for full theme override
@@ -70,7 +70,7 @@
 
 ### 3. Download
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also submitted to [F-Droid](https://f-droid.org/) (awaiting review).
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also on [F-Droid](https://f-droid.org/) (MR !44635, CI passing).
 - **Windows:** `PcHwMonitor.exe` — single-file server, built with `build_exe.bat` (see Getting Started).
 
 ### 4. Architecture
@@ -137,7 +137,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 37 tests
+.venv/bin/python -m pytest tests -v        # 48 server tests
 ```
 
 #### Android Setup
@@ -147,7 +147,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Tests: `./gradlew :app:testDebugUnitTest`
+Tests: `./gradlew :app:testDebugUnitTest` (79 unit tests)
 
 ### 5b. Remote Access via Cloudflare Tunnel
 
@@ -320,7 +320,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
    - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
    - Disk, Ağ, Fan ve FPS kartları — disk kullanımı ve aktarım, ağ gönderim/alan, fan RPM, oyun FPS'yi ve 1% düşük değeri (1% low)
    - Canlı grafikler, grafik penceresi (30s / 60s / 300s), 1 saatlik geçmiş (Room DB), özel logo
-   - **5 renk paleti** (Default, Ocean, Ember, Forest, Black & Gold) — açık/koyu varyantlarla, ayarlardan anında uygulanır
+   - **9 renk paleti** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — açık/koyu varyantlarla, ayarlardan anında uygulanır
    - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
    - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
    - 14 dil (ayarlardan seçilebilir)
@@ -336,7 +336,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
 
 ### 3. İndirme
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) listesine gönderildi (inceleme bekleniyor).
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) üzerinde (MR !44635, CI başarılı).
 - **Windows:** `PcHwMonitor.exe` — tek dosyalık sunucu; `build_exe.bat` ile derlenir (bkz. Başlarken).
 
 ### 4. Mimari
@@ -397,7 +397,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # welcome + 3 status mesajı doğrular
-.venv/bin/python -m pytest tests -v        # 37 test
+.venv/bin/python -m pytest tests -v        # 48 sunucu testi
 ```
 
 #### Android Kurulumu
@@ -407,7 +407,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Testler: `./gradlew :app:testDebugUnitTest`
+Testler: `./gradlew :app:testDebugUnitTest` (79 birim testi)
 
 ### 5b. Cloudflare Tunnel ile Uzaktan Erişim
 
