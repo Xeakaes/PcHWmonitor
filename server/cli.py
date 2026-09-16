@@ -187,24 +187,28 @@ def main() -> None:
 
 
 def _find_cloudflared():
-    """Find cloudflared.exe - check next to exe, then in vendor dir."""
+    """Find cloudflared.exe - check multiple locations."""
+    candidates = []
     if getattr(sys, "frozen", False):
         base = Path(sys.executable).parent
+        meipass = Path(sys._MEIPASS)
+        candidates = [
+            meipass / "cloudflared.exe",
+            meipass / "vendor" / "cloudflared.exe",
+            base / "cloudflared.exe",
+            base / "vendor" / "cloudflared.exe",
+        ]
     else:
         base = Path(__file__).resolve().parent
-    # Check same directory
-    candidate = base / "cloudflared.exe"
-    if candidate.exists():
-        return candidate
-    # Check vendor directory
-    candidate = base / "vendor" / "cloudflared.exe"
-    if candidate.exists():
-        return candidate
-    # Check _MEIPASS (PyInstaller temp dir)
-    if getattr(sys, "frozen", False):
-        candidate = Path(sys._MEIPASS) / "cloudflared.exe"
-        if candidate.exists():
-            return candidate
+        candidates = [
+            base / "cloudflared.exe",
+            base / "vendor" / "cloudflared.exe",
+            base.parent / "cloudflared.exe",
+            base.parent / "vendor" / "cloudflared.exe",
+        ]
+    for c in candidates:
+        if c.exists():
+            return c
     return None
 
 

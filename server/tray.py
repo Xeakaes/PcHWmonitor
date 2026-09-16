@@ -120,23 +120,30 @@ class TunnelManager:
 
 
 def _find_cloudflared():
-    """Find cloudflared.exe - check next to exe, then in vendor dir."""
+    """Find cloudflared.exe - check multiple locations."""
     import sys
     from pathlib import Path
+    candidates = []
     if getattr(sys, "frozen", False):
         base = Path(sys.executable).parent
+        meipass = Path(sys._MEIPASS)
+        candidates = [
+            meipass / "cloudflared.exe",
+            meipass / "vendor" / "cloudflared.exe",
+            base / "cloudflared.exe",
+            base / "vendor" / "cloudflared.exe",
+        ]
     else:
         base = Path(__file__).resolve().parent
-    candidate = base / "cloudflared.exe"
-    if candidate.exists():
-        return candidate
-    candidate = base / "vendor" / "cloudflared.exe"
-    if candidate.exists():
-        return candidate
-    if getattr(sys, "frozen", False):
-        candidate = Path(sys._MEIPASS) / "cloudflared.exe"
-        if candidate.exists():
-            return candidate
+        candidates = [
+            base / "cloudflared.exe",
+            base / "vendor" / "cloudflared.exe",
+            base.parent / "cloudflared.exe",
+            base.parent / "vendor" / "cloudflared.exe",
+        ]
+    for c in candidates:
+        if c.exists():
+            return c
     return None
 
 
