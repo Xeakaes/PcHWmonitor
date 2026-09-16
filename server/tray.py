@@ -289,12 +289,10 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         icon.stop()
 
     # Dynamic menu: show tunnel status
-    def _tunnel_status_text():
+    def _tunnel_status_text(item=None):
         if tunnel.is_running:
-            label = f"Tunnel: {tunnel.url or tunnel.name or 'starting...'}"
-        else:
-            label = "Tunnel: off"
-        return label
+            return f"Tunnel: {tunnel.url or tunnel.name or 'starting...'}"
+        return "Tunnel: off"
 
     menu = pystray.Menu(
         pystray.MenuItem("Show QR", _show_qr, default=True),
@@ -303,7 +301,7 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         pystray.MenuItem("Info", _show_info),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem(
-            lambda: _tunnel_status_text(),
+            _tunnel_status_text,
             pystray.Menu(
                 pystray.MenuItem("Start Quick Tunnel", _start_quick_tunnel),
                 pystray.MenuItem("Start Named Tunnel...", _start_named_tunnel),
