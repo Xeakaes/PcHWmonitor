@@ -138,7 +138,7 @@ class MonitorControllerTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         assertTrue(client.urls.isEmpty())
-        assertEquals("server IP must be in a private range", controller.lastError.value)
+        assertEquals("server address must be a private IP or known hostname", controller.lastError.value)
     }
 
     @Test
@@ -155,6 +155,23 @@ class MonitorControllerTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(4, client.urls.size)
+        assertNull(controller.lastError.value)
+    }
+
+    @Test
+    fun connectAcceptsKnownHostnames() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        for (host in listOf("localhost", "my-pc.trycloudflare.com")) {
+            controller.connect(host, 8765)
+        }
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(2, client.urls.size)
         assertNull(controller.lastError.value)
     }
 
