@@ -33,7 +33,17 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         payload = _connection_payload()
         try:
             import subprocess
-            subprocess.run("clip", input=payload.encode("utf-16-le"), shell=True, check=True)
+            # Use xclip if available, fall back to clip.exe on Windows
+            import shutil
+            if shutil.which("xclip"):
+                subprocess.run(
+                    ["xclip", "-selection", "clipboard"],
+                    input=payload.encode("utf-8"), check=True,
+                )
+            else:
+                subprocess.run(
+                    ["clip"], input=payload.encode("utf-16-le"), check=True,
+                )
             icon.notify("Connection info copied to clipboard.", "PC HW Monitor")
         except Exception:
             icon.notify(f"Copy failed. Payload:\n{payload}", "PC HW Monitor")

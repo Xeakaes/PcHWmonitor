@@ -118,6 +118,10 @@ def build_app(
     app.state.welcome = WelcomeMessage(intervalMs=interval_ms, serverName=pc_name, source=source_name, pcName=pc_name)
     app.state.token = token
     app.state.auth_timeout = auth_timeout
+    # Rate limiting: {ip: [timestamp, ...]} — max 10 connections per 60s
+    app.state._conn_attempts: dict[str, list[float]] = {}
+    app.state._MAX_CONNS_PER_MIN = 10
+    app.state._RATE_WINDOW = 60.0
 
     @app.get("/health")
     async def health():
@@ -143,6 +147,19 @@ def build_app(
             # app and CLI tools do not. Reject browser origins to block CSWSH.
             await ws.close(code=1008)
             return
+        # Rate limiting per client IP
+        client_ip = ws.client.host if ws.client else "unknown"
+        now = time.time()
+        attempts = app.state._conn_attempts.setdefault(client_ip, [])
+        # Prune old entries
+        cutoff = now - app.state._RATE_WINDOW
+        attempts[:] = [t for t in attempts if t > cutoff]
+        if len(attempts) >= app.state._MAX_CONNS_PER_MIN:
+            logger.warning("rate limit: rejected connection from %s (%d in last %ds)",
+                           client_ip, len(attempts), int(app.state._RATE_WINDOW))
+            await ws.close(code=1008)
+            return
+        attempts.append(now)
         await ws.accept()
         if app.state.token is not None and not await _authenticated(ws):
             logger.warning("client rejected: missing or invalid auth token")

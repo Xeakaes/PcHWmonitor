@@ -14,15 +14,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import java.security.MessageDigest
+import java.security.cert.X509Certificate
+import java.util.Base64
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLPeerUnverifiedException
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 enum class ConnectionState { DISCONNECTED, CONNECTING, CONNECTED }
 
@@ -110,13 +115,19 @@ class WebSocketClient(
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            if (t is SSLPeerUnverifiedException) {
-                val cert = response?.handshake?.peerCertificates?.firstOrNull()
-                if (cert != null) {
-                    val hash = MessageDigest.getInstance("SHA-256")
-                        .digest(cert.encoded)
-                        .joinToString("") { "%02x".format(it) }
-                    _messages.tryEmit(WsMessage.CertUntrusted(hash, null))
+            val peerCert = response?.handshake?.peerCertificates?.firstOrNull()
+            when (t) {
+                is SSLPeerUnverifiedException -> {
+                    if (peerCert != null) {
+                        val hash = computeSpkiPin(peerCert)
+                        _messages.tryEmit(WsMessage.CertUntrusted(hash, null))
+                    }
+                }
+                is SSLHandshakeException -> {
+                    if (peerCert != null) {
+                        val hash = computeSpkiPin(peerCert)
+                        _messages.tryEmit(WsMessage.CertUntrusted(hash, null))
+                    }
                 }
             }
             _messages.tryEmit(WsMessage.ParseFailure("socket", t.message ?: "socket failure"))
@@ -134,18 +145,58 @@ class WebSocketClient(
     }
 
     companion object {
+        /**
+         * Compute SPKI pin in the format OkHttp expects: sha256/<Base64-of-SPKI-SHA256>
+         */
+        fun computeSpkiPin(cert: java.security.cert.Certificate): String {
+            val x509 = cert as X509Certificate
+            val subjectPublicKeyInfo = x509.publicKey.encoded
+            val spkiSha256 = MessageDigest.getInstance("SHA-256").digest(subjectPublicKeyInfo)
+            return Base64.getEncoder().encodeToString(spkiSha256)
+        }
+
         fun defaultClient(): OkHttpClient = OkHttpClient.Builder()
             .pingInterval(20, TimeUnit.SECONDS)
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
             .build()
 
-        fun buildTrustedClient(certHash: String): OkHttpClient {
-            val certificatePinner = CertificatePinner.Builder()
-                .add("*", "sha256/$certHash")
-                .build()
+        /**
+         * Build a client that trusts only a specific certificate identified by its
+         * SPKI pin (sha256/<Base64>). Uses a custom TrustManager that validates
+         * the server cert matches the pinned hash, instead of CertificatePinner
+         * which doesn't work with self-signed certificates.
+         */
+        fun buildTrustedClient(spkiPin: String): OkHttpClient {
+            val trustManager = object : X509TrustManager {
+                override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+                    // Not a server — not needed
+                }
+
+                override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+                    if (chain == null || chain.isEmpty()) {
+                        throw SSLPeerUnverifiedException("No server certificate presented")
+                    }
+                    val serverCert = chain[0]
+                    // Verify SPKI pin — this IS the trust decision for self-signed certs
+                    val serverPin = computeSpkiPin(serverCert)
+                    if (serverPin != spkiPin) {
+                        throw SSLPeerUnverifiedException(
+                            "Certificate SPKI pin mismatch: expected sha256/$spkiPin, got sha256/$serverPin"
+                        )
+                    }
+                }
+
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+            }
+
+            val sslContext = SSLContext.getInstance("TLS").apply {
+                init(null, arrayOf<TrustManager>(trustManager), null)
+            }
+
             return defaultClient().newBuilder()
-                .certificatePinner(certificatePinner)
+                .sslSocketFactory(sslContext.socketFactory, trustManager)
+                .hostnameVerifier { _, _ -> true } // SPKI pin provides auth; skip hostname check
                 .build()
         }
     }

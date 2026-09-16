@@ -65,21 +65,58 @@ def main() -> None:
     ssl_key = args.ssl_key
     if ssl_cert == "auto":
         import platform
+        import socket
         import subprocess
         import tempfile
         cert_fd, cert_path = tempfile.mkstemp(suffix=".pem")
         key_fd, key_path = tempfile.mkstemp(suffix=".pem")
         os.close(cert_fd)
         os.close(key_fd)
-        subprocess.run([
-            "openssl", "req", "-x509", "-newkey", "rsa:2048",
-            "-keyout", key_path, "-out", cert_path,
-            "-days", "365", "-nodes",
-            "-subj", f"/CN={platform.node()}",
-        ], check=True)
+        hostname = platform.node()
+        # Resolve local IP for SAN
+        try:
+            local_ip = socket.gethostbyname(hostname)
+        except Exception:
+            local_ip = "127.0.0.1"
+        # Create openssl config with SAN (IP + DNS)
+        cfg_fd, cfg_path = tempfile.mkstemp(suffix=".cnf")
+        os.close(cfg_fd)
+        with open(cfg_path, "w") as f:
+            f.write(f"[req]\ndistinguished_name = req_dn\nx509_extensions = v3_req\nprompt = no\n\n")
+            f.write(f"[req_dn]\nCN = {hostname}\n\n")
+            f.write(f"[v3_req]\nsubjectAltName = @alt_names\n\n")
+            f.write(f"[alt_names]\nDNS.1 = {hostname}\nDNS.2 = localhost\nIP.1 = {local_ip}\nIP.2 = 127.0.0.1\n")
+        try:
+            subprocess.run([
+                "openssl", "req", "-x509", "-newkey", "rsa:2048",
+                "-keyout", key_path, "-out", cert_path,
+                "-days", "365", "-nodes",
+                "-config", cfg_path,
+            ], check=True)
+        finally:
+            try:
+                os.unlink(cfg_path)
+            except Exception:
+                pass
         ssl_cert = cert_path
         ssl_key = key_path
-        logger.info("auto-generated self-signed cert: %s", ssl_cert)
+        # Compute SPKI hash (what OkHttp CertificatePinner expects)
+        try:
+            result = subprocess.run([
+                "openssl", "x509", "-in", cert_path, "-noout",
+                "-pubkey", "-outform", "DER",
+            ], capture_output=True, check=True)
+            spki_der = result.stdout
+            import hashlib
+            spki_sha256 = hashlib.sha256(spki_der).digest()
+            import base64
+            spki_b64 = base64.b64encode(spki_sha256).decode()
+            logger.info("auto-generated self-signed cert: %s", ssl_cert)
+            logger.info("cert SPKI pin (sha256/%s) — add this to the Android app", spki_b64)
+            print(f"\n  CERT PIN: sha256/{spki_b64}")
+            print(f"  Add this to the Android app when prompted to trust the certificate\n")
+        except Exception as e:
+            logger.warning("could not compute SPKI pin: %s", e)
         import atexit
         atexit.register(lambda: _cleanup_cert(ssl_cert, ssl_key))
 
@@ -87,7 +124,7 @@ def main() -> None:
     if args.simulate:
         logger.info("running in SIMULATION mode on 0.0.0.0:%d", args.port)
     else:
-        logger.info("running with source=%s on 0.0.0.0:%d", args.source, args.port)
+        logger.info("running with source=%s on 0.0.0.0:%d (auth required)", args.source, args.port)
 
     # Cloudflare Tunnel
     tunnel_process = None
@@ -131,7 +168,6 @@ def main() -> None:
         _run_with_tray(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key)
     else:
         scheme = "wss" if ssl_cert else "ws"
-        logger.info("token: %s", token)
         print(f"\n{'='*50}")
         print(f"  ACCESS TOKEN: {token}")
         print(f"  Enter this in the Android app's Access Key field")

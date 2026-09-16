@@ -60,9 +60,12 @@ class MonitorController(
     }
 
     fun connect(ip: String, port: Int, token: String? = null, useTls: Boolean = false) {
-        if (!isPrivateIp(ip)) {
-            _lastError.value = "server IP must be in a private range"
+        if (!isAllowedHost(ip)) {
+            _lastError.value = "server address must be a private IP or known hostname"
             return
+        }
+        if (!useTls && token != null) {
+            _lastError.value = "Warning: token sent in plaintext (ws://). Enable TLS for secure auth."
         }
         val scheme = if (useTls) "wss" else "ws"
         val url = "$scheme://$ip:$port/ws"
@@ -80,8 +83,12 @@ class MonitorController(
     }
 
     companion object {
-        private fun isPrivateIp(ip: String): Boolean {
-            val parts = ip.split('.').mapNotNull { it.toIntOrNull() }
+        private fun isAllowedHost(host: String): Boolean {
+            // Allow known hostnames (Cloudflare tunnels, localhost, etc.)
+            val lower = host.lowercase()
+            if (lower == "localhost" || lower.endsWith(".trycloudflare.com")) return true
+            // Allow private IPs
+            val parts = host.split('.').mapNotNull { it.toIntOrNull() }
             if (parts.size != 4 || parts.any { it !in 0..255 }) return false
             val a = parts[0]
             val b = parts[1]
