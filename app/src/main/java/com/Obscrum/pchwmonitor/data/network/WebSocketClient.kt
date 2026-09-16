@@ -156,7 +156,7 @@ class WebSocketClient(
         }
 
         fun defaultClient(): OkHttpClient = OkHttpClient.Builder()
-            .pingInterval(20, TimeUnit.SECONDS)
+            .pingInterval(0, TimeUnit.MILLISECONDS)
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
             .build()

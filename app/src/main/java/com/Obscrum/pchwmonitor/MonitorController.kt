@@ -59,16 +59,26 @@ class MonitorController(
         }
     }
 
-    fun connect(ip: String, port: Int, token: String? = null, useTls: Boolean = false) {
-        if (!isAllowedHost(ip)) {
-            _lastError.value = "server address must be a private IP or known hostname"
-            return
+    fun connect(ip: String, port: Int, token: String? = null, useTls: Boolean = false, hostname: String? = null) {
+        // If hostname is set (e.g. Cloudflare tunnel), use it directly
+        val target = if (!hostname.isNullOrBlank()) {
+            hostname.trim()
+        } else {
+            if (!isAllowedHost(ip)) {
+                _lastError.value = "server address must be a private IP or known hostname"
+                return
+            }
+            ip
         }
         if (!useTls && token != null) {
             _lastError.value = "Warning: token sent in plaintext (ws://). Enable TLS for secure auth."
         }
         val scheme = if (useTls) "wss" else "ws"
-        val url = "$scheme://$ip:$port/ws"
+        val url = if (!hostname.isNullOrBlank()) {
+            "$scheme://$target/ws"
+        } else {
+            "$scheme://$target:$port/ws"
+        }
         if (url == currentUrl && token == currentToken) return
         currentUrl = url
         currentToken = token

@@ -146,6 +146,7 @@ fun SettingsScreen(
     var newServerIp by remember { mutableStateOf("") }
     var newServerPort by remember { mutableStateOf("8765") }
     var newServerToken by remember { mutableStateOf("") }
+    var newServerHostname by remember { mutableStateOf("") }
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
@@ -263,6 +264,13 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                         )
                         OutlinedTextField(
+                            value = newServerHostname,
+                            onValueChange = { newServerHostname = it },
+                            label = { Text("Cloudflare Tunnel URL (optional)") },
+                            placeholder = { Text("my-tunnel.trycloudflare.com") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
                             value = newServerIp,
                             onValueChange = { newServerIp = it },
                             label = { Text(stringResource(R.string.ip_address)) },
@@ -292,6 +300,7 @@ fun SettingsScreen(
                                 ip = newServerIp.trim(),
                                 port = portInt,
                                 token = newServerToken.trim().ifBlank { null },
+                                hostname = newServerHostname.trim().ifBlank { null },
                             )
                             onAddServer(server)
                             showAddServerForm = false
@@ -299,6 +308,7 @@ fun SettingsScreen(
                             newServerIp = ""
                             newServerPort = "8765"
                             newServerToken = ""
+                            newServerHostname = ""
                         },
                     ) {
                         Text(stringResource(R.string.add))

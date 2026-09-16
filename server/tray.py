@@ -401,26 +401,32 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         icon.notify("Opening Cloudflare login page...\nAuthenticate in your browser.", "PC HW Monitor")
         def _run_login():
             try:
+                import webbrowser
                 proc = subprocess.Popen(
                     [str(cf), "tunnel", "login"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
                 )
+                url_opened = False
                 for line in proc.stdout:
                     line = line.strip()
                     logger.info("cloudflared login: %s", line)
-                    if "https://" in line and "cloudflareaccess" in line:
+                    if not url_opened and "https://" in line:
                         for word in line.split():
-                            if word.startswith("https://"):
-                                import webbrowser
-                                webbrowser.open(word.rstrip(",/.;"))
+                            word = word.rstrip(",/.;")
+                            if word.startswith("https://") and ("dash.cloudflare" in word or "cloudflare" in word):
+                                webbrowser.open(word)
+                                url_opened = True
+                                logger.info("opened login URL: %s", word)
                                 break
                 proc.wait()
                 if _is_cloudflared_authenticated(cf):
                     logger.info("cloudflared authentication successful")
                 else:
-                    logger.warning("cloudflared authentication may have failed")
+                    logger.warning("cloudflared auth may have failed — check cert.pem")
+            except Exception as e:
+                logger.error("cloudflared login failed: %s", e)
             except Exception as e:
                 logger.error("cloudflared login failed: %s", e)
         threading.Thread(target=_run_login, daemon=True).start()

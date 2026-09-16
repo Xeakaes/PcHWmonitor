@@ -117,7 +117,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
                 ctrl.start()
                 _controllers[id] = ctrl
             }
-            _controllers[id]?.connect(cfg.ip, cfg.port, cfg.token, cfg.useTls)
+            _controllers[id]?.connect(cfg.ip, cfg.port, cfg.token, cfg.useTls, cfg.hostname)
         }
         // Set active if none or invalid
         if (_activeServerId.value == null || _activeServerId.value !in _controllers) {
@@ -181,7 +181,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
             val ctrl = MonitorController(client = client, history = hist, scope = viewModelScope, pcId = activeId)
             ctrl.start()
             _controllers[activeId] = ctrl
-            ctrl.connect(cfg.ip, cfg.port, cfg.token, true)
+            ctrl.connect(cfg.ip, cfg.port, cfg.token, true, cfg.hostname)
         }
     }
 
