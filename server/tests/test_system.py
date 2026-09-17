@@ -44,7 +44,7 @@ def test_second_sample_computes_mbps():
     fake = _FakePsutil(
         io=_FakeCounters(0, 0, 0, 0),
         net=_FakeCounters(0, 0, 0, 0),
-        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4"})()],
+        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4", "device": "/dev/sda1"})()],
         usages={"/": type("U", (), {"total": 100.0, "used": 40.0, "percent": 40.0})},
     )
     adapter = SystemAdapter(interval=1.0, _psutil=fake)
@@ -66,8 +66,8 @@ def test_usage_averages_all_partitions_weighted_by_capacity():
         io=_FakeCounters(0, 0, 0, 0),
         net=_FakeCounters(0, 0, 0, 0),
         partitions=[
-            type("P", (), {"mountpoint": "/", "fstype": "ext4"})(),
-            type("P", (), {"mountpoint": "/data", "fstype": "ext4"})(),
+            type("P", (), {"mountpoint": "/", "fstype": "ext4", "device": "/dev/sda1"})(),
+            type("P", (), {"mountpoint": "/data", "fstype": "ext4", "device": "/dev/sda2"})(),
         ],
         usages={
             "/": type("U", (), {"total": 100.0, "used": 50.0, "percent": 50.0}),
@@ -88,9 +88,9 @@ def test_usage_skips_pseudo_filesystems():
         io=_FakeCounters(0, 0, 0, 0),
         net=_FakeCounters(0, 0, 0, 0),
         partitions=[
-            type("P", (), {"mountpoint": "/", "fstype": "ext4"})(),
-            type("P", (), {"mountpoint": "/dev/shm", "fstype": "tmpfs"})(),
-            type("P", (), {"mountpoint": "/snap/x", "fstype": "squashfs"})(),
+            type("P", (), {"mountpoint": "/", "fstype": "ext4", "device": "/dev/sda1"})(),
+            type("P", (), {"mountpoint": "/dev/shm", "fstype": "tmpfs", "device": "tmpfs"})(),
+            type("P", (), {"mountpoint": "/snap/x", "fstype": "squashfs", "device": "/dev/loop0"})(),
         ],
         usages={
             "/": type("U", (), {"total": 100.0, "used": 50.0, "percent": 50.0}),
@@ -111,7 +111,7 @@ def test_usage_none_when_all_partitions_fail():
     fake = _FakePsutil(
         io=_FakeCounters(0, 0, 0, 0),
         net=_FakeCounters(0, 0, 0, 0),
-        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4"})()],
+        partitions=[type("P", (), {"mountpoint": "/", "fstype": "ext4", "device": "/dev/sda1"})()],
         usages={},
     )
     adapter = SystemAdapter(interval=1.0, _psutil=fake)
