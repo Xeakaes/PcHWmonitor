@@ -28,13 +28,12 @@ def _unavailable_sample() -> StatusMessage:
     return StatusMessage(timestamp=int(time.time()), available=False, error="LibreHardwareMonitorLib.dll not found")
 
 
-def _lib_available() -> bool:
+def _lib_available() -> LhmLibAdapter | None:
     try:
         adapter = LhmLibAdapter()
-        adapter.close()
-        return True
+        return adapter
     except Exception:
-        return False
+        return None
 
 
 def _presentmon_path() -> str:
@@ -59,22 +58,23 @@ def build_app(
     auth_timeout: float = 5.0,
 ) -> FastAPI:
     if simulate:
-        sample = Simulator().sample
+        sim = Simulator()
+        sample = sim.sample
         source_name = "simulator"
         pc_name = platform.node() or "SIM-PC"
     else:
         chosen = source
         if chosen == "auto":
-            chosen = "lib" if _lib_available() else "http"
+            chosen = "lib" if _lib_available() is not None else "http"
         if chosen == "lib":
-            try:
-                adapter = LhmLibAdapter()
+            adapter = _lib_available()
+            if adapter is not None:
                 sample = adapter.fetch
                 source_name = "lhm-lib"
-            except Exception as exc:
+            else:
                 sample = _unavailable_sample
                 source_name = "lhm-lib"
-                logger.warning("lhm-lib init failed (%s); reporting unavailable", exc)
+                logger.warning("lhm-lib init failed; reporting unavailable")
         else:
             adapter = LhmAdapter(lhm_url=lhm_url)
             sample = adapter.fetch
@@ -82,10 +82,9 @@ def build_app(
         pc_name = platform.node()
 
     if simulate:
-        sim = Simulator()
         system_adapter = None
         fps_adapter = None
-        base_sample = sim.sample
+        base_sample = sample
     else:
         system_adapter = SystemAdapter()
         exe_path = _presentmon_path()
@@ -154,6 +153,8 @@ def build_app(
         # Prune old entries
         cutoff = now - app.state._RATE_WINDOW
         attempts[:] = [t for t in attempts if t > cutoff]
+        if not attempts:
+            app.state._conn_attempts.pop(client_ip, None)
         if len(attempts) >= app.state._MAX_CONNS_PER_MIN:
             logger.warning("rate limit: rejected connection from %s (%d in last %ds)",
                            client_ip, len(attempts), int(app.state._RATE_WINDOW))
@@ -170,8 +171,13 @@ def build_app(
         logger.info("client connected (%d total)", hub.client_count)
         try:
             while True:
-                await ws.receive_text()
+                try:
+                    await ws.receive_text()
+                except Exception:
+                    break
         except WebSocketDisconnect:
+            pass
+        finally:
             hub.unregister(ws)
             logger.info("client disconnected (%d total)", hub.client_count)
 

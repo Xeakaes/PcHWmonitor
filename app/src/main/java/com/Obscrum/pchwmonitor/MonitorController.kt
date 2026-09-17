@@ -44,8 +44,12 @@ class MonitorController(
                             val now = message.status.timestamp
                             val firstRecord = lastRecordedAt == Long.MIN_VALUE
                             if (firstRecord || now - lastRecordedAt >= recordIntervalMs) {
-                                history.record(message.status, pcId)
-                                lastRecordedAt = now
+                                try {
+                                    history.record(message.status, pcId)
+                                    lastRecordedAt = now
+                                } catch (e: Exception) {
+                                    _lastError.value = "History write failed: ${e.message}"
+                                }
                             }
                         } else {
                             _lastError.value = message.status.error ?: "data unavailable"

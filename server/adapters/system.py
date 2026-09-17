@@ -20,13 +20,18 @@ class SystemAdapter:
         self._psutil = _psutil
         self._last = None
         self._last_time = None
+        self._seen_devices: set[str] = set()
 
     def _usage_percent(self) -> float | None:
         total = 0
         used = 0
+        self._seen_devices.clear()
         for part in self._psutil.disk_partitions(all=False):
             if part.fstype in _PSEUDO_FS:
                 continue
+            if part.device in self._seen_devices:
+                continue
+            self._seen_devices.add(part.device)
             try:
                 usage = self._psutil.disk_usage(part.mountpoint)
             except Exception:

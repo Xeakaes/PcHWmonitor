@@ -5,10 +5,16 @@ import time
 import logging
 from pathlib import Path
 
-from schema import CpuInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
+import math
+
+from schema import CpuInfo, FanInfo, GpuInfo, PcInfo, RamInfo, StatusMessage
 
 logger = logging.getLogger("pchw.lhm_lib")
-from adapters.lhm import _clock_max, _find, _loads
+from adapters.lhm import _clock_max, _find, _find_first, _loads
+
+
+def _safe(val):
+    return val if isinstance(val, (int, float)) and math.isfinite(val) else None
 
 
 def _default_lib_dir() -> str:
@@ -91,9 +97,10 @@ class LhmLibAdapter:
             gpu = self._parse_gpu(gpu_node) if gpu_node else None
             igpu = self._parse_gpu(igpu_node) if igpu_node else None
             ram = self._parse_ram(mem_node) if mem_node else None
+            fans = self._parse_fans(hw)
 
             pc = PcInfo(name=platform.node(), os="Windows", source="lhm-lib")
-            return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram)
+            return StatusMessage(timestamp=int(time.time()), pc=pc, cpu=cpu, gpu=gpu, igpu=igpu, ram=ram, fans=fans)
         except Exception as exc:
             logger.warning("lhm-lib read failed: %s", exc)
             return StatusMessage(timestamp=int(time.time()), available=False, error="hardware read failed")
@@ -104,10 +111,10 @@ class LhmLibAdapter:
         sensors = _sensor_dicts(node)
         return CpuInfo(
             name=node.Name,
-            usagePct=_find(sensors, ("Load",), "cpu total"),
-            tempC=_find(sensors, ("Temperature",), "cpu package") or _find(sensors, ("Temperature",), "core max"),
-            clockMhz=_find(sensors, ("Clock",), "core max") or _clock_max(sensors),
-            powerW=_find(sensors, ("Power",), "cpu package") or _find(sensors, ("Power",), "cpu total power"),
+            usagePct=_safe(_find(sensors, ("Load",), "cpu total")),
+            tempC=_safe(_find_first(sensors, ("Temperature",), "cpu package", "core max")),
+            clockMhz=_safe(_find_first(sensors, ("Clock",), "core max") or _clock_max(sensors)),
+            powerW=_safe(_find_first(sensors, ("Power",), "cpu package", "cpu total power")),
             loads=_loads(sensors),
         )
 
@@ -115,31 +122,39 @@ class LhmLibAdapter:
         sensors = _sensor_dicts(node)
         return GpuInfo(
             name=node.Name,
-            usagePct=_find(sensors, ("Load",), "gpu core"),
-            tempC=_find(sensors, ("Temperature",), "gpu core"),
-            hotspotC=_find(sensors, ("Temperature",), "gpu hot spot"),
-            vramUsedMb=_find(sensors, ("SmallData",), "gpu memory used"),
-            vramTotalMb=_find(sensors, ("SmallData",), "gpu memory total"),
-            coreClockMhz=_find(sensors, ("Clock",), "gpu core"),
-            memClockMhz=_find(sensors, ("Clock",), "gpu memory"),
-            powerW=(
-                _find(sensors, ("Power",), "gpu total power")
-                or _find(sensors, ("Power",), "gpu power")
-                or _find(sensors, ("Power",), "gpu package")
-            ),
+            usagePct=_safe(_find(sensors, ("Load",), "gpu core")),
+            tempC=_safe(_find(sensors, ("Temperature",), "gpu core")),
+            hotspotC=_safe(_find(sensors, ("Temperature",), "gpu hot spot")),
+            vramUsedMb=_safe(_find(sensors, ("SmallData",), "gpu memory used")),
+            vramTotalMb=_safe(_find(sensors, ("SmallData",), "gpu memory total")),
+            coreClockMhz=_safe(_find(sensors, ("Clock",), "gpu core")),
+            memClockMhz=_safe(_find(sensors, ("Clock",), "gpu memory")),
+            powerW=_safe(_find_first(sensors, ("Power",), "gpu total power", "gpu power", "gpu package")),
         )
 
     def _parse_ram(self, node) -> RamInfo:
         sensors = _sensor_dicts(node)
-        used = _find(sensors, ("Data",), "memory used")
-        total = _find(sensors, ("Data",), "memory total")
+        used = _safe(_find(sensors, ("Data",), "memory used"))
+        total = _safe(_find(sensors, ("Data",), "memory total"))
         if total is None:
-            available = _find(sensors, ("Data",), "memory available")
+            available = _safe(_find(sensors, ("Data",), "memory available"))
             if used is not None and available is not None:
                 total = used + available
         return RamInfo(
             usedGb=used,
             totalGb=total,
-            usagePct=_find(sensors, ("Load",), "memory utilization") or _find(sensors, ("Load",), "memory"),
-            clockMhz=_find(sensors, ("Clock",), "memory clock"),
+            usagePct=_safe(_find_first(sensors, ("Load",), "memory utilization", "memory")),
+            clockMhz=_safe(_find(sensors, ("Clock",), "memory clock")),
         )
+
+    def _parse_fans(self, hw: dict) -> list[FanInfo] | None:
+        fans: list[FanInfo] = []
+        for node_list in hw.values():
+            for node in node_list:
+                for sensor in _sensor_dicts(node):
+                    if sensor.get("Type") != "Fan":
+                        continue
+                    rpm = _safe(sensor.get("Value"))
+                    if rpm is not None:
+                        fans.append(FanInfo(label=sensor.get("Text"), rpm=round(rpm, 1)))
+        return fans or None

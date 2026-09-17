@@ -1,3 +1,5 @@
+import csv
+import io
 import math
 import subprocess
 import threading
@@ -13,7 +15,7 @@ def parse_csv_line(header: list[str], line: str) -> tuple[str, float] | None:
         idx_ms = header.index("msBetweenPresents")
     except ValueError:
         return None
-    parts = line.split(",")
+    parts = next(csv.reader(io.StringIO(line)))
     if len(parts) <= max(idx_app, idx_ms):
         return None
     try:
@@ -35,7 +37,7 @@ def compute_fps(entries: list[tuple[str, float]], now: float, interval_s: float 
     if len(entries) < 2:
         return None
     app = entries[-1][0]
-    frames = [ms for _, ms in entries]
+    frames = [ms for name, ms in entries if name == app]
     recent = frames[-max(2, int(interval_s / window_s * len(frames))):]
     current = 1000.0 / (sum(recent) / len(recent))
     avg = 1000.0 / (sum(frames) / len(frames))

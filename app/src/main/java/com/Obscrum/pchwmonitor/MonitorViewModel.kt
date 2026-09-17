@@ -92,7 +92,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
                 // Load custom background if enabled
                 if (s.customBackgroundEnabled && s.customBackgroundUri != null) {
                     loadCustomBackground()
-                    _glassmorphism.value = true
+                    _glassmorphism.value = s.glassmorphismEnabled
                 }
             }
         }

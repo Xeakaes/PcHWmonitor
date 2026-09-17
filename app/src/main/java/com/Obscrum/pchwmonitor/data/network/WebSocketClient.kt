@@ -42,6 +42,8 @@ class WebSocketClient(
     private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
     override val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
 
+    private val _trustedClient: OkHttpClient? = if (trustedCertHash != null) buildTrustedClient(trustedCertHash) else null
+
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val closedEvents = Channel<Unit>(Channel.CONFLATED)
     private var job: Job? = null
@@ -82,7 +84,7 @@ class WebSocketClient(
             closedEvents.receive()
             ws = null
             while (closedEvents.tryReceive().isSuccess) {
-                closedEvents.tryReceive()
+                // drain
             }
             // Apply backoff after any disconnection to avoid tight retry loops
             // (e.g. auth failure → connect → fail → connect → fail …)
@@ -93,11 +95,7 @@ class WebSocketClient(
 
     private fun tryOpen(url: String): WebSocket? {
         return try {
-            val client = if (trustedCertHash != null) {
-                buildTrustedClient(trustedCertHash)
-            } else {
-                okHttp
-            }
+            val client = _trustedClient ?: okHttp
             val request = Request.Builder().url(url).build()
             client.newWebSocket(request, listener())
         } catch (e: Exception) {
@@ -156,11 +154,11 @@ class WebSocketClient(
             val x509 = cert as X509Certificate
             val subjectPublicKeyInfo = x509.publicKey.encoded
             val spkiSha256 = MessageDigest.getInstance("SHA-256").digest(subjectPublicKeyInfo)
-            return Base64.encodeToString(spkiSha256, Base64.NO_WRAP)
+            return "sha256/" + Base64.encodeToString(spkiSha256, Base64.NO_WRAP)
         }
 
         fun defaultClient(): OkHttpClient = OkHttpClient.Builder()
-            .pingInterval(0, TimeUnit.MILLISECONDS)
+            .pingInterval(15, TimeUnit.SECONDS)
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.MILLISECONDS)
             .build()

@@ -65,6 +65,10 @@ class Hub:
             return True
         except asyncio.TimeoutError:
             logger.warning("slow client timed out, disconnecting")
+            try:
+                await ws.close(code=1008, reason="slow client")
+            except Exception:
+                pass
             return False
         except Exception as exc:
             logger.debug("send failed, dropping client: %s", exc)

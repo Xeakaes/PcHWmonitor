@@ -14,7 +14,7 @@ class BackgroundConnectionHandler(
         when (event) {
             Lifecycle.Event.ON_START -> {
                 serversProvider().forEach { cfg ->
-                    controllers[cfg.id]?.connect(cfg.ip, cfg.port, cfg.token, cfg.useTls)
+                    controllers[cfg.id]?.connect(cfg.ip, cfg.port, cfg.token, cfg.useTls, cfg.hostname)
                 }
             }
             Lifecycle.Event.ON_STOP -> {

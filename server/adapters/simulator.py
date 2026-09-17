@@ -15,6 +15,8 @@ class Simulator:
         self._base_temp = base_temp
         self._start = time.time()
         self.pc_name = platform.node() or "SIM-PC"
+        self._cpu_name = self._rng.choice(CPU_NAMES)
+        self._gpu_name = self._rng.choice(GPU_NAMES)
 
     def sample(self) -> StatusMessage:
         t = time.time() - self._start
@@ -33,7 +35,7 @@ class Simulator:
         vram_used = clamp(vram_used, 0, vram_total)
 
         cpu = CpuInfo(
-            name=r.choice(CPU_NAMES),
+            name=self._cpu_name,
             usagePct=round(cpu_usage, 1),
             tempC=round(cpu_temp, 1),
             clockMhz=round(clamp(800 + (cpu_usage / 100.0) * 4300 + r.uniform(-150, 150), 800, 5200), 0),
@@ -41,7 +43,7 @@ class Simulator:
             loads=[round(clamp(cpu_usage + r.uniform(-25, 25), 0, 100), 1) for _ in range(8)],
         )
         gpu = GpuInfo(
-            name=r.choice(GPU_NAMES),
+            name=self._gpu_name,
             usagePct=round(gpu_usage, 1),
             tempC=round(gpu_temp, 1),
             hotspotC=round(hotspot, 1),

@@ -1,12 +1,14 @@
 package com.Obscrum.pchwmonitor.data.local
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "history_samples")
+@Entity(
+    tableName = "history_samples",
+    primaryKeys = ["pcId", "timestamp"]
+)
 data class HistorySample(
-    @PrimaryKey val timestamp: Long,
-    val pcId: String = "default",
+    val pcId: String,
+    val timestamp: Long,
     val cpuTempC: Float? = null,
     val cpuUsagePct: Float? = null,
     val gpuTempC: Float? = null,

@@ -86,6 +86,14 @@ def _find(sensors: list[dict], sensor_types: tuple[str, ...], name_part: str) ->
     return None
 
 
+def _find_first(sensors: list[dict], types: tuple[str, ...], *names: str) -> float | None:
+    for name in names:
+        result = _find(sensors, types, name)
+        if result is not None:
+            return result
+    return None
+
+
 def _clock_max(sensors: list[dict]) -> float | None:
     """Fallback for CPUs whose max core clock sensor is missing (LHM >= 0.9.6)."""
     values = []
@@ -155,9 +163,9 @@ class LhmAdapter:
         return CpuInfo(
             name=node.get("Text"),
             usagePct=_find(sensors, ("Load",), "cpu total"),
-            tempC=_find(sensors, ("Temperature",), "cpu package") or _find(sensors, ("Temperature",), "core max"),
-            clockMhz=_find(sensors, ("Clock",), "core max") or _clock_max(sensors),
-            powerW=_find(sensors, ("Power",), "cpu package") or _find(sensors, ("Power",), "cpu total power"),
+            tempC=_find_first(sensors, ("Temperature",), "cpu package", "core max"),
+            clockMhz=_find_first(sensors, ("Clock",), "core max") or _clock_max(sensors),
+            powerW=_find_first(sensors, ("Power",), "cpu package", "cpu total power"),
             loads=_loads(sensors),
         )
 
@@ -172,11 +180,7 @@ class LhmAdapter:
             vramTotalMb=_find(sensors, ("SmallData",), "gpu memory total"),
             coreClockMhz=_find(sensors, ("Clock",), "gpu core"),
             memClockMhz=_find(sensors, ("Clock",), "gpu memory"),
-            powerW=(
-                _find(sensors, ("Power",), "gpu total power")
-                or _find(sensors, ("Power",), "gpu power")
-                or _find(sensors, ("Power",), "gpu package")
-            ),
+            powerW=_find_first(sensors, ("Power",), "gpu total power", "gpu power", "gpu package"),
         )
 
     def _parse_ram(self, node: dict) -> RamInfo:
@@ -190,7 +194,7 @@ class LhmAdapter:
         return RamInfo(
             usedGb=used,
             totalGb=total,
-            usagePct=_find(sensors, ("Load",), "memory utilization") or _find(sensors, ("Load",), "memory"),
+            usagePct=_find_first(sensors, ("Load",), "memory utilization", "memory"),
             clockMhz=_find(sensors, ("Clock",), "memory clock"),
         )
 
