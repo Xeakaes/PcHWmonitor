@@ -41,15 +41,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import android.os.Build
 import com.Obscrum.pchwmonitor.MonitorViewModel
 import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
+import com.Obscrum.pchwmonitor.ui.components.EmptyStateCta
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardScreen
+import com.Obscrum.pchwmonitor.ui.servers.ServersScreen
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
@@ -125,72 +129,86 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val activeServerId by viewModel.activeServerId.collectAsState()
                     val servers by viewModel.servers.collectAsState()
                     Column(modifier = Modifier.fillMaxSize()) {
-                        if (servers.size > 1) {
-                            ScrollableTabRow(
-                                selectedTabIndex = servers.indexOfFirst { it.id == activeServerId }.coerceAtLeast(0),
-                                modifier = Modifier.fillMaxWidth(),
+                        if (servers.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
                             ) {
-                                servers.forEach { server ->
-                                    Tab(
-                                        selected = server.id == activeServerId,
-                                        onClick = { viewModel.setActiveServer(server.id) },
-                                        text = { Text(server.name) },
-                                    )
+                                EmptyStateCta(
+                                    title = stringResource(R.string.dashboard_empty_title),
+                                    description = stringResource(R.string.dashboard_empty_desc),
+                                    actionLabel = stringResource(R.string.dashboard_empty_action),
+                                    onAction = { navController.navigate("servers") },
+                                )
+                            }
+                        } else {
+                            if (servers.size > 1) {
+                                ScrollableTabRow(
+                                    selectedTabIndex = servers.indexOfFirst { it.id == activeServerId }.coerceAtLeast(0),
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    servers.forEach { server ->
+                                        Tab(
+                                            selected = server.id == activeServerId,
+                                            onClick = { viewModel.setActiveServer(server.id) },
+                                            text = { Text(server.name) },
+                                        )
+                                    }
                                 }
                             }
+                            DashboardScreen(
+                                status = activeStatus,
+                                connection = activeConnection ?: ConnectionState.DISCONNECTED,
+                                chartWindowSeconds = chartWindowSeconds,
+                                layout = dashboardLayout,
+                                onLayoutChange = viewModel::setDashboardLayout,
+                                editMode = editMode,
+                                onEditModeChange = { editMode = it },
+                                labelMenuHide = stringResource(R.string.menu_hide),
+                                labelMenuPin = stringResource(R.string.menu_pin),
+                                labelMenuUnpin = stringResource(R.string.menu_unpin),
+                                labelMenuEdit = stringResource(R.string.menu_edit_layout),
+                                labelMenuFpsDetails = stringResource(R.string.fps_details_title),
+                                labelEditDone = stringResource(R.string.edit_done),
+                                labelEditCancel = stringResource(R.string.edit_cancel),
+                                labelHiddenCards = stringResource(R.string.hidden_cards),
+                                labelCardWidthHalf = stringResource(R.string.card_width_half),
+                                labelCardWidthFull = stringResource(R.string.card_width_full),
+                                labelConnecting = stringResource(R.string.connecting),
+                                labelConnected = stringResource(R.string.connected),
+                                labelDisconnected = stringResource(R.string.disconnected),
+                                labelCpu = stringResource(R.string.cpu),
+                                labelCpuTemp = stringResource(R.string.cpu_temp),
+                                labelUsage = stringResource(R.string.usage),
+                                labelClock = stringResource(R.string.core_clock),
+                                labelPower = stringResource(R.string.power),
+                                labelCores = stringResource(R.string.cores),
+                                labelGpuTemp = stringResource(R.string.gpu_temp),
+                                labelHotspot = stringResource(R.string.gpu_hotspot),
+                                labelVram = stringResource(R.string.vram),
+                                labelCoreClock = stringResource(R.string.core_clock),
+                                labelMemClock = stringResource(R.string.mem_clock),
+                                labelIntegratedGpu = stringResource(R.string.label_integrated_gpu),
+                                labelRam = stringResource(R.string.ram),
+                                labelRamUsed = stringResource(R.string.ram_used),
+                                labelNoData = stringResource(R.string.no_data),
+                                labelFps = stringResource(R.string.fps_card_title),
+                                labelFpsAvg = stringResource(R.string.fps_avg),
+                                labelFpsOnePercentLow = stringResource(R.string.fps_1pct_low),
+                                labelFpsDetails = stringResource(R.string.fps_details_title),
+                                labelFpsHint = stringResource(R.string.fps_hint),
+                                labelDisk = stringResource(R.string.disk_card_title),
+                                labelDiskRead = stringResource(R.string.disk_read),
+                                labelDiskWrite = stringResource(R.string.disk_write),
+                                labelDiskUsage = stringResource(R.string.disk_usage),
+                                labelNet = stringResource(R.string.net_card_title),
+                                labelNetDownload = stringResource(R.string.net_download),
+                                labelNetUpload = stringResource(R.string.net_upload),
+                                labelFan = stringResource(R.string.fan_card_title),
+                                customBackgroundBitmap = customBackgroundBitmap,
+                                glassmorphism = glassmorphism,
+                            )
                         }
-                        DashboardScreen(
-                            status = activeStatus,
-                            connection = activeConnection ?: ConnectionState.DISCONNECTED,
-                            chartWindowSeconds = chartWindowSeconds,
-                            layout = dashboardLayout,
-                            onLayoutChange = viewModel::setDashboardLayout,
-                            editMode = editMode,
-                            onEditModeChange = { editMode = it },
-                            labelMenuHide = stringResource(R.string.menu_hide),
-                            labelMenuPin = stringResource(R.string.menu_pin),
-                            labelMenuUnpin = stringResource(R.string.menu_unpin),
-                            labelMenuEdit = stringResource(R.string.menu_edit_layout),
-                            labelMenuFpsDetails = stringResource(R.string.fps_details_title),
-                            labelEditDone = stringResource(R.string.edit_done),
-                            labelEditCancel = stringResource(R.string.edit_cancel),
-                            labelHiddenCards = stringResource(R.string.hidden_cards),
-                            labelCardWidthHalf = stringResource(R.string.card_width_half),
-                            labelCardWidthFull = stringResource(R.string.card_width_full),
-                            labelConnecting = stringResource(R.string.connecting),
-                            labelConnected = stringResource(R.string.connected),
-                            labelDisconnected = stringResource(R.string.disconnected),
-                            labelCpu = stringResource(R.string.cpu),
-                            labelCpuTemp = stringResource(R.string.cpu_temp),
-                            labelUsage = stringResource(R.string.usage),
-                            labelClock = stringResource(R.string.core_clock),
-                            labelPower = stringResource(R.string.power),
-                            labelCores = stringResource(R.string.cores),
-                            labelGpuTemp = stringResource(R.string.gpu_temp),
-                            labelHotspot = stringResource(R.string.gpu_hotspot),
-                            labelVram = stringResource(R.string.vram),
-                            labelCoreClock = stringResource(R.string.core_clock),
-                            labelMemClock = stringResource(R.string.mem_clock),
-                            labelIntegratedGpu = stringResource(R.string.label_integrated_gpu),
-                            labelRam = stringResource(R.string.ram),
-                            labelRamUsed = stringResource(R.string.ram_used),
-                            labelNoData = stringResource(R.string.no_data),
-                            labelFps = stringResource(R.string.fps_card_title),
-                            labelFpsAvg = stringResource(R.string.fps_avg),
-                            labelFpsOnePercentLow = stringResource(R.string.fps_1pct_low),
-                            labelFpsDetails = stringResource(R.string.fps_details_title),
-                            labelFpsHint = stringResource(R.string.fps_hint),
-                            labelDisk = stringResource(R.string.disk_card_title),
-                            labelDiskRead = stringResource(R.string.disk_read),
-                            labelDiskWrite = stringResource(R.string.disk_write),
-                            labelDiskUsage = stringResource(R.string.disk_usage),
-                            labelNet = stringResource(R.string.net_card_title),
-                            labelNetDownload = stringResource(R.string.net_download),
-                            labelNetUpload = stringResource(R.string.net_upload),
-                            labelFan = stringResource(R.string.fan_card_title),
-                            customBackgroundBitmap = customBackgroundBitmap,
-                            glassmorphism = glassmorphism,
-                        )
                     }
                 }
                 composable("history") {
@@ -322,6 +340,34 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onDeleteSavedServer = viewModel::removeServer,
                         onAddServer = viewModel::addServer,
                     )
+                }
+                composable("servers") {
+                    val servers by viewModel.servers.collectAsState()
+                    val activeServerId by viewModel.activeServerId.collectAsState()
+                    val activeConnection by viewModel.activeConnection.collectAsState()
+                    ServersScreen(
+                        servers = servers,
+                        activeServerId = activeServerId,
+                        connectionState = activeConnection,
+                        onBack = { navController.popBackStack() },
+                        onSelect = viewModel::setActiveServer,
+                        onEdit = { id -> navController.navigate("server_edit?serverId=$id") },
+                        onDelete = viewModel::removeServer,
+                        onQrPayload = viewModel::connectViaQr,
+                        onAddManual = { navController.navigate("server_edit") },
+                    )
+                }
+                composable(
+                    route = "server_edit?serverId={serverId}",
+                    arguments = listOf(
+                        navArgument("serverId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
+                ) {
+                    // Placeholder stub — Task 7 replaces this body with ServerEditScreen.
                 }
             }
         }

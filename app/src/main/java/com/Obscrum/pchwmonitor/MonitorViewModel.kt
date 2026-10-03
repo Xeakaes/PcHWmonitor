@@ -28,6 +28,9 @@ import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.service.MonitorNotificationService
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import com.Obscrum.pchwmonitor.ui.theme.CustomBackgroundManager
+import com.Obscrum.pchwmonitor.util.QrMatch
+import com.Obscrum.pchwmonitor.util.QrPayload
+import com.Obscrum.pchwmonitor.util.matchServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -218,6 +221,13 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         _controllers.remove(id)?.dispose()
         connectedConfigs.remove(id)
         viewModelScope.launch { settingsStore.removeServer(id) }
+    }
+
+    fun connectViaQr(payload: QrPayload.Result) {
+        when (val match = matchServer(settings.value.servers, payload)) {
+            is QrMatch.Existing -> setActiveServer(match.serverId)
+            is QrMatch.New -> addServer(match.config)
+        }
     }
 
     fun trustCert(certHash: String) {

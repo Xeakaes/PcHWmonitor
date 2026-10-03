@@ -143,4 +143,17 @@
     <string name="error_data_unavailable">Data unavailable</string>
     <string name="error_unknown_message_type">Unknown message type: %s</string>
     <string name="error_raw">%s</string>
+    <string name="servers_title">Servers</string>
+    <string name="servers_qr_action">Scan QR code</string>
+    <string name="servers_add_manual">Add manually</string>
+    <string name="servers_delete_confirm_title">Delete server</string>
+    <string name="servers_delete_confirm_message">Delete \"%1$s\"? This cannot be undone.</string>
+    <string name="servers_empty_title">No servers yet</string>
+    <string name="servers_empty_desc">Scan a QR code from the PC app to add your first server.</string>
+    <string name="servers_empty_action">Add manually</string>
+    <string name="dashboard_empty_title">No servers configured</string>
+    <string name="dashboard_empty_desc">Add a server to start monitoring your PC.</string>
+    <string name="dashboard_empty_action">Add a server</string>
+    <string name="back">Back</string>
+    <string name="edit">Edit</string>
 </resources>
