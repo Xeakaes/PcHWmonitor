@@ -9,9 +9,14 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.AppError
+import com.Obscrum.pchwmonitor.data.ConnectionKey
+import com.Obscrum.pchwmonitor.data.ConnectionPlan
 import com.Obscrum.pchwmonitor.data.ServerConfig
 import com.Obscrum.pchwmonitor.data.SettingsStore
 import com.Obscrum.pchwmonitor.data.ThemeMode
+import com.Obscrum.pchwmonitor.data.planConnections
+import com.Obscrum.pchwmonitor.data.planOnStop
+import com.Obscrum.pchwmonitor.data.toConnectionKey
 import com.Obscrum.pchwmonitor.data.local.HistoryDb
 import com.Obscrum.pchwmonitor.data.local.HistoryRepository
 import com.Obscrum.pchwmonitor.data.local.HistorySample
@@ -28,6 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -72,14 +78,15 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     // Multi-PC state
     private val _controllers = mutableMapOf<String, MonitorController>()
+    private val connectedConfigs = mutableMapOf<String, ServerConfig>()
     private val _activeServerId = MutableStateFlow<String?>(null)
     val activeServerId: StateFlow<String?> = _activeServerId.asStateFlow()
 
     private val _activeStatus = MutableStateFlow<SystemStatus?>(null)
     val activeStatus: StateFlow<SystemStatus?> = _activeStatus.asStateFlow()
 
-    private val _activeConnection = MutableStateFlow(ConnectionState.DISCONNECTED)
-    val activeConnection: StateFlow<ConnectionState> = _activeConnection.asStateFlow()
+    private val _activeConnection = MutableStateFlow<ConnectionState?>(ConnectionState.DISCONNECTED)
+    val activeConnection: StateFlow<ConnectionState?> = _activeConnection.asStateFlow()
 
     private val _lastError = MutableStateFlow<AppError?>(null)
     val lastError: StateFlow<AppError?> = _lastError.asStateFlow()
@@ -88,8 +95,20 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         viewModelScope.launch {
+            settings.map { it.toConnectionKey() }.distinctUntilChanged().collect { key ->
+                applyPlan(
+                    planConnections(
+                        servers = key.servers,
+                        activeId = key.activeServerId,
+                        backgroundAll = key.backgroundConnectAll,
+                        current = connectedConfigs,
+                    ),
+                )
+                repairActive(key)
+            }
+        }
+        viewModelScope.launch {
             settings.collect { s ->
-                syncControllers(s)
                 // Load custom background if enabled
                 if (s.customBackgroundEnabled && s.customBackgroundUri != null) {
                     loadCustomBackground()
@@ -99,45 +118,79 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         }
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             BackgroundConnectionHandler(
-                serversProvider = { settings.value.servers },
-                controllers = _controllers,
+                onForeground = {
+                    applyPlan(
+                        planConnections(
+                            servers = settings.value.servers,
+                            activeId = _activeServerId.value,
+                            backgroundAll = settings.value.backgroundConnectAll,
+                            current = connectedConfigs,
+                        ),
+                    )
+                },
+                onBackground = {
+                    applyPlan(planOnStop(connectedConfigs, settings.value.backgroundConnectAll))
+                },
             ),
         )
     }
 
-    private fun syncControllers(settings: AppSettings) {
-        val desired = settings.servers.associateBy { it.id }
-        // Remove controllers for deleted servers
-        _controllers.keys.retainAll(desired.keys)
-        // Add controllers for new servers
-        desired.forEach { (id, cfg) ->
-            if (id !in _controllers) {
-                val client = WebSocketClient(parser = StatusParser, trustedCertHash = cfg.trustedCertHash)
-                val hist = HistoryRepository(HistoryDb.get(getApplication()).historyDao())
-                val ctrl = MonitorController(client = client, history = hist, scope = viewModelScope, pcId = id)
-                ctrl.start()
-                _controllers[id] = ctrl
+    private fun applyPlan(plan: ConnectionPlan) {
+        plan.dispose.forEach { id ->
+            _controllers.remove(id)?.dispose()
+            connectedConfigs.remove(id)
+        }
+        plan.disconnect.forEach { id ->
+            _controllers[id]?.disconnect()
+            connectedConfigs.remove(id)
+        }
+        plan.connect.forEach { (id, cfg) ->
+            ensureController(id, cfg).connect(
+                cfg.ip,
+                cfg.port,
+                cfg.token,
+                cfg.useTls,
+                cfg.hostname,
+            )
+            connectedConfigs[id] = cfg
+        }
+    }
+
+    private fun ensureController(id: String, cfg: ServerConfig): MonitorController =
+        _controllers.getOrPut(id) {
+            val client = WebSocketClient(parser = StatusParser, trustedCertHash = cfg.trustedCertHash)
+            val hist = HistoryRepository(HistoryDb.get(getApplication()).historyDao())
+            MonitorController(client = client, history = hist, scope = viewModelScope, pcId = id)
+                .also { it.start() }
+        }
+
+    private fun repairActive(key: ConnectionKey) {
+        val active = _activeServerId.value
+        if (active == null || key.servers.none { it.id == active }) {
+            val resolved = key.activeServerId ?: key.servers.firstOrNull()?.id
+            _activeServerId.value = resolved
+            if (resolved == null) {
+                _activeStatus.value = null
+                _activeConnection.value = null
+                _lastError.value = null
             }
-            _controllers[id]?.connect(cfg.ip, cfg.port, cfg.token, cfg.useTls, cfg.hostname)
         }
-        // Set active if none or invalid
-        if (_activeServerId.value == null || _activeServerId.value !in _controllers) {
-            _activeServerId.value = settings.activeServerId ?: settings.servers.firstOrNull()?.id
-        }
-        // Update notification with active server name
         val activeId = _activeServerId.value
-        if (activeId != null) {
-            val serverName = settings.servers.find { it.id == activeId }?.name
-            MonitorNotificationService.updateServerName(serverName)
-        }
-        // Re-collect from active controller (cancel old jobs first)
+        val serverName = key.servers.find { it.id == activeId }?.name
+        MonitorNotificationService.updateServerName(serverName)
         collectFromActiveController()
     }
 
     private fun collectFromActiveController() {
         activeCollectJobs.forEach { it.cancel() }
         activeCollectJobs.clear()
-        val activeId = _activeServerId.value ?: return
+        val activeId = _activeServerId.value
+        if (activeId == null) {
+            _activeStatus.value = null
+            _activeConnection.value = null
+            _lastError.value = null
+            return
+        }
         val ctrl = _controllers[activeId] ?: return
         activeCollectJobs += viewModelScope.launch { ctrl.status.collect { _activeStatus.value = it } }
         activeCollectJobs += viewModelScope.launch { ctrl.connection.collect { _activeConnection.value = it } }
@@ -162,11 +215,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun removeServer(id: String) {
-        viewModelScope.launch {
-            _controllers[id]?.disconnect()
-            _controllers.remove(id)
-            settingsStore.removeServer(id)
-        }
+        _controllers.remove(id)?.dispose()
+        connectedConfigs.remove(id)
+        viewModelScope.launch { settingsStore.removeServer(id) }
     }
 
     fun trustCert(certHash: String) {
@@ -176,13 +227,16 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
             _pendingCertHash.value = null
             // Reconnect with trusted cert
             val cfg = settings.value.servers.find { it.id == activeId } ?: return@launch
-            _controllers[activeId]?.disconnect()
-            val client = WebSocketClient(parser = StatusParser, trustedCertHash = certHash)
+            _controllers.remove(activeId)?.dispose()
+            val trusted = cfg.copy(trustedCertHash = certHash, useTls = true)
+            val client = WebSocketClient(parser = StatusParser, trustedCertHash = trusted.trustedCertHash)
             val hist = HistoryRepository(HistoryDb.get(getApplication()).historyDao())
             val ctrl = MonitorController(client = client, history = hist, scope = viewModelScope, pcId = activeId)
             ctrl.start()
             _controllers[activeId] = ctrl
-            ctrl.connect(cfg.ip, cfg.port, cfg.token, true, cfg.hostname)
+            ctrl.connect(trusted.ip, trusted.port, trusted.token, trusted.useTls, trusted.hostname)
+            connectedConfigs[activeId] = trusted
+            collectFromActiveController()
         }
     }
 

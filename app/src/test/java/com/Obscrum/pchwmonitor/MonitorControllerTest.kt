@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -219,6 +221,25 @@ class MonitorControllerTest {
             listOf(1_754_150_000_000L, 1_754_150_009_000L),
             history.recorded.map { it.timestamp },
         )
+    }
+
+    @Test
+    fun dispose_cancelsStartJob_andDisconnects() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope, pcId = "default")
+
+        controller.start()
+        controller.connect("10.0.0.1", 8765)
+        dispatcher.scheduler.advanceUntilIdle()
+        assertEquals(ConnectionState.CONNECTED, controller.connection.value)
+
+        controller.dispose()
+
+        assertEquals(ConnectionState.DISCONNECTED, controller.connection.value)
+        assertNotNull(controller.startJob)
+        assertFalse(controller.startJob!!.isActive)
     }
 
     @Test

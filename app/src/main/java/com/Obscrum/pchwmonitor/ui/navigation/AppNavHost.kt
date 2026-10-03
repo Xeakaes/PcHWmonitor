@@ -48,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import android.os.Build
 import com.Obscrum.pchwmonitor.MonitorViewModel
 import com.Obscrum.pchwmonitor.R
+import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardScreen
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
@@ -140,7 +141,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         }
                         DashboardScreen(
                             status = activeStatus,
-                            connection = activeConnection,
+                            connection = activeConnection ?: ConnectionState.DISCONNECTED,
                             chartWindowSeconds = chartWindowSeconds,
                             layout = dashboardLayout,
                             onLayoutChange = viewModel::setDashboardLayout,
@@ -219,7 +220,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val activeServerId by viewModel.activeServerId.collectAsState()
                     SettingsScreen(
                         settings = settings,
-                        connection = connection,
+                        connection = connection ?: ConnectionState.DISCONNECTED,
                         labelConnecting = stringResource(R.string.connecting),
                         labelConnected = stringResource(R.string.connected),
                         labelDisconnected = stringResource(R.string.disconnected),

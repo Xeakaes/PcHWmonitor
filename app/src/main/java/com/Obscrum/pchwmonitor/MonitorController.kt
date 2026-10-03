@@ -7,6 +7,7 @@ import com.Obscrum.pchwmonitor.data.network.WsClient
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.domain.model.WsMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,8 +35,10 @@ class MonitorController(
     private var currentToken: String? = null
     private var lastRecordedAt = Long.MIN_VALUE
 
+    internal var startJob: Job? = null
+
     fun start() {
-        scope.launch {
+        startJob = scope.launch {
             client.messages.collect { message ->
                 when (message) {
                     is WsMessage.Status -> {
@@ -95,6 +98,11 @@ class MonitorController(
         currentUrl = null
         currentToken = null
         client.disconnect()
+    }
+
+    fun dispose() {
+        startJob?.cancel()
+        disconnect()
     }
 
     companion object {
