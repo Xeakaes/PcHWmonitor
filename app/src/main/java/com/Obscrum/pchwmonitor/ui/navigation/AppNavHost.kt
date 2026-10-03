@@ -48,11 +48,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import android.os.Build
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.Obscrum.pchwmonitor.MonitorViewModel
 import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.ui.components.EmptyStateCta
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardScreen
+import com.Obscrum.pchwmonitor.ui.servers.ServerEditScreen
+import com.Obscrum.pchwmonitor.ui.servers.ServerEditViewModel
 import com.Obscrum.pchwmonitor.ui.servers.ServersScreen
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
@@ -366,8 +369,21 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                             defaultValue = null
                         },
                     ),
-                ) {
-                    // Placeholder stub — Task 7 replaces this body with ServerEditScreen.
+                ) { backStackEntry ->
+                    val serverId = backStackEntry.arguments?.getString("serverId")
+                    val editViewModel: ServerEditViewModel = viewModel(
+                        factory = ServerEditViewModel.factory(viewModel.settingsStore, serverId),
+                    )
+                    val discoveredServers by viewModel.discovery.servers.collectAsState()
+                    val isScanning by viewModel.discovery.isScanning.collectAsState()
+                    ServerEditScreen(
+                        viewModel = editViewModel,
+                        onBack = { navController.popBackStack() },
+                        onSaved = { navController.popBackStack() },
+                        discoveredServers = discoveredServers.map { Triple(it.name, it.ip, it.port) },
+                        isScanning = isScanning,
+                        onDiscover = { viewModel.discovery.startScan() },
+                    )
                 }
             }
         }

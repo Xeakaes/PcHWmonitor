@@ -156,4 +156,11 @@
     <string name="dashboard_empty_action">Add a server</string>
     <string name="back">Back</string>
     <string name="edit">Edit</string>
+    <string name="server_edit_title_new">Add server</string>
+    <string name="server_edit_title_edit">Edit server</string>
+    <string name="tunnel_url_label">Cloudflare Tunnel URL (optional)</string>
+    <string name="err_empty_ip">Server address is required</string>
+    <string name="err_invalid_port">Port must be a number between 1 and 65535</string>
+    <string name="err_duplicate_name">A server with this name already exists</string>
+    <string name="default_server_name">PC</string>
 </resources>

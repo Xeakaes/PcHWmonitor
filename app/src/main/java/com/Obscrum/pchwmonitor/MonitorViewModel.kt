@@ -44,7 +44,7 @@ import java.io.File
 
 class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val settingsStore: SettingsStore = SettingsStore(
+    val settingsStore: SettingsStore = SettingsStore(
         PreferenceDataStoreFactory.create(
             scope = viewModelScope,
             produceFile = { File(app.filesDir, "settings.preferences_pb") },
