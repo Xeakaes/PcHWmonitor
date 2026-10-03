@@ -188,7 +188,10 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     // Server list methods
     suspend fun setServers(servers: List<ServerConfig>) {
-        dataStore.edit { it[keyServersJson] = json.encodeToString(servers) }
+        dataStore.edit { prefs ->
+            prefs[keyServersJson] = json.encodeToString(servers)
+            prefs.mirrorLegacy(resolveActive(prefs, servers))
+        }
     }
 
     suspend fun setActiveServerId(id: String?) {
@@ -243,8 +246,11 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     suspend fun updateServerHostname(id: String, hostname: String) {
         dataStore.edit { prefs ->
             val current = decodeServers(prefs)
-            val updated = current.map { if (it.id == id) it.copy(hostname = hostname) else it }
+            val updated = current.map {
+                if (it.id == id) it.copy(hostname = hostname.takeIf { h -> h.isNotBlank() }) else it
+            }
             prefs[keyServersJson] = json.encodeToString(updated)
+            prefs.mirrorLegacy(resolveActive(prefs, updated))
         }
     }
 
