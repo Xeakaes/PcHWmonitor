@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor.domain.model
 
+import com.Obscrum.pchwmonitor.data.AppError
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -97,6 +98,6 @@ data class WelcomeInfo(
 sealed class WsMessage {
     data class Welcome(val info: WelcomeInfo) : WsMessage()
     data class Status(val status: SystemStatus) : WsMessage()
-    data class ParseFailure(val raw: String, val reason: String) : WsMessage()
+    data class ParseFailure(val source: String, val reason: String, val error: AppError? = null) : WsMessage()
     data class CertUntrusted(val certHash: String, val serverName: String?) : WsMessage()
 }

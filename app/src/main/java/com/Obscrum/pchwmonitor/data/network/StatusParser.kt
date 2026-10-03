@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor.data.network
 
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.domain.model.WelcomeInfo
 import com.Obscrum.pchwmonitor.domain.model.WsMessage
@@ -21,7 +22,11 @@ object StatusParser {
                     val status = json.decodeFromString(SystemStatus.serializer(), raw)
                     WsMessage.Status(status.copy(timestamp = status.timestamp * 1000L))
                 }
-                else -> WsMessage.ParseFailure(raw, "unknown message type: $type")
+                else -> WsMessage.ParseFailure(
+                    raw,
+                    "unknown message type: $type",
+                    error = type?.let { AppError.UnknownMessageType(it) },
+                )
             }
         } catch (e: Exception) {
             WsMessage.ParseFailure(raw, e.message ?: e.javaClass.simpleName)

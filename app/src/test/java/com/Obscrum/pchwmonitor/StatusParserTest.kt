@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor
 
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.data.network.StatusParser
 import com.Obscrum.pchwmonitor.domain.model.WsMessage
 import org.junit.Assert.assertEquals
@@ -75,12 +76,17 @@ class StatusParserTest {
     fun malformedJsonYieldsParseFailure() {
         val msg = StatusParser.parse("not json at all")
         assertTrue(msg is WsMessage.ParseFailure)
+        assertNull((msg as WsMessage.ParseFailure).error)
     }
 
     @Test
     fun unknownTypeYieldsParseFailure() {
         val msg = StatusParser.parse("""{"type":"mystery"}""")
         assertTrue(msg is WsMessage.ParseFailure)
+        assertEquals(
+            AppError.UnknownMessageType("mystery"),
+            (msg as WsMessage.ParseFailure).error,
+        )
     }
 
     @Test

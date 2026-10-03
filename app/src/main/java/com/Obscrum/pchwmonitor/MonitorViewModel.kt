@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.Obscrum.pchwmonitor.data.AppSettings
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.data.ServerConfig
 import com.Obscrum.pchwmonitor.data.SettingsStore
 import com.Obscrum.pchwmonitor.data.ThemeMode
@@ -80,8 +81,8 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     private val _activeConnection = MutableStateFlow(ConnectionState.DISCONNECTED)
     val activeConnection: StateFlow<ConnectionState> = _activeConnection.asStateFlow()
 
-    private val _lastError = MutableStateFlow<String?>(null)
-    val lastError: StateFlow<String?> = _lastError.asStateFlow()
+    private val _lastError = MutableStateFlow<AppError?>(null)
+    val lastError: StateFlow<AppError?> = _lastError.asStateFlow()
 
     val discovery = DiscoveryService(viewModelScope, app)
 

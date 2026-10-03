@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor
 
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.data.local.HistorySample
 import com.Obscrum.pchwmonitor.data.local.HistoryStore
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
@@ -138,7 +139,7 @@ class MonitorControllerTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         assertTrue(client.urls.isEmpty())
-        assertEquals("server address must be a private IP or known hostname", controller.lastError.value)
+        assertEquals(AppError.AddressInvalid, controller.lastError.value)
     }
 
     @Test
@@ -235,7 +236,7 @@ class MonitorControllerTest {
         client.emit(WsMessage.Status(status(1_000L, available = false)))
         dispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals("boom", controller.lastError.value)
+        assertEquals(AppError.ServerMessage("boom"), controller.lastError.value)
         assertTrue(history.recorded.isEmpty())
     }
 }

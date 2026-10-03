@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor.data.network
 
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.domain.model.WsMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -99,7 +100,7 @@ class WebSocketClient(
             val request = Request.Builder().url(url).build()
             client.newWebSocket(request, listener())
         } catch (e: Exception) {
-            _messages.tryEmit(WsMessage.ParseFailure(url, e.message ?: "connect failed"))
+            _messages.tryEmit(WsMessage.ParseFailure(url, e.message ?: "connect failed", error = AppError.ConnectFailed))
             null
         }
     }
@@ -132,14 +133,14 @@ class WebSocketClient(
                     }
                 }
             }
-            _messages.tryEmit(WsMessage.ParseFailure("socket", t.message ?: "socket failure"))
+            _messages.tryEmit(WsMessage.ParseFailure("socket", t.message ?: "socket failure", error = AppError.SocketFailure))
             _connectionState.value = ConnectionState.DISCONNECTED
             closedEvents.trySend(Unit)
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             if (code == 1008) {
-                _messages.tryEmit(WsMessage.ParseFailure("auth", "Token required — check server console for token"))
+                _messages.tryEmit(WsMessage.ParseFailure("auth", "Token required — check server console for token", error = AppError.TokenRequired))
             }
             _connectionState.value = ConnectionState.DISCONNECTED
             closedEvents.trySend(Unit)

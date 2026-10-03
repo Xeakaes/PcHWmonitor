@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
 import com.Obscrum.pchwmonitor.ui.settings.SettingsScreen
+import com.Obscrum.pchwmonitor.ui.resolveError
 import kotlinx.coroutines.flow.map
 
 private data class NavItem(
@@ -211,7 +213,9 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val settings by viewModel.settings.collectAsState()
                     val discoveredServers by viewModel.discovery.servers.collectAsState()
                     val isScanning by viewModel.discovery.isScanning.collectAsState()
-                    val errorMessage by viewModel.lastError.collectAsState()
+                    val context = LocalContext.current
+                    val lastError by viewModel.lastError.collectAsState()
+                    val errorMessage = lastError?.let { context.resolveError(it) }
                     val activeServerId by viewModel.activeServerId.collectAsState()
                     SettingsScreen(
                         settings = settings,

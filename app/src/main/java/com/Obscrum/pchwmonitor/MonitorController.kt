@@ -1,5 +1,6 @@
 package com.Obscrum.pchwmonitor
 
+import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.data.local.HistoryStore
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.data.network.WsClient
@@ -23,8 +24,8 @@ class MonitorController(
     private val _status = MutableStateFlow<SystemStatus?>(null)
     val status: StateFlow<SystemStatus?> = _status.asStateFlow()
 
-    private val _lastError = MutableStateFlow<String?>(null)
-    val lastError: StateFlow<String?> = _lastError.asStateFlow()
+    private val _lastError = MutableStateFlow<AppError?>(null)
+    val lastError: StateFlow<AppError?> = _lastError.asStateFlow()
 
     private val _certHash = MutableStateFlow<String?>(null)
     val certHash: StateFlow<String?> = _certHash.asStateFlow()
@@ -48,15 +49,15 @@ class MonitorController(
                                     history.record(message.status, pcId)
                                     lastRecordedAt = now
                                 } catch (e: Exception) {
-                                    _lastError.value = "History write failed: ${e.message}"
+                                    _lastError.value = AppError.HistoryWriteFailed
                                 }
                             }
                         } else {
-                            _lastError.value = message.status.error ?: "data unavailable"
+                            _lastError.value = message.status.error?.let { AppError.ServerMessage(it) } ?: AppError.DataUnavailable
                         }
                     }
                     is WsMessage.Welcome -> Unit
-                    is WsMessage.ParseFailure -> _lastError.value = message.reason
+                    is WsMessage.ParseFailure -> _lastError.value = message.error ?: AppError.ServerMessage(message.reason)
                     is WsMessage.CertUntrusted -> _certHash.value = message.certHash
                 }
             }
@@ -69,13 +70,13 @@ class MonitorController(
             hostname.trim()
         } else {
             if (!isAllowedHost(ip)) {
-                _lastError.value = "server address must be a private IP or known hostname"
+                _lastError.value = AppError.AddressInvalid
                 return
             }
             ip
         }
         if (!useTls && token != null) {
-            _lastError.value = "Warning: token sent in plaintext (ws://). Enable TLS for secure auth."
+            _lastError.value = AppError.PlaintextToken
         }
         val scheme = if (useTls) "wss" else "ws"
         val url = if (!hostname.isNullOrBlank()) {
