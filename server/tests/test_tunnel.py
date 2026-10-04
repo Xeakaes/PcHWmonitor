@@ -133,3 +133,37 @@ def test_stop_kills_hung_process(tmp_path):
     assert mgr.is_running is False
     assert mgr.state is TunnelState.OFF
     assert process.poll() is not None
+
+
+def test_second_https_line_does_not_replace_url(tmp_path):
+    shim = write_shim(
+        tmp_path,
+        "import time\n"
+        "print('https://quick-test.trycloudflare.com', flush=True)\n"
+        "time.sleep(0.2)\n"
+        "print('see https://developers.cloudflare.com/docs for details', flush=True)\n"
+        "time.sleep(60)\n",
+    )
+    url_event = threading.Event()
+    urls = []
+
+    def on_url(url: str) -> None:
+        urls.append(url)
+        url_event.set()
+
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        on_url=on_url,
+    )
+
+    assert mgr.start_quick(8765) is True
+    assert url_event.wait(timeout=5)
+    assert urls == ["https://quick-test.trycloudflare.com"]
+
+    # Let the reader consume the later docs-URL line before asserting the latch.
+    time.sleep(0.8)
+    assert urls == ["https://quick-test.trycloudflare.com"]
+    assert mgr.url == "https://quick-test.trycloudflare.com"
+
+    mgr.stop()

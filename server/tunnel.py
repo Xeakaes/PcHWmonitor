@@ -169,6 +169,8 @@ class TunnelManager:
 
     def _set_url(self, url: str) -> None:
         with self._lock:
+            if self._url is not None:
+                return
             self._url = url
         if self._on_url is None:
             return
