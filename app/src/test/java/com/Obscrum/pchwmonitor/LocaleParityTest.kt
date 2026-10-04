@@ -60,11 +60,19 @@ class LocaleParityTest {
         return SPEC_REGEX.findAll(cleaned).map { it.value }.sorted().toList()
     }
 
-    private fun localeDirs(): List<File> =
-        findResDir().listFiles { f -> f.isDirectory && f.name.startsWith("values-") }
-            ?.filter { File(it, "strings.xml").exists() }
-            ?.sortedBy { it.name }
-            ?: error("no values-* directories found in ${findResDir()}")
+    private fun localeDirs(): List<File> {
+        val res = findResDir()
+        val problems = EXPECTED_LOCALES.flatMap { name ->
+            val dir = File(res, name)
+            when {
+                !dir.isDirectory -> listOf("$name/ (directory missing)")
+                !File(dir, "strings.xml").exists() -> listOf("$name/strings.xml (file missing)")
+                else -> emptyList()
+            }
+        }
+        assertTrue("Expected locale resources missing:\n${problems.joinToString("\n")}", problems.isEmpty())
+        return EXPECTED_LOCALES.map { File(res, it) }
+    }
 
     private fun findResDir(): File {
         val candidates = listOf(File("src/main/res"), File("app/src/main/res"))
@@ -74,5 +82,11 @@ class LocaleParityTest {
 
     private companion object {
         val SPEC_REGEX = Regex("%(\\d+\\$)?[-#+,0]*(\\d+)?(\\.\\d+)?[a-zA-Z%]")
+
+        val EXPECTED_LOCALES = listOf(
+            "values-de", "values-es", "values-fr", "values-it", "values-ja",
+            "values-nl", "values-pl", "values-pt", "values-pt-rBR", "values-ru",
+            "values-tr", "values-zh", "values-zh-rTW",
+        )
     }
 }
