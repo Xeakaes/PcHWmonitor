@@ -5,7 +5,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tunnel import TunnelManager, TunnelState  # noqa: E402
+from tunnel import (  # noqa: E402
+    TunnelConfig,
+    TunnelManager,
+    TunnelState,
+    load_tunnel_config,
+    parse_tunnel_id,
+    route_dns,
+    save_tunnel_config,
+    write_ingress_config,
+)
 
 
 def write_shim(tmp_path, body: str) -> Path:
@@ -167,3 +176,69 @@ def test_second_https_line_does_not_replace_url(tmp_path):
     assert mgr.url == "https://quick-test.trycloudflare.com"
 
     mgr.stop()
+
+
+def test_config_roundtrip_and_corrupt_defaults(tmp_path):
+    cfg_dir = tmp_path / "cfg"
+    save_tunnel_config(cfg_dir, TunnelConfig("id-1", "pc", "t.example.com", True))
+    loaded = load_tunnel_config(cfg_dir)
+    assert loaded == TunnelConfig("id-1", "pc", "t.example.com", True)
+
+    (cfg_dir / "tunnel.json").write_text("not json {{{", encoding="utf-8")
+    assert load_tunnel_config(cfg_dir) == TunnelConfig()
+
+    assert load_tunnel_config(tmp_path / "missing-dir") == TunnelConfig()
+
+
+def test_parse_tunnel_id_variants():
+    assert parse_tunnel_id("Created tunnel t1 id=aaa") == "aaa"
+    assert parse_tunnel_id("Created tunnel t1 with id bbb") == "bbb"
+    assert (
+        parse_tunnel_id(
+            "some output\n11111111-2222-3333-4444-555555555555\n"
+        )
+        == "11111111-2222-3333-4444-555555555555"
+    )
+    assert parse_tunnel_id("some output\nsome error text") is None
+
+
+def test_write_ingress_config_exact_content(tmp_path):
+    cfg_dir = tmp_path / "cfg"
+    path = write_ingress_config(cfg_dir, "tid", "pc.example.com", 8765)
+
+    expected = (
+        "tunnel: tid\n"
+        "ingress:\n"
+        "  - hostname: pc.example.com\n"
+        "    service: http://localhost:8765\n"
+        "  - service: http_status:404\n"
+    )
+    assert path == cfg_dir / "cloudflared" / "config.yml"
+    assert path.read_text(encoding="utf-8") == expected
+
+
+def test_route_dns_tolerates_already_exists(tmp_path):
+    exists_dir = tmp_path / "already"
+    exists_dir.mkdir()
+    shim_exists = write_shim(
+        exists_dir,
+        "import sys\n"
+        "print('ERR: pc.example.com already exists', file=sys.stderr)\n"
+        "sys.exit(1)\n",
+    )
+    assert route_dns(shim_exists, "pc", "pc.example.com") is True
+
+    denied_dir = tmp_path / "denied"
+    denied_dir.mkdir()
+    shim_denied = write_shim(
+        denied_dir,
+        "import sys\n"
+        "print('permission denied', file=sys.stderr)\n"
+        "sys.exit(1)\n",
+    )
+    assert route_dns(shim_denied, "pc", "pc.example.com") is False
+
+    ok_dir = tmp_path / "ok"
+    ok_dir.mkdir()
+    shim_ok = write_shim(ok_dir, "print('ok')\n")
+    assert route_dns(shim_ok, "pc", "pc.example.com") is True
