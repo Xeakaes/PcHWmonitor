@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import subprocess
 import threading
 import time
 from pathlib import Path
@@ -8,6 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI
 
 from app import _run_forever
+from tunnel import TunnelManager, TunnelState
 
 logger = logging.getLogger("pchw.tray")
 
@@ -23,172 +23,10 @@ def _tray_image():
     return img
 
 
-class TunnelManager:
-    """Manages a cloudflared tunnel subprocess."""
-
-    def __init__(self):
-        self._process: subprocess.Popen | None = None
-        self._url: str | None = None
-        self._name: str | None = None
-        self._reader_thread: threading.Thread | None = None
-        self._on_url_callback = None
-
-    @property
-    def is_running(self) -> bool:
-        return self._process is not None and self._process.poll() is None
-
-    @property
-    def url(self) -> str | None:
-        return self._url
-
-    @property
-    def name(self) -> str | None:
-        return self._name
-
-    def set_on_url_callback(self, callback):
-        self._on_url_callback = callback
-
-    def start_quick(self, port: int) -> bool:
-        """Start a temporary quick tunnel."""
-        if self.is_running:
-            return False
-        cloudflared = _find_cloudflared()
-        if cloudflared is None:
-            return False
-        cmd = [str(cloudflared), "tunnel", "--url", f"http://localhost:{port}"]
-        return self._start(cmd, "quick")
-
-    def start_named(self, tunnel_name: str, port: int) -> bool:
-        """Start a named (persistent) tunnel. Creates it first if needed."""
-        if self.is_running:
-            return False
-        cloudflared = _find_cloudflared()
-        if cloudflared is None:
-            return False
-        # Create tunnel if it doesn't exist
-        tunnel_id = self.create_tunnel(cloudflared, tunnel_name)
-        if tunnel_id is None:
-            # Tunnel might already exist — try to run it anyway
-            logger.info("tunnel '%s' may already exist, attempting to run", tunnel_name)
-        else:
-            logger.info("created tunnel '%s' (id: %s)", tunnel_name, tunnel_id)
-        cmd = [str(cloudflared), "tunnel", "run", tunnel_name]
-        return self._start(cmd, tunnel_name)
-
-    def create_tunnel(self, cloudflared_path, tunnel_name: str) -> str | None:
-        """Create a cloudflare tunnel. Returns tunnel ID or None on failure."""
-        try:
-            result = subprocess.run(
-                [str(cloudflared_path), "tunnel", "create", tunnel_name],
-                capture_output=True, text=True, timeout=30,
-            )
-            if result.returncode != 0:
-                logger.error("tunnel create failed: %s", result.stderr.strip() or result.stdout.strip())
-                return None
-            # Parse tunnel ID from output like: Created tunnel <name> id=<id>
-            for line in result.stdout.splitlines():
-                if "id=" in line:
-                    return line.split("id=")[-1].strip()
-                # Also handle: "Created tunnel ... with id ... "
-                if "Created tunnel" in line:
-                    parts = line.split()
-                    for i, p in enumerate(parts):
-                        if p == "id" and i + 1 < len(parts):
-                            return parts[i + 1]
-            # Fallback: last line might be the ID
-            lines = [l.strip() for l in result.stdout.strip().splitlines() if l.strip()]
-            if lines:
-                return lines[-1]
-            return None
-        except Exception as e:
-            logger.error("tunnel create exception: %s", e)
-            return None
-
-    def _start(self, cmd: list[str], name: str) -> bool:
-        try:
-            logger.info("starting cloudflare tunnel: %s", " ".join(cmd))
-            self._process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-            )
-            self._name = name
-            self._url = None
-            self._reader_thread = threading.Thread(
-                target=self._read_output, daemon=True, name="tunnel-reader"
-            )
-            self._reader_thread.start()
-            return True
-        except Exception as e:
-            logger.error("failed to start tunnel: %s", e)
-            return False
-
-    def _read_output(self):
-        proc = self._process
-        if proc is None or proc.stdout is None:
-            return
-        for line in proc.stdout:
-            line = line.strip()
-            logger.info("cloudflared: %s", line)
-            if "trycloudflare.com" in line or "https://" in line:
-                for word in line.split():
-                    if word.startswith("https://"):
-                        self._url = word.rstrip(",/.;")
-                        logger.info("tunnel URL: %s", self._url)
-                        if self._on_url_callback:
-                            self._on_url_callback(self._url)
-                        break
-
-    def stop(self):
-        if self._process is not None:
-            try:
-                self._process.terminate()
-                self._process.wait(timeout=5)
-            except Exception:
-                try:
-                    self._process.kill()
-                except Exception:
-                    pass
-            self._process = None
-            self._url = None
-            self._name = None
-            logger.info("tunnel stopped")
-
-
-def _find_cloudflared():
-    """Find cloudflared.exe - check multiple locations."""
-    import sys
-    from pathlib import Path
-    candidates = []
-    if getattr(sys, "frozen", False):
-        base = Path(sys.executable).parent
-        meipass = Path(sys._MEIPASS)
-        candidates = [
-            meipass / "cloudflared.exe",
-            meipass / "vendor" / "cloudflared.exe",
-            base / "cloudflared.exe",
-            base / "vendor" / "cloudflared.exe",
-        ]
-    else:
-        base = Path(__file__).resolve().parent
-        candidates = [
-            base / "cloudflared.exe",
-            base / "vendor" / "cloudflared.exe",
-            base.parent / "cloudflared.exe",
-            base.parent / "vendor" / "cloudflared.exe",
-        ]
-    for c in candidates:
-        if c.exists():
-            return c
-    return None
-
-
-def _run_tray(stop_event: threading.Event, token: str | None = None, port: int = 8765) -> None:
+def _run_tray(stop_event: threading.Event, token: str | None, port: int, tunnel: TunnelManager) -> None:
     import pystray
 
     active_token = token or "(restart required)"
-    tunnel = TunnelManager()
 
     def _connection_payload() -> str:
         from discovery import best_lan_ip
@@ -264,62 +102,50 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         if tunnel.is_running:
             icon.notify("Tunnel already running.", "PC HW Monitor")
             return
-        if not _find_cloudflared():
+        if not tunnel.has_cloudflared():
             icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe.", "PC HW Monitor")
             return
-        def _on_url(url):
-            icon.notify(f"Quick tunnel started:\n{url}", "PC HW Monitor")
-        tunnel.set_on_url_callback(_on_url)
         ok = tunnel.start_quick(port)
         if not ok:
-            icon.notify("Failed to start tunnel.", "PC HW Monitor")
+            icon.notify(f"Failed: {tunnel.last_error}", "PC HW Monitor")
 
     def _start_named_tunnel(icon, item):
         if tunnel.is_running:
             icon.notify("Tunnel already running.", "PC HW Monitor")
             return
-        cf = _find_cloudflared()
-        if not cf:
+        if not tunnel.has_cloudflared():
             icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe or in vendor/.", "PC HW Monitor")
             return
         # Check if authenticated
-        if not _is_cloudflared_authenticated(cf):
+        if not _is_cloudflared_authenticated():
             icon.notify("Not authenticated with Cloudflare.\nPlease run 'Cloudflare Login' first.", "PC HW Monitor")
             return
         # Check if there are existing tunnels to offer as choices
-        existing = _list_existing_tunnels(cf)
+        existing = tunnel.list_tunnels()
         if existing:
             threading.Thread(target=_pick_tunnel, args=(existing,), daemon=True).start()
         else:
             threading.Thread(target=_ask_new_tunnel_name, daemon=True).start()
 
-    def _is_cloudflared_authenticated(cf_path):
+    def _is_cloudflared_authenticated():
         """Check if cloudflared has a cert.pem (means user has logged in)."""
         cert_path = Path.home() / ".cloudflared" / "cert.pem"
         return cert_path.exists()
 
-    def _list_existing_tunnels(cf_path):
-        """List existing cloudflare tunnels. Returns list of (name, id) tuples."""
-        try:
-            result = subprocess.run(
-                [str(cf_path), "tunnel", "list"],
-                capture_output=True, text=True, timeout=15,
-            )
-            if result.returncode != 0:
-                return []
-            tunnels = []
-            for line in result.stdout.splitlines():
-                # Skip header and separator lines
-                if line.startswith("ID") or line.startswith("---") or not line.strip():
-                    continue
-                parts = line.split()
-                if len(parts) >= 2:
-                    # Format: <id> <name> ... 
-                    tunnels.append((parts[1] if len(parts) > 1 else parts[0], parts[0]))
-            return tunnels
-        except Exception as e:
-            logger.debug("tunnel list failed: %s", e)
-            return []
+    def _resolve_hostname(name: str) -> str | None:
+        """Reuse saved hostname for this tunnel, else prompt; blank/None aborts."""
+        cfg = tunnel.get_config()
+        if cfg.tunnel_name == name and cfg.hostname:
+            return cfg.hostname
+        import tkinter as tk
+        from tkinter import simpledialog
+        root = tk.Tk()
+        root.withdraw()
+        hostname = simpledialog.askstring("Hostname", "Public hostname (e.g. pc.example.com):", parent=root)
+        root.destroy()
+        if not hostname or not hostname.strip():
+            return None
+        return hostname.strip()
 
     def _pick_tunnel(existing):
         """Show dialog to pick existing tunnel or create new one."""
@@ -328,7 +154,7 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         root = tk.Tk()
         root.withdraw()
         # Build choices
-        choices = [name for name, tid in existing]
+        choices = [info.name for info in existing]
         choices.append("+ Create new tunnel")
         # Simple selection dialog
         from tkinter import ttk
@@ -365,15 +191,14 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
             threading.Thread(target=_ask_new_tunnel_name, daemon=True).start()
         else:
             # Run existing tunnel
-            def _on_url(url):
-                logger.info("named tunnel URL: %s", url)
-            tunnel.set_on_url_callback(_on_url)
-            ok = tunnel.start_named(selected[0], port)
-            if not ok:
-                logger.error("failed to start tunnel: %s", selected[0])
+            name = selected[0]
+            hostname = _resolve_hostname(name)
+            if hostname is None:
+                return
+            threading.Thread(target=tunnel.start_named, args=(name, hostname, port), daemon=True).start()
 
     def _ask_new_tunnel_name():
-        """Ask for a new tunnel name, create it, and start it."""
+        """Ask for a new tunnel name + hostname, then start it."""
         import tkinter as tk
         from tkinter import simpledialog
         root = tk.Tk()
@@ -383,58 +208,22 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
         if not name or not name.strip():
             return
         tunnel_name = name.strip()
-        cf = _find_cloudflared()
-        if not cf:
+        hostname = _resolve_hostname(tunnel_name)
+        if hostname is None:
             return
-        # Create tunnel first
-        logger.info("creating tunnel '%s'...", tunnel_name)
-        tunnel_id = tunnel.create_tunnel(cf, tunnel_name)
-        if tunnel_id:
-            logger.info("tunnel '%s' created (id: %s)", tunnel_name, tunnel_id)
-        else:
-            logger.info("tunnel '%s' may already exist, trying to run", tunnel_name)
-        # Start running it
-        def _on_url(url):
-            logger.info("named tunnel URL: %s", url)
-        tunnel.set_on_url_callback(_on_url)
-        ok = tunnel.start_named(tunnel_name, port)
-        if not ok:
-            logger.error("failed to start tunnel: %s", tunnel_name)
+        threading.Thread(target=tunnel.start_named, args=(tunnel_name, hostname, port), daemon=True).start()
 
     def _cloudflare_login(icon, item):
-        cf = _find_cloudflared()
-        if not cf:
+        if not tunnel.has_cloudflared():
             icon.notify("cloudflared.exe not found.", "PC HW Monitor")
             return
         icon.notify("Opening Cloudflare login page...\nAuthenticate in your browser.", "PC HW Monitor")
         def _run_login():
-            try:
-                import webbrowser
-                proc = subprocess.Popen(
-                    [str(cf), "tunnel", "login"],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                )
-                url_opened = False
-                for line in proc.stdout:
-                    line = line.strip()
-                    logger.info("cloudflared login: %s", line)
-                    if not url_opened and "https://" in line:
-                        for word in line.split():
-                            word = word.rstrip(",/.;")
-                            if word.startswith("https://") and ("dash.cloudflare" in word or "cloudflare" in word):
-                                webbrowser.open(word)
-                                url_opened = True
-                                logger.info("opened login URL: %s", word)
-                                break
-                proc.wait()
-                if _is_cloudflared_authenticated(cf):
-                    logger.info("cloudflared authentication successful")
-                else:
-                    logger.warning("cloudflared auth may have failed — check cert.pem")
-            except Exception as e:
-                logger.error("cloudflared login failed: %s", e)
+            ok = tunnel.login()
+            icon.notify(
+                "Cloudflare login successful." if ok else "Login failed — check cloudflared output.",
+                "PC HW Monitor",
+            )
         threading.Thread(target=_run_login, daemon=True).start()
 
     def _stop_tunnel(icon, item):
@@ -477,9 +266,21 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
 
     # Dynamic menu: show tunnel status
     def _tunnel_status_text(item=None):
-        if tunnel.is_running:
-            return f"Tunnel: {tunnel.url or tunnel.name or 'starting...'}"
+        if tunnel.state is TunnelState.STARTING:
+            return "Tunnel: starting..."
+        if tunnel.state is TunnelState.RUNNING:
+            return f"Tunnel: {tunnel.url or tunnel.tunnel_name}"
+        if tunnel.state is TunnelState.ERROR:
+            return f"Tunnel: error — {tunnel.last_error}"
         return "Tunnel: off"
+
+    def _toggle_auto_start(icon, item):
+        current = tunnel.get_config().auto_start
+        tunnel.set_auto_start(not current)
+        enabled = tunnel.get_config().auto_start
+        icon.notify(
+            f"Auto-start named tunnel {'enabled' if enabled else 'disabled'}.", "PC HW Monitor"
+        )
 
     menu = pystray.Menu(
         pystray.MenuItem("Show QR", _show_qr, default=True),
@@ -498,12 +299,24 @@ def _run_tray(stop_event: threading.Event, token: str | None = None, port: int =
                 pystray.MenuItem("Show Tunnel URL", _show_tunnel_url),
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem("Cloudflare Login", _cloudflare_login),
+                pystray.MenuItem(
+                    "Auto-start named tunnel",
+                    _toggle_auto_start,
+                    checked=lambda item: tunnel.get_config().auto_start,
+                ),
             ),
         ),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Exit", _show_exit),
     )
     icon = pystray.Icon("PcHwMonitor", _tray_image(), "PC HW Monitor", menu)
+    tunnel._on_url = lambda u: icon.notify(f"Tunnel ready:\n{u}", "PC HW Monitor")
+    tunnel._on_state = (
+        lambda s: icon.notify(f"Tunnel error:\n{tunnel.last_error}", "PC HW Monitor")
+        if s is TunnelState.ERROR
+        else None
+    )
+    threading.Thread(target=tunnel.apply_auto_start, args=(port,), daemon=True).start()
     icon.run()
 
 
@@ -516,11 +329,19 @@ def _serve_in_thread(app: FastAPI, port: int, stop_event: threading.Event, ssl_c
         stop_event.set()
 
 
-def _run_with_tray(app: FastAPI, port: int, ssl_cert: str | None = None, ssl_key: str | None = None) -> None:
+def _run_with_tray(
+    app: FastAPI,
+    port: int,
+    ssl_cert: str | None = None,
+    ssl_key: str | None = None,
+    tunnel_manager: TunnelManager | None = None,
+) -> None:
     stop_event = threading.Event()
     thread = threading.Thread(target=_serve_in_thread, args=(app, port, stop_event, ssl_cert, ssl_key), daemon=True)
     thread.start()
-    _run_tray(stop_event, token=app.state.token, port=port)
+    tunnel = tunnel_manager if tunnel_manager is not None else TunnelManager()
+    _run_tray(stop_event, token=app.state.token, port=port, tunnel=tunnel)
+    tunnel.stop()
     thread.join(timeout=5)
     if app.state.fps_adapter is not None:
         app.state.fps_adapter.stop()

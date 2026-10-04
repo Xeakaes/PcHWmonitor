@@ -572,3 +572,10 @@ def test_set_auto_start_persists_via_get_config(tmp_path):
 
     mgr.set_auto_start(False)
     assert mgr.get_config() == TunnelConfig("tid-1", "pc", "pc.example.com", False)
+
+
+def test_tray_headless_and_accepts_shared_manager():
+    import inspect
+    import tray  # must import without pystray/tkinter/display (lazy imports stay lazy)
+    sig = inspect.signature(tray._run_with_tray)
+    assert "tunnel_manager" in sig.parameters
