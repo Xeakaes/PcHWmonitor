@@ -64,7 +64,7 @@
     <string name="chart_window_300s">300 sn</string>
     <string name="fps_card_title">FPS</string>
     <string name="fps_avg">Ort.</string>
-    <string name="fps_1pct_low">1% Low</string>
+    <string name="fps_1pct_low" formatted="false">1% düşük</string>
     <string name="fps_details_title">FPS Detayları</string>
     <string name="fps_hint" formatted="false">1% low, kare sürelerindeki en kötü %1\'in ortalamasıdır — takılma hissiyatını ölçer.</string>
     <string name="fps_ok">Tamam</string>
@@ -109,13 +109,13 @@
     <string name="method_scan">Ağı tara</string>
     <string name="connect">Bağlan</string>
     <string name="qr_scan">QR ile doldur</string>
-    <string name="custom_background">Custom Background</string>
-    <string name="custom_background_enable">Enable custom background</string>
-    <string name="custom_background_description">Set a background image and auto-extract theme colors</string>
-    <string name="custom_background_pick">Choose image</string>
-    <string name="custom_background_remove">Remove background</string>
-    <string name="custom_background_blur">Glassmorphism cards</string>
-    <string name="custom_background_blur_description">Cards become semi-transparent with blur effect</string>
+    <string name="custom_background">Özel arka plan</string>
+    <string name="custom_background_enable">Özel arka planı etkinleştir</string>
+    <string name="custom_background_description">Bir arka plan görüntüsü ayarla ve tema renklerini otomatik çıkar</string>
+    <string name="custom_background_pick">Görüntü seç</string>
+    <string name="custom_background_remove">Arka planı kaldır</string>
+    <string name="custom_background_blur">Glassmorphism kartlar</string>
+    <string name="custom_background_blur_description">Kartlar bulanıklık efektiyle yarı saydam hale gelir</string>
     <string name="cert_trust_title">Sunucu sertifikasına güvenilsin mi?</string>
     <string name="cert_trust_message">Sunucunun sertifikası güvenilir değil.</string>
     <string name="cert_trust_sha">SHA-256: %1$s</string>
@@ -134,4 +134,37 @@
     <string name="fan_label">Fan</string>
     <string name="gpu_label">GPU</string>
     <string name="summary_format">min %1$.0f / ort. %2$.0f / max %3$.0f</string>
+    <string name="error_token_required">Token gerekli — token için sunucu konsolunu kontrol edin</string>
+    <string name="error_connect_failed">Bağlantı başarısız oldu</string>
+    <string name="error_socket_failure">Bağlantı kesildi</string>
+    <string name="error_address_invalid">Sunucu adresi özel bir IP veya bilinen bir ana makine adı olmalıdır</string>
+    <string name="error_plaintext_token">Uyarı: token düz metin olarak gönderiliyor (ws://). Güvenli kimlik doğrulama için TLS\'i etkinleştirin.</string>
+    <string name="error_history_write_failed">Geçmişe yazılamadı</string>
+    <string name="error_data_unavailable">Veri kullanılamıyor</string>
+    <string name="error_unknown_message_type">Bilinmeyen mesaj türü: %s</string>
+    <string name="error_raw">%s</string>
+    <string name="servers_title">Sunucular</string>
+    <string name="servers_qr_action">QR kodu tara</string>
+    <string name="servers_add_manual">Elle ekle</string>
+    <string name="servers_delete_confirm_title">Sunucuyu sil</string>
+    <string name="servers_delete_confirm_message">\"%1$s\" silinsin mi? Bu işlem geri alınamaz.</string>
+    <string name="servers_empty_title">Henüz sunucu yok</string>
+    <string name="servers_empty_desc">İlk sunucunu eklemek için PC uygulamasındaki QR kodu tara.</string>
+    <string name="servers_empty_action">Elle ekle</string>
+    <string name="dashboard_empty_title">Yapılandırılmış sunucu yok</string>
+    <string name="dashboard_empty_desc">Bilgisayarını izlemeye başlamak için bir sunucu ekle.</string>
+    <string name="dashboard_empty_action">Sunucu ekle</string>
+    <string name="back">Geri</string>
+    <string name="edit">Düzenle</string>
+    <string name="server_edit_title_new">Sunucu ekle</string>
+    <string name="server_edit_title_edit">Sunucuyu düzenle</string>
+    <string name="tunnel_url_label">Cloudflare Tunnel URL (isteğe bağlı)</string>
+    <string name="connection_card_title">Bağlantı</string>
+    <string name="manage_servers">Yönet</string>
+    <string name="background_connect_all_label">Arka planda tüm sunuculara bağlan</string>
+    <string name="background_connect_all_desc">Yalnızca etkin sunucu yerine kayıtlı her sunucunun bağlı kalmasını sağlar</string>
+    <string name="err_empty_ip">Sunucu adresi gerekli</string>
+    <string name="err_invalid_port">Port 1 ile 65535 arasında bir sayı olmalıdır</string>
+    <string name="err_duplicate_name">Bu adda bir sunucu zaten var</string>
+    <string name="default_server_name">PC</string>
 </resources>

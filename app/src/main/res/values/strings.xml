@@ -64,7 +64,7 @@
     <string name="chart_window_300s">300 s</string>
     <string name="fps_card_title">FPS</string>
     <string name="fps_avg">Avg</string>
-    <string name="fps_1pct_low">1% Low</string>
+    <string name="fps_1pct_low" formatted="false">1% Low</string>
     <string name="fps_details_title">FPS Details</string>
     <string name="fps_hint" formatted="false">1% low is the average of the worst 1% of frame times — it measures stutter.</string>
     <string name="fps_ok">OK</string>
@@ -133,7 +133,7 @@
     <string name="token_optional">Token (optional)</string>
     <string name="fan_label">Fan</string>
     <string name="gpu_label">GPU</string>
-    <string name="summary_format">min %1$.0f / ort. %2$.0f / max %3$.0f</string>
+    <string name="summary_format">min %1$.0f / avg %2$.0f / max %3$.0f</string>
     <string name="error_token_required">Token required — check server console for token</string>
     <string name="error_connect_failed">Connection failed</string>
     <string name="error_socket_failure">Connection lost</string>
