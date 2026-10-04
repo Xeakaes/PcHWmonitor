@@ -59,16 +59,16 @@ class ServerEditViewModel(
         }
     }
 
-    fun save(): Boolean = runBlocking {
+    fun save(defaultName: String = ""): Boolean = runBlocking {
         val portNumber = port.value.toIntOrNull()
-        val trimmedName = name.value.trim()
+        val effectiveName = name.value.trim().ifBlank { defaultName }
         val trimmedIp = ip.value.trim()
         val trimmedToken = token.value.trim()
         val trimmedHostname = hostname.value.trim()
         val validated = ServerValidator.validate(
             ip = trimmedIp,
             port = portNumber,
-            name = trimmedName,
+            name = effectiveName,
             hostname = trimmedHostname,
             existingNames = store.settings.first().servers
                 .filter { it.id != serverId }
@@ -81,7 +81,7 @@ class ServerEditViewModel(
             store.addServer(
                 ServerConfig(
                     id = UUID.randomUUID().toString(),
-                    name = trimmedName,
+                    name = effectiveName,
                     ip = trimmedIp,
                     port = portNumberOrBlocked,
                     token = trimmedToken.ifBlank { null },
@@ -91,13 +91,14 @@ class ServerEditViewModel(
         } else {
             store.updateServerConnection(
                 id = serverId!!,
-                name = trimmedName,
+                name = effectiveName,
                 ip = trimmedIp,
                 port = portNumberOrBlocked,
                 token = trimmedToken.ifBlank { null },
                 hostname = trimmedHostname.ifBlank { null },
             )
         }
+        if (result.isSuccess) name.value = effectiveName
         result.isSuccess
     }
 

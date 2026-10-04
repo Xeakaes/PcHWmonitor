@@ -104,10 +104,6 @@
 <string name="notification_waiting_data">Waiting for data…</string>
 <string name="notification_connecting">Connecting…</string>
 <string name="notification_disconnected">Disconnected</string>
-    <string name="connection_method">Connection method</string>
-    <string name="method_manual">Manual (IP + port)</string>
-    <string name="method_scan">Scan network</string>
-    <string name="connect">Connect</string>
     <string name="qr_scan">Fill via QR</string>
     <string name="custom_background">Custom Background</string>
     <string name="custom_background_enable">Enable custom background</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">Saved Servers</string>
     <string name="select">Select</string>
     <string name="delete_label">Delete</string>
-    <string name="add_new_server">Add new server</string>
-    <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="server_name">Name</string>
     <string name="ip_address">IP Address</string>

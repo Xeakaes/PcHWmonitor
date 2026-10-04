@@ -11,18 +11,18 @@ class ErrorMapperTest {
 
     @Test
     fun everyAppError_mapsToAResource_withArgsIntact() {
-        val objects = listOf(
-            AppError.TokenRequired,
-            AppError.ConnectFailed,
-            AppError.SocketFailure,
-            AppError.AddressInvalid,
-            AppError.PlaintextToken,
-            AppError.HistoryWriteFailed,
-            AppError.DataUnavailable,
+        val expectations = mapOf(
+            AppError.TokenRequired to R.string.error_token_required,
+            AppError.ConnectFailed to R.string.error_connect_failed,
+            AppError.SocketFailure to R.string.error_socket_failure,
+            AppError.AddressInvalid to R.string.error_address_invalid,
+            AppError.PlaintextToken to R.string.error_plaintext_token,
+            AppError.HistoryWriteFailed to R.string.error_history_write_failed,
+            AppError.DataUnavailable to R.string.error_data_unavailable,
         )
-        objects.forEach { appError ->
+        expectations.forEach { (appError, expectedResId) ->
             val text = appError.toErrorText()
-            assertTrue("resId must be non-zero for $appError", text.resId != 0)
+            assertEquals("resId for $appError", expectedResId, text.resId)
             assertTrue("args must be empty for $appError", text.args.isEmpty())
         }
 

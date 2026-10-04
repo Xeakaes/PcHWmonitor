@@ -104,10 +104,6 @@
 <string name="notification_waiting_data">Veri bekleniyor…</string>
 <string name="notification_connecting">Bağlanıyor…</string>
 <string name="notification_disconnected">Bağlantı kesildi</string>
-    <string name="connection_method">Bağlantı yöntemi</string>
-    <string name="method_manual">Elle (IP + port)</string>
-    <string name="method_scan">Ağı tara</string>
-    <string name="connect">Bağlan</string>
     <string name="qr_scan">QR ile doldur</string>
     <string name="custom_background">Özel arka plan</string>
     <string name="custom_background_enable">Özel arka planı etkinleştir</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">Kayıtlı Sunucular</string>
     <string name="select">Seç</string>
     <string name="delete_label">Sil</string>
-    <string name="add_new_server">Yeni sunucu ekle</string>
-    <string name="add">Ekle</string>
     <string name="cancel">İptal</string>
     <string name="server_name">İsim</string>
     <string name="ip_address">IP Adresi</string>

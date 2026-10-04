@@ -104,10 +104,6 @@
     <string name="notification_waiting_data">Ожидание данных…</string>
     <string name="notification_connecting">Подключение…</string>
     <string name="notification_disconnected">Отключено</string>
-    <string name="connection_method">Способ подключения</string>
-    <string name="method_manual">Вручную (IP + порт)</string>
-    <string name="method_scan">Сканировать сеть</string>
-    <string name="connect">Подключить</string>
     <string name="qr_scan">Заполнить по QR</string>
     <string name="custom_background">Пользовательский фон</string>
     <string name="custom_background_enable">Включить пользовательский фон</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">Сохранённые серверы</string>
     <string name="select">Выбрать</string>
     <string name="delete_label">Удалить</string>
-    <string name="add_new_server">Добавить новый сервер</string>
-    <string name="add">Добавить</string>
     <string name="cancel">Отмена</string>
     <string name="server_name">Имя</string>
     <string name="ip_address">IP-адрес</string>

@@ -104,10 +104,6 @@
 <string name="notification_waiting_data">Wachten op gegevens…</string>
 <string name="notification_connecting">Verbinden…</string>
 <string name="notification_disconnected">Verbonden</string>
-    <string name="connection_method">Verbindingsmethode</string>
-    <string name="method_manual">Handmatig (IP + poort)</string>
-    <string name="method_scan">Netwerk scannen</string>
-    <string name="connect">Verbinden</string>
     <string name="qr_scan">Invullen via QR</string>
     <string name="custom_background">Aangepaste achtergrond</string>
     <string name="custom_background_enable">Aangepaste achtergrond inschakelen</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">Opgeslagen servers</string>
     <string name="select">Selecteren</string>
     <string name="delete_label">Verwijderen</string>
-    <string name="add_new_server">Nieuwe server toevoegen</string>
-    <string name="add">Toevoegen</string>
     <string name="cancel">Annuleren</string>
     <string name="server_name">Naam</string>
     <string name="ip_address">IP-adres</string>

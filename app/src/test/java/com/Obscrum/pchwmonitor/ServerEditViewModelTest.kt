@@ -139,4 +139,22 @@ class ServerEditViewModelTest {
         )
         handle.close()
     }
+
+    @Test
+    fun blankName_defaultAssignedOnlyOnSuccessfulSave() = runTest {
+        val handle = store(tmpDir())
+        val vm = ServerEditViewModel(handle.store, serverId = null)
+        vm.port.first { it == "8765" }
+        vm.ip.value = ""
+
+        assertFalse(vm.save("New PC"))
+        assertEquals("", vm.name.value)
+        assertTrue(handle.store.settings.first().servers.isEmpty())
+
+        vm.ip.value = "10.0.0.9"
+        assertTrue(vm.save("New PC"))
+        assertEquals("New PC", vm.name.value)
+        assertEquals("New PC", handle.store.settings.first().servers.single().name)
+        handle.close()
+    }
 }

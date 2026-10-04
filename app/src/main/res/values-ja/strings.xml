@@ -104,10 +104,6 @@
 <string name="notification_waiting_data">データ待ち…</string>
 <string name="notification_connecting">接続中…</string>
 <string name="notification_disconnected">切断済み</string>
-    <string name="connection_method">接続方法</string>
-    <string name="method_manual">手動（IP＋ポート）</string>
-    <string name="method_scan">ネットワークをスキャン</string>
-    <string name="connect">接続</string>
     <string name="qr_scan">QRで入力</string>
     <string name="custom_background">カスタム背景</string>
     <string name="custom_background_enable">カスタム背景を有効にする</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">保存済みサーバー</string>
     <string name="select">選択</string>
     <string name="delete_label">削除</string>
-    <string name="add_new_server">新しいサーバーを追加</string>
-    <string name="add">追加</string>
     <string name="cancel">キャンセル</string>
     <string name="server_name">名前</string>
     <string name="ip_address">IP アドレス</string>

@@ -104,10 +104,6 @@
 <string name="notification_waiting_data">Esperando datos…</string>
 <string name="notification_connecting">Conectando…</string>
 <string name="notification_disconnected">Desconectado</string>
-    <string name="connection_method">Método de conexión</string>
-    <string name="method_manual">Manual (IP + puerto)</string>
-    <string name="method_scan">Escanear red</string>
-    <string name="connect">Conectar</string>
     <string name="qr_scan">Rellenar con QR</string>
     <string name="custom_background">Fondo personalizado</string>
     <string name="custom_background_enable">Activar fondo personalizado</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">Servidores guardados</string>
     <string name="select">Seleccionar</string>
     <string name="delete_label">Eliminar</string>
-    <string name="add_new_server">Añadir nuevo servidor</string>
-    <string name="add">Añadir</string>
     <string name="cancel">Cancelar</string>
     <string name="server_name">Nombre</string>
     <string name="ip_address">Dirección IP</string>

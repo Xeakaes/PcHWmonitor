@@ -104,10 +104,6 @@
     <string name="notification_waiting_data">等待資料…</string>
     <string name="notification_connecting">連線中…</string>
     <string name="notification_disconnected">已中斷連線</string>
-    <string name="connection_method">連線方式</string>
-    <string name="method_manual">手動（IP + 連接埠）</string>
-    <string name="method_scan">掃描網路</string>
-    <string name="connect">連線</string>
     <string name="qr_scan">掃碼填入</string>
     <string name="custom_background">自訂背景</string>
     <string name="custom_background_enable">啟用自訂背景</string>
@@ -125,8 +121,6 @@
     <string name="saved_servers">已儲存的伺服器</string>
     <string name="select">選擇</string>
     <string name="delete_label">刪除</string>
-    <string name="add_new_server">新增伺服器</string>
-    <string name="add">新增</string>
     <string name="cancel">取消</string>
     <string name="server_name">名稱</string>
     <string name="ip_address">IP 位址</string>

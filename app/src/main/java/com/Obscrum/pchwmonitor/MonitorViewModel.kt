@@ -187,6 +187,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     private fun collectFromActiveController() {
         activeCollectJobs.forEach { it.cancel() }
         activeCollectJobs.clear()
+        _pendingCertHash.value = null
         val activeId = _activeServerId.value
         if (activeId == null) {
             _activeStatus.value = null
@@ -254,16 +255,10 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
         _pendingCertHash.value = null
     }
 
-    fun disconnect() = _controllers.values.forEach { it.disconnect() }
-
     suspend fun historySamples(start: Long): List<HistorySample> {
         val activeId = _activeServerId.value ?: return emptyList()
         return _controllers[activeId]?.historySamples(start) ?: emptyList()
     }
-
-    suspend fun setServerIp(ip: String) = settingsStore.setServerIp(ip)
-
-    suspend fun setServerPort(port: Int) = settingsStore.setServerPort(port)
 
     fun setTheme(theme: ThemeMode) {
         viewModelScope.launch { settingsStore.setTheme(theme) }

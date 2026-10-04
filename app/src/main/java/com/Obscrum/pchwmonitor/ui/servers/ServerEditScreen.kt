@@ -204,8 +204,7 @@ fun ServerEditScreen(
             ) {
                 Button(
                     onClick = {
-                        viewModel.name.value = viewModel.name.value.ifBlank { defaultServerName }
-                        if (viewModel.save()) onSaved()
+                        if (viewModel.save(defaultServerName)) onSaved()
                     },
                     modifier = Modifier.weight(1f),
                 ) {

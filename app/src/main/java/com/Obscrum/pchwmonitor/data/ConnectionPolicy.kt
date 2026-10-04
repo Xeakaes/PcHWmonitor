@@ -44,8 +44,8 @@ fun planConnections(
             if (id !in desired) {
                 add(id)
             } else {
-                val wanted = desiredById[id]
-                if (wanted != null && current.getValue(id).connSignature() != wanted.connSignature()) {
+                val wanted = desiredById.getValue(id)
+                if (current.getValue(id).connSignature() != wanted.connSignature()) {
                     add(id)
                 }
             }
