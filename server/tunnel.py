@@ -72,16 +72,26 @@ class TunnelManager:
     ) -> None:
         self._finder = cloudflared_finder if cloudflared_finder is not None else _find_cloudflared
         self.config_dir = config_dir
-        self.cert_path = cert_path
+        self._cert_path = cert_path
         self.bootstrap_timeout = bootstrap_timeout
-        self._on_state = on_state
-        self._on_url = on_url
+        self._state_listeners: list[Callable[[TunnelState], None]] = []
+        self._url_listeners: list[Callable[[str], None]] = []
+        if on_state is not None:
+            self._state_listeners.append(on_state)
+        if on_url is not None:
+            self._url_listeners.append(on_url)
         self._lock = threading.Lock()
         self._process: subprocess.Popen | None = None
         self._state = TunnelState.OFF
         self._url: str | None = None
         self._tunnel_name: str | None = None
         self._last_error: str | None = None
+
+    @property
+    def cert_path(self) -> Path:
+        if self._cert_path is None:
+            return Path.home() / ".cloudflared" / "cert.pem"
+        return self._cert_path
 
     @property
     def state(self) -> TunnelState:
@@ -106,6 +116,14 @@ class TunnelManager:
 
     def has_cloudflared(self) -> bool:
         return self._finder() is not None
+
+    def add_state_listener(self, listener: Callable[[TunnelState], None]) -> None:
+        """Register an additional on_state subscriber (ctor callbacks are the first)."""
+        self._state_listeners.append(listener)
+
+    def add_url_listener(self, listener: Callable[[str], None]) -> None:
+        """Register an additional on_url subscriber (ctor callbacks are the first)."""
+        self._url_listeners.append(listener)
 
     def start_quick(self, port: int) -> bool:
         if self.is_running:
@@ -175,7 +193,7 @@ class TunnelManager:
         if cloudflared is None:
             self._set_state(TunnelState.ERROR, "cloudflared not found")
             return False
-        if self.cert_path is None or not Path(self.cert_path).exists():
+        if not Path(self.cert_path).exists():
             self._set_state(TunnelState.ERROR, "Cloudflare login required")
             return False
         cfg_dir = self._resolved_config_dir()
@@ -267,7 +285,7 @@ class TunnelManager:
         except Exception as e:
             logger.error("cloudflared login failed: %s", e)
             return False
-        return self.cert_path is not None and Path(self.cert_path).exists()
+        return Path(self.cert_path).exists()
 
     def get_config(self) -> "TunnelConfig":
         return load_tunnel_config(self._resolved_config_dir())
@@ -334,24 +352,22 @@ class TunnelManager:
         self._fire_state(state)
 
     def _fire_state(self, state: TunnelState) -> None:
-        if self._on_state is None:
-            return
-        try:
-            self._on_state(state)
-        except Exception:
-            logger.exception("on_state subscriber raised")
+        for listener in list(self._state_listeners):
+            try:
+                listener(state)
+            except Exception:
+                logger.exception("on_state subscriber raised")
 
     def _set_url(self, url: str) -> None:
         with self._lock:
             if self._url is not None:
                 return
             self._url = url
-        if self._on_url is None:
-            return
-        try:
-            self._on_url(url)
-        except Exception:
-            logger.exception("on_url subscriber raised")
+        for listener in list(self._url_listeners):
+            try:
+                listener(url)
+            except Exception:
+                logger.exception("on_url subscriber raised")
 
     def _read_output(self, process: subprocess.Popen) -> None:
         for raw_line in process.stdout:

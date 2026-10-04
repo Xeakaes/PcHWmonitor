@@ -105,9 +105,7 @@ def _run_tray(stop_event: threading.Event, token: str | None, port: int, tunnel:
         if not tunnel.has_cloudflared():
             icon.notify("cloudflared.exe not found.\nPlace it next to PcHwMonitor.exe.", "PC HW Monitor")
             return
-        ok = tunnel.start_quick(port)
-        if not ok:
-            icon.notify(f"Failed: {tunnel.last_error}", "PC HW Monitor")
+        tunnel.start_quick(port)
 
     def _start_named_tunnel(icon, item):
         if tunnel.is_running:
@@ -310,8 +308,8 @@ def _run_tray(stop_event: threading.Event, token: str | None, port: int, tunnel:
         pystray.MenuItem("Exit", _show_exit),
     )
     icon = pystray.Icon("PcHwMonitor", _tray_image(), "PC HW Monitor", menu)
-    tunnel._on_url = lambda u: icon.notify(f"Tunnel ready:\n{u}", "PC HW Monitor")
-    tunnel._on_state = (
+    tunnel.add_url_listener(lambda u: icon.notify(f"Tunnel ready:\n{u}", "PC HW Monitor"))
+    tunnel.add_state_listener(
         lambda s: icon.notify(f"Tunnel error:\n{tunnel.last_error}", "PC HW Monitor")
         if s is TunnelState.ERROR
         else None

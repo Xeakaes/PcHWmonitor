@@ -579,3 +579,48 @@ def test_tray_headless_and_accepts_shared_manager():
     import tray  # must import without pystray/tkinter/display (lazy imports stay lazy)
     sig = inspect.signature(tray._run_with_tray)
     assert "tunnel_manager" in sig.parameters
+
+
+def test_cert_path_defaults_lazily(tmp_path):
+    mgr = TunnelManager(cloudflared_finder=lambda: None, config_dir=tmp_path / "cfg")
+    assert mgr.cert_path == Path.home() / ".cloudflared" / "cert.pem"
+
+
+def test_ctor_and_added_listeners_both_fire(tmp_path):
+    shim = write_shim(
+        tmp_path,
+        "print('https://fanout-test.trycloudflare.com', flush=True)\n"
+        "import time\n"
+        "time.sleep(60)\n",
+    )
+    ctor_urls, added_urls = [], []
+    ctor_states, added_states = [], []
+    url_event = threading.Event()
+    state_event = threading.Event()
+
+    def ctor_on_state(state: TunnelState) -> None:
+        ctor_states.append(state)
+        if state is TunnelState.RUNNING:
+            state_event.set()
+
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        on_state=ctor_on_state,
+        on_url=lambda url: (ctor_urls.append(url), url_event.set()),
+    )
+    mgr.add_state_listener(added_states.append)
+    mgr.add_url_listener(added_urls.append)
+
+    assert mgr.start_quick(8765) is True
+    assert state_event.wait(timeout=5)
+    assert url_event.wait(timeout=5)
+    # (a) url fan-out: ctor subscriber AND added subscriber both fired
+    assert ctor_urls == ["https://fanout-test.trycloudflare.com"]
+    assert added_urls == ["https://fanout-test.trycloudflare.com"]
+    # (b) state fan-out: both saw RUNNING, both see OFF on stop
+    assert TunnelState.RUNNING in ctor_states
+    assert TunnelState.RUNNING in added_states
+    mgr.stop()
+    assert TunnelState.OFF in ctor_states
+    assert TunnelState.OFF in added_states
