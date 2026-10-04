@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -50,6 +51,11 @@ import androidx.compose.ui.unit.dp
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.domain.model.SystemStatus
 import com.Obscrum.pchwmonitor.ui.components.ConnectionBar
+
+private val editSnapshotSaver = Saver<DashboardLayout?, String>(
+    save = { it?.toJson() },
+    restore = { s -> DashboardLayout().fromJson(s) },
+)
 
 @Composable
 fun DashboardScreen(
@@ -113,9 +119,13 @@ fun DashboardScreen(
         val sizeClass = sizeClassForWidth(maxWidth)
         val plan = layoutDashboard(layout, sizeClass, maxWidth, landscape, maxHeight)
         var fpsDetailsOpen by rememberSaveable { mutableStateOf(false) }
-        var editSnapshot by remember { mutableStateOf<DashboardLayout?>(null) }
+        var editSnapshot by rememberSaveable(stateSaver = editSnapshotSaver) { mutableStateOf<DashboardLayout?>(null) }
         LaunchedEffect(editMode) {
-            editSnapshot = if (editMode) layout else null
+            if (editMode) {
+                if (editSnapshot == null) editSnapshot = layout
+            } else {
+                editSnapshot = null
+            }
         }
 
         // Background image for glassmorphism
