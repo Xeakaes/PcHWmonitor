@@ -80,7 +80,6 @@ class WebSocketClient(
                 continue
             }
             ws = socket
-            _connectionState.value = ConnectionState.CONNECTED
             backoffMs = 1000L
             closedEvents.receive()
             ws = null
@@ -107,6 +106,7 @@ class WebSocketClient(
 
     private fun listener() = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
+            _connectionState.value = ConnectionState.CONNECTED
             pendingToken?.takeIf { it.isNotBlank() }?.let { token ->
                 val escaped = token.replace("\\", "\\\\").replace("\"", "\\\"")
                 webSocket.send("""{"type":"auth","token":"$escaped"}""")
