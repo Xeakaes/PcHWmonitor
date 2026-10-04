@@ -63,6 +63,7 @@ fun ServersScreen(
     val pendingDelete = servers.find { it.id == pendingDeleteId }
     val activeServer = servers.find { it.id == activeServerId }
     val qrPrompt = stringResource(R.string.servers_qr_action)
+    val defaultServerName = stringResource(R.string.default_server_name)
 
     val qrLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
         result.contents?.let { text ->
@@ -84,7 +85,7 @@ fun ServersScreen(
         )
         ConnectionBar(
             state = connectionState ?: ConnectionState.DISCONNECTED,
-            serverName = activeServer?.name,
+            serverName = activeServer?.name?.ifBlank { defaultServerName },
             labelConnecting = stringResource(R.string.connecting),
             labelConnected = stringResource(R.string.connected),
             labelDisconnected = stringResource(R.string.disconnected),
@@ -165,7 +166,7 @@ fun ServersScreen(
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = server.name,
+                                text = server.name.ifBlank { defaultServerName },
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                             )
@@ -200,7 +201,10 @@ fun ServersScreen(
             title = { Text(text = stringResource(R.string.servers_delete_confirm_title)) },
             text = {
                 Text(
-                    text = stringResource(R.string.servers_delete_confirm_message, pendingDelete.name),
+                    text = stringResource(
+                        R.string.servers_delete_confirm_message,
+                        pendingDelete.name.ifBlank { defaultServerName },
+                    ),
                 )
             },
             confirmButton = {

@@ -153,7 +153,9 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                                         Tab(
                                             selected = server.id == activeServerId,
                                             onClick = { viewModel.setActiveServer(server.id) },
-                                            text = { Text(server.name) },
+                                            text = {
+                                                Text(server.name.ifBlank { stringResource(R.string.default_server_name) })
+                                            },
                                         )
                                     }
                                 }
@@ -207,6 +209,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                                 labelNetDownload = stringResource(R.string.net_download),
                                 labelNetUpload = stringResource(R.string.net_upload),
                                 labelFan = stringResource(R.string.fan_card_title),
+                                labelDefaultServerName = stringResource(R.string.default_server_name),
                                 customBackgroundBitmap = customBackgroundBitmap,
                                 glassmorphism = glassmorphism,
                             )

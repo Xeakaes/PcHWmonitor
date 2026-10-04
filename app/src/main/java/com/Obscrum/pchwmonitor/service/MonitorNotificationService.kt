@@ -132,7 +132,10 @@ class MonitorNotificationService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(_serverName.value ?: getString(R.string.app_name))
+            .setContentTitle(
+                _serverName.value?.ifBlank { getString(R.string.default_server_name) }
+                    ?: getString(R.string.app_name),
+            )
             .setContentText(contentText)
             .setStyle(NotificationCompat.BigTextStyle().bigText(expandedText))
             .setOngoing(true)
@@ -145,18 +148,18 @@ class MonitorNotificationService : Service() {
     private fun buildMetricsText(status: SystemStatus): String {
         val parts = mutableListOf<String>()
         status.cpu?.let { cpu ->
-            cpu.usagePct?.let { parts.add("CPU: %.0f%%".format(it)) }
-            cpu.tempC?.let { parts.add("CPU: %.0f°C".format(it)) }
+            cpu.usagePct?.let { parts.add(getString(R.string.notif_cpu_usage, it)) }
+            cpu.tempC?.let { parts.add(getString(R.string.notif_cpu_temp, it)) }
         }
         status.gpu?.let { gpu ->
-            gpu.tempC?.let { parts.add("GPU: %.0f°C".format(it)) }
-            gpu.hotspotC?.let { parts.add("GPU Hot: %.0f°C".format(it)) }
+            gpu.tempC?.let { parts.add(getString(R.string.notif_gpu_temp, it)) }
+            gpu.hotspotC?.let { parts.add(getString(R.string.notif_gpu_hotspot, it)) }
         }
         status.ram?.let { ram ->
-            ram.usagePct?.let { parts.add("RAM: %.0f%%".format(it)) }
+            ram.usagePct?.let { parts.add(getString(R.string.notif_ram_usage, it)) }
         }
         status.fps?.let { fps ->
-            fps.current?.let { parts.add("FPS: %.0f".format(it)) }
+            fps.current?.let { parts.add(getString(R.string.notif_fps, it)) }
         }
         return parts.joinToString(" · ").ifEmpty { getString(R.string.notification_waiting_data) }
     }
@@ -164,29 +167,29 @@ class MonitorNotificationService : Service() {
     private fun buildExpandedText(status: SystemStatus): String {
         val lines = mutableListOf<String>()
         status.cpu?.let { cpu ->
-            lines.add("── CPU ──")
-            cpu.usagePct?.let { lines.add("  Kullanım: %.0f%%".format(it)) }
-            cpu.tempC?.let { lines.add("  Sıcaklık: %.0f°C".format(it)) }
-            cpu.clockMhz?.let { lines.add("  Frekans: %.0f MHz".format(it)) }
-            cpu.powerW?.let { lines.add("  Güç: %.1f W".format(it)) }
+            lines.add(getString(R.string.notif_section_cpu))
+            cpu.usagePct?.let { lines.add("  " + getString(R.string.notif_label_usage, it)) }
+            cpu.tempC?.let { lines.add("  " + getString(R.string.notif_label_temp, it)) }
+            cpu.clockMhz?.let { lines.add("  " + getString(R.string.notif_label_freq, it)) }
+            cpu.powerW?.let { lines.add("  " + getString(R.string.notif_label_power, it)) }
         }
         status.gpu?.let { gpu ->
-            lines.add("── GPU ──")
-            gpu.tempC?.let { lines.add("  Sıcaklık: %.0f°C".format(it)) }
-            gpu.hotspotC?.let { lines.add("  Hotspot: %.0f°C".format(it)) }
-            gpu.usagePct?.let { lines.add("  Kullanım: %.0f%%".format(it)) }
-            gpu.coreClockMhz?.let { lines.add("  Frekans: %.0f MHz".format(it)) }
-            gpu.powerW?.let { lines.add("  Güç: %.1f W".format(it)) }
+            lines.add(getString(R.string.notif_section_gpu))
+            gpu.tempC?.let { lines.add("  " + getString(R.string.notif_label_temp, it)) }
+            gpu.hotspotC?.let { lines.add("  " + getString(R.string.notif_label_hotspot, it)) }
+            gpu.usagePct?.let { lines.add("  " + getString(R.string.notif_label_usage, it)) }
+            gpu.coreClockMhz?.let { lines.add("  " + getString(R.string.notif_label_freq, it)) }
+            gpu.powerW?.let { lines.add("  " + getString(R.string.notif_label_power, it)) }
         }
         status.ram?.let { ram ->
-            lines.add("── RAM ──")
-            ram.usagePct?.let { lines.add("  Kullanım: %.0f%%".format(it)) }
-            ram.usedGb?.let { lines.add("  Kullanılan: %.1f GB".format(it)) }
+            lines.add(getString(R.string.notif_section_ram))
+            ram.usagePct?.let { lines.add("  " + getString(R.string.notif_label_usage, it)) }
+            ram.usedGb?.let { lines.add("  " + getString(R.string.notif_label_used, it)) }
         }
         status.fps?.let { fps ->
-            lines.add("── FPS ──")
-            fps.current?.let { lines.add("  FPS: %.0f".format(it)) }
-            fps.onePercentLow?.let { lines.add("  1%% Low: %.0f".format(it)) }
+            lines.add(getString(R.string.notif_section_fps))
+            fps.current?.let { lines.add("  " + getString(R.string.notif_line_fps, it)) }
+            fps.onePercentLow?.let { lines.add("  " + getString(R.string.notif_line_low1, it)) }
         }
         return lines.joinToString("\n").ifEmpty { getString(R.string.notification_waiting_data) }
     }

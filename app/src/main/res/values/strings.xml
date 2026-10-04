@@ -167,4 +167,23 @@
     <string name="err_invalid_port">Port must be a number between 1 and 65535</string>
     <string name="err_duplicate_name">A server with this name already exists</string>
     <string name="default_server_name">PC</string>
+    <string name="notif_cpu_usage">CPU: %1$.0f%%</string>
+    <string name="notif_cpu_temp">CPU: %1$.0f°C</string>
+    <string name="notif_gpu_temp">GPU: %1$.0f°C</string>
+    <string name="notif_gpu_hotspot">GPU Hot: %1$.0f°C</string>
+    <string name="notif_ram_usage">RAM: %1$.0f%%</string>
+    <string name="notif_fps">FPS: %1$.0f</string>
+    <string name="notif_section_cpu">── CPU ──</string>
+    <string name="notif_section_gpu">── GPU ──</string>
+    <string name="notif_section_ram">── RAM ──</string>
+    <string name="notif_section_fps">── FPS ──</string>
+    <string name="notif_label_usage">Usage: %1$.0f%%</string>
+    <string name="notif_label_temp">Temp: %1$.0f°C</string>
+    <string name="notif_label_freq">Frequency: %1$.0f MHz</string>
+    <string name="notif_label_power">Power: %1$.1f W</string>
+    <string name="notif_label_hotspot">Hotspot: %1$.0f°C</string>
+    <string name="notif_label_used">Used: %1$.1f GB</string>
+    <string name="notif_line_fps">FPS: %1$.0f</string>
+    <string name="notif_line_low1">1%% Low: %1$.0f</string>
+    <string name="unknown_device">Unknown</string>
 </resources>

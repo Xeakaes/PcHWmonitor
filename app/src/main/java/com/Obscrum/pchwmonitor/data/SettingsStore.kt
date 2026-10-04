@@ -62,7 +62,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
                 val legacyIp = prefs[keyIp] ?: "192.168.1.100"
                 val legacyPort = prefs[keyPort] ?: 8765
                 val legacyToken = prefs[keyAuthToken]?.takeIf { it.isNotBlank() }
-                val migrated = listOf(ServerConfig(id = "default", name = "My PC", ip = legacyIp, port = legacyPort, token = legacyToken))
+                val migrated = listOf(ServerConfig(id = "default", name = "", ip = legacyIp, port = legacyPort, token = legacyToken))
                 // Write back migration
                 dataStore.edit { it[keyServersJson] = json.encodeToString(migrated) }
                 migrated

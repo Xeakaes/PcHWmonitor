@@ -56,6 +56,7 @@ fun ServerEditScreen(
     val issues by viewModel.issues.collectAsState()
 
     val defaultServerName = stringResource(R.string.default_server_name)
+    val unknownDevice = stringResource(R.string.unknown_device)
     val qrPrompt = stringResource(R.string.qr_scan)
 
     val qrLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
@@ -177,7 +178,7 @@ fun ServerEditScreen(
             if (discoveredServers.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 discoveredServers.forEach { (foundName, foundIp, foundPort) ->
-                    val label = "$foundName ($foundIp:$foundPort)"
+                    val label = "${foundName.ifBlank { unknownDevice }} ($foundIp:$foundPort)"
                     Button(
                         onClick = {
                             viewModel.ip.value = foundIp

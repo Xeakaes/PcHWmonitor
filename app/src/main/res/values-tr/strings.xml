@@ -167,4 +167,23 @@
     <string name="err_invalid_port">Port 1 ile 65535 arasında bir sayı olmalıdır</string>
     <string name="err_duplicate_name">Bu adda bir sunucu zaten var</string>
     <string name="default_server_name">PC</string>
+    <string name="notif_cpu_usage">CPU: %1$.0f%%</string>
+    <string name="notif_cpu_temp">CPU: %1$.0f°C</string>
+    <string name="notif_gpu_temp">GPU: %1$.0f°C</string>
+    <string name="notif_gpu_hotspot">GPU sıcak nokta: %1$.0f°C</string>
+    <string name="notif_ram_usage">RAM: %1$.0f%%</string>
+    <string name="notif_fps">FPS: %1$.0f</string>
+    <string name="notif_section_cpu">── CPU ──</string>
+    <string name="notif_section_gpu">── GPU ──</string>
+    <string name="notif_section_ram">── RAM ──</string>
+    <string name="notif_section_fps">── FPS ──</string>
+    <string name="notif_label_usage">Kullanım: %1$.0f%%</string>
+    <string name="notif_label_temp">Sıcaklık: %1$.0f°C</string>
+    <string name="notif_label_freq">Frekans: %1$.0f MHz</string>
+    <string name="notif_label_power">Güç: %1$.1f W</string>
+    <string name="notif_label_hotspot">Sıcak nokta: %1$.0f°C</string>
+    <string name="notif_label_used">Kullanılan: %1$.1f GB</string>
+    <string name="notif_line_fps">FPS: %1$.0f</string>
+    <string name="notif_line_low1">1%% düşük: %1$.0f</string>
+    <string name="unknown_device">Bilinmeyen cihaz</string>
 </resources>

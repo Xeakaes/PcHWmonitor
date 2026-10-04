@@ -96,6 +96,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val activeServer = servers.find { it.id == activeServerId }
+    val defaultServerName = stringResource(R.string.default_server_name)
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
@@ -118,7 +119,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(8.dp))
         ConnectionBar(
             state = connection,
-            serverName = activeServer?.name,
+            serverName = activeServer?.name?.ifBlank { defaultServerName },
             labelConnecting = labelConnecting,
             labelConnected = labelConnected,
             labelDisconnected = labelDisconnected,

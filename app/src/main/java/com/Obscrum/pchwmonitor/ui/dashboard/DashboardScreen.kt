@@ -107,6 +107,7 @@ fun DashboardScreen(
     labelHiddenCards: String = "",
     labelCardWidthHalf: String = "",
     labelCardWidthFull: String = "",
+    labelDefaultServerName: String = "",
     chartWindowSeconds: Int = 60,
     fpsChartMax: Float = 360f,
     diskChartMax: Float = 200f,
@@ -156,7 +157,7 @@ fun DashboardScreen(
             item {
                 ConnectionBar(
                     state = connection,
-                    serverName = status?.pc?.name,
+                    serverName = status?.pc?.name?.ifBlank { labelDefaultServerName },
                     labelConnecting = labelConnecting,
                     labelConnected = labelConnected,
                     labelDisconnected = labelDisconnected,

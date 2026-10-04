@@ -78,7 +78,7 @@ class DiscoveryService(
 
                         if (json.optString("magic") == MAGIC) {
                             val server = DiscoveredServer(
-                                name = json.optString("name", "Unknown"),
+                                name = json.optString("name", ""),
                                 ip = json.optString("ip", ""),
                                 port = json.optInt("port", 8765),
                                 version = json.optString("version", "unknown"),

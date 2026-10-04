@@ -167,4 +167,23 @@
     <string name="err_invalid_port">De poort moet een getal tussen 1 en 65535 zijn</string>
     <string name="err_duplicate_name">Er bestaat al een server met deze naam</string>
     <string name="default_server_name">PC</string>
+    <string name="notif_cpu_usage">CPU: %1$.0f%%</string>
+    <string name="notif_cpu_temp">CPU: %1$.0f°C</string>
+    <string name="notif_gpu_temp">GPU: %1$.0f°C</string>
+    <string name="notif_gpu_hotspot">GPU-hotspot: %1$.0f°C</string>
+    <string name="notif_ram_usage">RAM: %1$.0f%%</string>
+    <string name="notif_fps">FPS: %1$.0f</string>
+    <string name="notif_section_cpu">── CPU ──</string>
+    <string name="notif_section_gpu">── GPU ──</string>
+    <string name="notif_section_ram">── RAM ──</string>
+    <string name="notif_section_fps">── FPS ──</string>
+    <string name="notif_label_usage">Gebruik: %1$.0f%%</string>
+    <string name="notif_label_temp">Temperatuur: %1$.0f°C</string>
+    <string name="notif_label_freq">Frequentie: %1$.0f MHz</string>
+    <string name="notif_label_power">Vermogen: %1$.1f W</string>
+    <string name="notif_label_hotspot">Hotspot: %1$.0f°C</string>
+    <string name="notif_label_used">Gebruikt: %1$.1f GB</string>
+    <string name="notif_line_fps">FPS: %1$.0f</string>
+    <string name="notif_line_low1">1 %% laag: %1$.0f</string>
+    <string name="unknown_device">Onbekend apparaat</string>
 </resources>

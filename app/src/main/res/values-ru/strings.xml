@@ -167,4 +167,23 @@
     <string name="err_invalid_port">Порт должен быть числом от 1 до 65535</string>
     <string name="err_duplicate_name">Сервер с таким именем уже существует</string>
     <string name="default_server_name">ПК</string>
+    <string name="notif_cpu_usage">CPU: %1$.0f%%</string>
+    <string name="notif_cpu_temp">CPU: %1$.0f°C</string>
+    <string name="notif_gpu_temp">GPU: %1$.0f°C</string>
+    <string name="notif_gpu_hotspot">Горячая точка GPU: %1$.0f°C</string>
+    <string name="notif_ram_usage">RAM: %1$.0f%%</string>
+    <string name="notif_fps">FPS: %1$.0f</string>
+    <string name="notif_section_cpu">── CPU ──</string>
+    <string name="notif_section_gpu">── GPU ──</string>
+    <string name="notif_section_ram">── RAM ──</string>
+    <string name="notif_section_fps">── FPS ──</string>
+    <string name="notif_label_usage">Нагрузка: %1$.0f%%</string>
+    <string name="notif_label_temp">Температура: %1$.0f°C</string>
+    <string name="notif_label_freq">Частота: %1$.0f MHz</string>
+    <string name="notif_label_power">Мощность: %1$.1f W</string>
+    <string name="notif_label_hotspot">Горячая точка: %1$.0f°C</string>
+    <string name="notif_label_used">Занято: %1$.1f GB</string>
+    <string name="notif_line_fps">FPS: %1$.0f</string>
+    <string name="notif_line_low1">1 %% низких: %1$.0f</string>
+    <string name="unknown_device">Неизвестное устройство</string>
 </resources>

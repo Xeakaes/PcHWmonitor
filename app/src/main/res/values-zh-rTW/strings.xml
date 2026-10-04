@@ -167,4 +167,23 @@
     <string name="err_invalid_port">連接埠必須是 1 到 65535 之間的數字</string>
     <string name="err_duplicate_name">已存在相同名稱的伺服器</string>
     <string name="default_server_name">電腦</string>
+    <string name="notif_cpu_usage">CPU: %1$.0f%%</string>
+    <string name="notif_cpu_temp">CPU: %1$.0f°C</string>
+    <string name="notif_gpu_temp">GPU: %1$.0f°C</string>
+    <string name="notif_gpu_hotspot">GPU 熱點: %1$.0f°C</string>
+    <string name="notif_ram_usage">RAM: %1$.0f%%</string>
+    <string name="notif_fps">FPS: %1$.0f</string>
+    <string name="notif_section_cpu">── CPU ──</string>
+    <string name="notif_section_gpu">── GPU ──</string>
+    <string name="notif_section_ram">── RAM ──</string>
+    <string name="notif_section_fps">── FPS ──</string>
+    <string name="notif_label_usage">使用率: %1$.0f%%</string>
+    <string name="notif_label_temp">溫度: %1$.0f°C</string>
+    <string name="notif_label_freq">頻率: %1$.0f MHz</string>
+    <string name="notif_label_power">功耗: %1$.1f W</string>
+    <string name="notif_label_hotspot">熱點: %1$.0f°C</string>
+    <string name="notif_label_used">已用: %1$.1f GB</string>
+    <string name="notif_line_fps">FPS: %1$.0f</string>
+    <string name="notif_line_low1">1%% 低帧: %1$.0f</string>
+    <string name="unknown_device">未知裝置</string>
 </resources>
