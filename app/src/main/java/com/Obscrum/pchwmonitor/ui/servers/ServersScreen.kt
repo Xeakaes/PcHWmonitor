@@ -57,6 +57,7 @@ fun ServersScreen(
     onDelete: (String) -> Unit,
     onQrPayload: (QrPayload.Result) -> Unit,
     onAddManual: () -> Unit,
+    errorMessage: String? = null,
 ) {
     var pendingDeleteId by remember { mutableStateOf<String?>(null) }
     val pendingDelete = servers.find { it.id == pendingDeleteId }
@@ -88,6 +89,14 @@ fun ServersScreen(
             labelConnected = stringResource(R.string.connected),
             labelDisconnected = stringResource(R.string.disconnected),
         )
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+        }
         Column(
             modifier = Modifier
                 .weight(1f)

@@ -256,12 +256,6 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun disconnect() = _controllers.values.forEach { it.disconnect() }
 
-    fun savePreferences(theme: ThemeMode, language: String?, chartWindowSeconds: Int, themePaletteId: String) {
-        viewModelScope.launch {
-            settingsStore.savePreferences(theme, language, chartWindowSeconds, themePaletteId)
-        }
-    }
-
     suspend fun historySamples(start: Long): List<HistorySample> {
         val activeId = _activeServerId.value ?: return emptyList()
         return _controllers[activeId]?.historySamples(start) ?: emptyList()

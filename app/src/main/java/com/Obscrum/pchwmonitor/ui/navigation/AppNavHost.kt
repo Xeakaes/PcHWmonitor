@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,6 +61,7 @@ import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
 import com.Obscrum.pchwmonitor.ui.settings.SettingsScreen
+import com.Obscrum.pchwmonitor.ui.resolveError
 
 private data class NavItem(
     val route: String,
@@ -316,6 +318,8 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val servers by viewModel.servers.collectAsState()
                     val activeServerId by viewModel.activeServerId.collectAsState()
                     val activeConnection by viewModel.activeConnection.collectAsState()
+                    val context = LocalContext.current
+                    val errorMessage = viewModel.lastError.collectAsState().value?.let { context.resolveError(it) }
                     ServersScreen(
                         servers = servers,
                         activeServerId = activeServerId,
@@ -326,6 +330,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onDelete = viewModel::removeServer,
                         onQrPayload = viewModel::connectViaQr,
                         onAddManual = { navController.navigate("server_edit") },
+                        errorMessage = errorMessage,
                     )
                 }
                 composable(
