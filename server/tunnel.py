@@ -51,6 +51,12 @@ class TunnelState(Enum):
     ERROR = "error"
 
 
+@dataclass
+class TunnelInfo:
+    id: str
+    name: str
+
+
 class TunnelManager:
     """Owns one cloudflared subprocess: quick tunnel, state, lifecycle."""
 
@@ -134,6 +140,170 @@ class TunnelManager:
             name="tunnel-reader",
         ).start()
         return True
+
+    def list_tunnels(self, timeout: float | None = None) -> list[TunnelInfo]:
+        cloudflared = self._finder()
+        if cloudflared is None:
+            return []
+        limit = self.bootstrap_timeout if timeout is None else timeout
+        try:
+            result = subprocess.run(
+                [str(cloudflared), "tunnel", "list"],
+                capture_output=True,
+                text=True,
+                timeout=limit,
+            )
+        except (subprocess.TimeoutExpired, OSError) as e:
+            logger.debug("tunnel list failed: %s", e)
+            return []
+        if result.returncode != 0:
+            return []
+        tunnels: list[TunnelInfo] = []
+        for line in (result.stdout or "").splitlines():
+            if line.startswith("ID") or line.startswith("---") or not line.strip():
+                continue
+            parts = line.split()
+            if len(parts) >= 2:
+                tunnels.append(TunnelInfo(id=parts[0], name=parts[1]))
+        return tunnels
+
+    def start_named(self, name: str, hostname: str, port: int) -> bool:
+        # Single-start design: only the caller thread and the output reader mutate state.
+        if self.is_running:
+            return False
+        cloudflared = self._finder()
+        if cloudflared is None:
+            self._set_state(TunnelState.ERROR, "cloudflared not found")
+            return False
+        if self.cert_path is None or not Path(self.cert_path).exists():
+            self._set_state(TunnelState.ERROR, "Cloudflare login required")
+            return False
+        cfg_dir = self._resolved_config_dir()
+        process: subprocess.Popen | None = None
+        try:
+            tunnel_id = self._ensure_tunnel(cloudflared, name)
+            if tunnel_id is None:
+                return False
+            cfg_path = write_ingress_config(cfg_dir, tunnel_id, hostname, port)
+            if not route_dns(
+                cloudflared, name, hostname, timeout=self.bootstrap_timeout
+            ):
+                self._set_state(
+                    TunnelState.ERROR, f"DNS route failed for {hostname}"
+                )
+                return False
+            process = subprocess.Popen(
+                [str(cloudflared), "tunnel", "run", "--config", str(cfg_path), name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+        except Exception as e:
+            if process is not None and process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                except Exception:
+                    process.kill()
+            self._set_state(TunnelState.ERROR, str(e))
+            return False
+        with self._lock:
+            self._process = process
+            self._tunnel_name = name
+            self._url = None
+            self._last_error = None
+            self._state = TunnelState.RUNNING
+        self._fire_state(TunnelState.RUNNING)
+        self._set_url(f"https://{hostname}")
+        previous = load_tunnel_config(cfg_dir)
+        save_tunnel_config(
+            cfg_dir,
+            TunnelConfig(tunnel_id, name, hostname, previous.auto_start),
+        )
+        threading.Thread(
+            target=self._read_output,
+            args=(process,),
+            daemon=True,
+            name="tunnel-reader",
+        ).start()
+        return True
+
+    def apply_auto_start(self, port: int) -> bool:
+        # Synchronous (caller threads it); an already-running tunnel wins (spec 4.3).
+        if self.is_running:
+            return False
+        cfg = self.get_config()
+        if not (cfg.auto_start and cfg.tunnel_name and cfg.hostname):
+            return False
+        return self.start_named(cfg.tunnel_name, cfg.hostname, port)
+
+    def login(self) -> bool:
+        cloudflared = self._finder()
+        if cloudflared is None:
+            return False
+        try:
+            import webbrowser
+
+            process = subprocess.Popen(
+                [str(cloudflared), "tunnel", "login"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            url_opened = False
+            for raw_line in process.stdout:
+                line = raw_line.strip()
+                logger.info("cloudflared login: %s", line)
+                if url_opened or "https://" not in line:
+                    continue
+                for word in line.split():
+                    word = word.rstrip(",/.;")
+                    if word.startswith("https://") and "cloudflare" in word:
+                        webbrowser.open(word)
+                        url_opened = True
+                        logger.info("opened login URL: %s", word)
+                        break
+            process.wait()
+        except Exception as e:
+            logger.error("cloudflared login failed: %s", e)
+            return False
+        return self.cert_path is not None and Path(self.cert_path).exists()
+
+    def get_config(self) -> "TunnelConfig":
+        return load_tunnel_config(self._resolved_config_dir())
+
+    def set_auto_start(self, enabled: bool) -> None:
+        cfg = self.get_config()
+        cfg.auto_start = enabled
+        save_tunnel_config(self._resolved_config_dir(), cfg)
+
+    def _resolved_config_dir(self) -> Path:
+        return self.config_dir if self.config_dir is not None else default_config_dir()
+
+    def _ensure_tunnel(self, cloudflared: Path, name: str) -> str | None:
+        for info in self.list_tunnels(timeout=self.bootstrap_timeout):
+            if info.name == name:
+                return info.id
+        result = subprocess.run(
+            [str(cloudflared), "tunnel", "create", name],
+            capture_output=True,
+            text=True,
+            timeout=self.bootstrap_timeout,
+        )
+        output = ((result.stdout or "") + (result.stderr or "")).strip()
+        if result.returncode != 0:
+            self._set_state(
+                TunnelState.ERROR,
+                output[-200:] or f"tunnel create failed ({result.returncode})",
+            )
+            return None
+        tunnel_id = parse_tunnel_id(output)
+        if tunnel_id is None:
+            self._set_state(
+                TunnelState.ERROR, output[-200:] or "could not parse tunnel id"
+            )
+            return None
+        return tunnel_id
 
     def stop(self) -> None:
         process = self._process

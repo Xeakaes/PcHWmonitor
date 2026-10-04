@@ -25,6 +25,40 @@ def write_shim(tmp_path, body: str) -> Path:
     return p
 
 
+def logged_shim(tmp_path, body: str) -> Path:
+    """Shim that appends its argv (minus program name) to calls.log, then runs body."""
+    calls = tmp_path / "calls.log"
+    prefix = (
+        "import sys, time\n"
+        f"with open({str(calls)!r}, 'a') as fh:\n"
+        "    fh.write(' '.join(sys.argv[1:]) + '\\n')\n"
+    )
+    return write_shim(tmp_path, prefix + body)
+
+
+def wait_for_calls(tmp_path, needle: str, timeout: float = 5.0) -> str:
+    """Poll calls.log until needle appears — shims log asynchronously after spawn."""
+    path = tmp_path / "calls.log"
+    deadline = time.monotonic() + timeout
+    while True:
+        text = path.read_text(encoding="utf-8") if path.exists() else ""
+        if needle in text or time.monotonic() >= deadline:
+            return text
+        time.sleep(0.05)
+
+
+EXISTING_TUNNEL_LIST = (
+    'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+    '    print("ID                                   NAME     CREATED")\n'
+    '    print("------------------------------------ -------- ----------")\n'
+    '    print("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee pc       2026-01-01")\n'
+    'elif sys.argv[1:3] == ["tunnel", "route"]:\n'
+    '    print("Updated pc.example.com route")\n'
+    "else:\n"
+    "    time.sleep(60)\n"
+)
+
+
 def test_start_quick_reaches_running_and_reports_url(tmp_path):
     shim = write_shim(
         tmp_path,
@@ -242,3 +276,299 @@ def test_route_dns_tolerates_already_exists(tmp_path):
     ok_dir.mkdir()
     shim_ok = write_shim(ok_dir, "print('ok')\n")
     assert route_dns(shim_ok, "pc", "pc.example.com") is True
+
+
+def test_start_named_existing_tunnel_no_create_and_ingress_written(tmp_path):
+    shim = logged_shim(tmp_path, EXISTING_TUNNEL_LIST)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    urls = []
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+        on_url=urls.append,
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is True
+    assert mgr.state is TunnelState.RUNNING
+    assert mgr.url == "https://pc.example.com"
+    assert urls == ["https://pc.example.com"]
+
+    cfg = load_tunnel_config(cfg_dir)
+    assert cfg.tunnel_name == "pc"
+    assert cfg.tunnel_id == "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+    assert cfg.hostname == "pc.example.com"
+    assert cfg.auto_start is False
+
+    config_text = (cfg_dir / "cloudflared" / "config.yml").read_text(encoding="utf-8")
+    assert config_text == (
+        "tunnel: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\n"
+        "ingress:\n"
+        "  - hostname: pc.example.com\n"
+        "    service: http://localhost:8765\n"
+        "  - service: http_status:404\n"
+    )
+
+    calls = wait_for_calls(tmp_path, "tunnel run --config")
+    assert "tunnel run --config" in calls
+    assert "tunnel create" not in calls
+
+    mgr.stop()
+
+
+def test_ingress_rewritten_with_current_port(tmp_path):
+    shim = logged_shim(tmp_path, EXISTING_TUNNEL_LIST)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is True
+    first = (cfg_dir / "cloudflared" / "config.yml").read_text(encoding="utf-8")
+    assert "localhost:8765" in first
+    mgr.stop()
+
+    assert mgr.start_named("pc", "pc.example.com", 9999) is True
+    second = (cfg_dir / "cloudflared" / "config.yml").read_text(encoding="utf-8")
+    assert "localhost:9999" in second
+    assert "8765" not in second
+
+    mgr.stop()
+
+
+def test_start_named_missing_cert_errors(tmp_path):
+    shim = logged_shim(tmp_path, EXISTING_TUNNEL_LIST)
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=tmp_path / "nonexistent-cert.pem",
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is False
+    assert mgr.state is TunnelState.ERROR
+    assert mgr.last_error == "Cloudflare login required"
+    assert not (cfg_dir / "tunnel.json").exists()
+
+
+def test_bootstrap_timeout_sets_error(tmp_path):
+    shim = logged_shim(tmp_path, "time.sleep(60)\n")
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        cert_path=cert,
+        bootstrap_timeout=1.0,
+    )
+
+    started = time.monotonic()
+    assert mgr.start_named("pc", "pc.example.com", 8765) is False
+    elapsed = time.monotonic() - started
+
+    assert mgr.state is TunnelState.ERROR
+    assert mgr.last_error is not None
+    assert elapsed < 5
+
+
+def test_create_failure_surfaces_output_tail(tmp_path):
+    shim = logged_shim(
+        tmp_path,
+        'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+        '    print("ID                                   NAME     CREATED")\n'
+        '    print("------------------------------------ -------- ----------")\n'
+        'elif sys.argv[1:3] == ["tunnel", "create"]:\n'
+        '    print("Account is out of credit")\n'
+        "    sys.exit(1)\n"
+        "else:\n"
+        "    time.sleep(60)\n",
+    )
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        cert_path=cert,
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is False
+    assert mgr.state is TunnelState.ERROR
+    assert mgr.last_error is not None
+    assert "out of credit" in mgr.last_error
+
+
+def test_route_dns_failure_aborts_start(tmp_path):
+    shim = logged_shim(
+        tmp_path,
+        'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+        '    print("ID                                   NAME     CREATED")\n'
+        '    print("------------------------------------ -------- ----------")\n'
+        '    print("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee pc       2026-01-01")\n'
+        'elif sys.argv[1:3] == ["tunnel", "route"]:\n'
+        '    print("permission denied")\n'
+        "    sys.exit(1)\n"
+        "else:\n"
+        "    time.sleep(60)\n",
+    )
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        cert_path=cert,
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is False
+    assert mgr.state is TunnelState.ERROR
+    calls = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert "tunnel run" not in calls
+
+
+def test_apply_auto_start_refused_when_already_running(tmp_path):
+    shim = logged_shim(
+        tmp_path,
+        "print('https://quick-test.trycloudflare.com', flush=True)\n"
+        "time.sleep(60)\n",
+    )
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+    )
+
+    assert mgr.start_quick(8765) is True
+    assert mgr.is_running is True
+    process = mgr._process
+
+    save_tunnel_config(
+        cfg_dir,
+        TunnelConfig("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "pc", "pc.example.com", True),
+    )
+    wait_for_calls(tmp_path, "tunnel --url")
+    assert mgr.apply_auto_start(8765) is False
+    assert mgr.is_running is True
+    assert mgr.tunnel_name == "quick"
+    assert mgr._process is process
+    assert process.poll() is None
+    calls = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert len([l for l in calls.splitlines() if l.strip()]) == 1
+
+    mgr.stop()
+
+
+def test_apply_auto_start_starts_saved_tunnel(tmp_path):
+    shim = logged_shim(tmp_path, EXISTING_TUNNEL_LIST)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    save_tunnel_config(
+        cfg_dir,
+        TunnelConfig("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "pc", "pc.example.com", True),
+    )
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+    )
+
+    assert mgr.apply_auto_start(8765) is True
+    assert mgr.state is TunnelState.RUNNING
+    assert mgr.url == "https://pc.example.com"
+    assert mgr.tunnel_name == "pc"
+    assert mgr.get_config().auto_start is True
+    config_text = (cfg_dir / "cloudflared" / "config.yml").read_text(encoding="utf-8")
+    assert "localhost:8765" in config_text
+
+    mgr.stop()
+
+
+def test_apply_auto_start_off_or_missing_returns_false(tmp_path):
+    shim = logged_shim(tmp_path, EXISTING_TUNNEL_LIST)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+    )
+
+    assert mgr.apply_auto_start(8765) is False
+    assert mgr.state is TunnelState.OFF
+
+    save_tunnel_config(
+        cfg_dir,
+        TunnelConfig("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "pc", "pc.example.com", False),
+    )
+    assert mgr.apply_auto_start(8765) is False
+    assert mgr.state is TunnelState.OFF
+    assert mgr.is_running is False
+    assert not (tmp_path / "calls.log").exists()
+
+
+def test_login_reports_success_and_failure(tmp_path, monkeypatch):
+    import webbrowser
+
+    opened = []
+    monkeypatch.setattr(webbrowser, "open", lambda url: opened.append(url))
+
+    ok_dir = tmp_path / "ok"
+    ok_dir.mkdir()
+    ok_cert = ok_dir / "cert.pem"
+    ok_shim = write_shim(
+        ok_dir,
+        "import sys, time\n"
+        "if sys.argv[1:3] == ['tunnel', 'login']:\n"
+        "    print('See https://example.com/docs first', flush=True)\n"
+        "    print('Please open https://dash.cloudflare.com/authorize?abc=1', flush=True)\n"
+        "    time.sleep(0.2)\n"
+        f"    with open({str(ok_cert)!r}, 'w') as fh:\n"
+        "        fh.write('cert')\n",
+    )
+    ok_mgr = TunnelManager(
+        cloudflared_finder=lambda: ok_shim,
+        config_dir=tmp_path / "ok-cfg",
+        cert_path=ok_cert,
+    )
+    assert ok_mgr.login() is True
+    assert opened == ["https://dash.cloudflare.com/authorize?abc=1"]
+
+    fail_dir = tmp_path / "fail"
+    fail_dir.mkdir()
+    fail_cert = fail_dir / "cert.pem"
+    fail_shim = write_shim(
+        fail_dir,
+        "import sys\n"
+        "print('login failed')\n"
+        "sys.exit(1)\n",
+    )
+    fail_mgr = TunnelManager(
+        cloudflared_finder=lambda: fail_shim,
+        config_dir=tmp_path / "fail-cfg",
+        cert_path=fail_cert,
+    )
+    assert fail_mgr.login() is False
+    assert not fail_cert.exists()
+
+
+def test_set_auto_start_persists_via_get_config(tmp_path):
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(cloudflared_finder=lambda: None, config_dir=cfg_dir)
+
+    assert mgr.get_config() == TunnelConfig()
+
+    save_tunnel_config(cfg_dir, TunnelConfig("tid-1", "pc", "pc.example.com", False))
+    mgr.set_auto_start(True)
+    assert mgr.get_config() == TunnelConfig("tid-1", "pc", "pc.example.com", True)
+
+    mgr.set_auto_start(False)
+    assert mgr.get_config() == TunnelConfig("tid-1", "pc", "pc.example.com", False)
