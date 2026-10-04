@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -112,6 +113,10 @@ fun DashboardScreen(
         val sizeClass = sizeClassForWidth(maxWidth)
         val plan = layoutDashboard(layout, sizeClass, maxWidth, landscape, maxHeight)
         var fpsDetailsOpen by rememberSaveable { mutableStateOf(false) }
+        var editSnapshot by remember { mutableStateOf<DashboardLayout?>(null) }
+        LaunchedEffect(editMode) {
+            editSnapshot = if (editMode) layout else null
+        }
 
         // Background image for glassmorphism
         if (customBackgroundBitmap != null && glassmorphism) {
@@ -178,7 +183,12 @@ fun DashboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                         ) {
-                            TextButton(onClick = { onEditModeChange(false) }) { Text(labelEditCancel) }
+                            TextButton(
+                                onClick = {
+                                    editSnapshot?.let(onLayoutChange)
+                                    onEditModeChange(false)
+                                },
+                            ) { Text(labelEditCancel) }
                             Spacer(modifier = Modifier.weight(1f))
                             TextButton(onClick = { onEditModeChange(false) }) { Text(labelEditDone) }
                         }
