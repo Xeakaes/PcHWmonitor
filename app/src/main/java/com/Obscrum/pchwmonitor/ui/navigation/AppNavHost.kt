@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,8 +60,6 @@ import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
 import com.Obscrum.pchwmonitor.ui.history.HistoryScreen
 import com.Obscrum.pchwmonitor.ui.settings.SettingsScreen
-import com.Obscrum.pchwmonitor.ui.resolveError
-import kotlinx.coroutines.flow.map
 
 private data class NavItem(
     val route: String,
@@ -233,22 +230,20 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                 }
                 composable("settings") {
                     val settings by viewModel.settings.collectAsState()
-                    val discoveredServers by viewModel.discovery.servers.collectAsState()
-                    val isScanning by viewModel.discovery.isScanning.collectAsState()
-                    val context = LocalContext.current
-                    val lastError by viewModel.lastError.collectAsState()
-                    val errorMessage = lastError?.let { context.resolveError(it) }
+                    val glassmorphism by viewModel.glassmorphism.collectAsState()
                     val activeServerId by viewModel.activeServerId.collectAsState()
+                    val servers by viewModel.servers.collectAsState()
                     SettingsScreen(
                         settings = settings,
                         connection = connection ?: ConnectionState.DISCONNECTED,
+                        servers = servers,
+                        activeServerId = activeServerId,
+                        onManageServers = { navController.navigate("servers") },
+                        backgroundConnectAll = settings.backgroundConnectAll,
+                        onBackgroundConnectAllToggle = viewModel::setBackgroundConnectAll,
                         labelConnecting = stringResource(R.string.connecting),
                         labelConnected = stringResource(R.string.connected),
                         labelDisconnected = stringResource(R.string.disconnected),
-                        labelServer = stringResource(R.string.server),
-                        labelIp = stringResource(R.string.server_ip),
-                        labelPort = stringResource(R.string.port),
-                        labelToken = stringResource(R.string.settings_token),
                         labelTheme = stringResource(R.string.theme),
                         labelThemeSystem = stringResource(R.string.theme_system),
                         labelThemeLight = stringResource(R.string.theme_light),
@@ -271,6 +266,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         },
                         paletteId = settings.themePaletteId,
                         onPaletteChange = viewModel::setThemePalette,
+                        onThemeChange = viewModel::setTheme,
                         labelLanguage = stringResource(R.string.settings_language),
                         labelLanguageSystem = stringResource(R.string.settings_language_system),
                         languages = listOf(
@@ -290,33 +286,15 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                             "zh-TW" to stringResource(R.string.language_zh_tw),
                             "ja" to stringResource(R.string.language_ja),
                         ),
+                        onLanguageChange = viewModel::setLanguage,
                         labelChartWindow = stringResource(R.string.chart_window),
                         labelChartWindow30s = stringResource(R.string.chart_window_30s),
                         labelChartWindow60s = stringResource(R.string.chart_window_60s),
                         labelChartWindow300s = stringResource(R.string.chart_window_300s),
-                        labelSave = stringResource(R.string.save),
-                        labelSaved = stringResource(R.string.saved),
+                        onChartWindowChange = viewModel::setChartWindowSeconds,
                         labelSupport = stringResource(R.string.support),
                         labelSupportDescription = stringResource(R.string.support_description),
                         labelSupportPatreon = stringResource(R.string.support_patreon),
-                        labelDiscover = stringResource(R.string.discover),
-                        labelDiscovering = stringResource(R.string.discovering),
-                        labelNoServers = stringResource(R.string.no_servers_found),
-                        labelConnectionMethod = stringResource(R.string.connection_method),
-                        labelMethodManual = stringResource(R.string.method_manual),
-                        labelMethodScan = stringResource(R.string.method_scan),
-                        labelConnect = stringResource(R.string.connect),
-                        labelQrScan = stringResource(R.string.qr_scan),
-                        discoveredServers = discoveredServers.map { Triple(it.name, it.ip, it.port) },
-                        isScanning = isScanning,
-                        onDiscover = { viewModel.discovery.startScan() },
-                        errorMessage = errorMessage,
-                        onServerSelected = { ip, port ->
-                            viewModel.saveSettings(ip, port, settings.authToken, settings.theme, settings.language, settings.chartWindowSeconds, settings.hostname)
-                        },
-                        onSave = { ip, port, authToken, theme, language, chartWindowSeconds, hostname ->
-                            viewModel.saveSettings(ip, port, authToken, theme, language, chartWindowSeconds, hostname)
-                        },
                         // Custom Background parameters
                         labelCustomBackground = stringResource(R.string.custom_background),
                         labelCustomBackgroundDescription = stringResource(R.string.custom_background_description),
@@ -326,22 +304,12 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelCustomBackgroundBlur = stringResource(R.string.custom_background_blur),
                         labelCustomBackgroundBlurDescription = stringResource(R.string.custom_background_blur_description),
                         customBackgroundEnabled = settings.customBackgroundEnabled,
-                        glassmorphismEnabled = settings.glassmorphismEnabled,
+                        glassmorphism = glassmorphism,
                         customBackgroundUri = settings.customBackgroundUri,
                         onCustomBackgroundToggle = viewModel::setCustomBackgroundEnabled,
                         onGlassmorphismToggle = viewModel::setGlassmorphismEnabled,
                         onCustomBackgroundPick = viewModel::pickCustomBackground,
                         onCustomBackgroundRemove = viewModel::removeCustomBackground,
-                        // Multi-PC parameters
-                        labelSavedServers = stringResource(R.string.saved_servers),
-                        labelSelect = stringResource(R.string.select),
-                        labelDelete = stringResource(R.string.delete_label),
-                        labelAddServer = stringResource(R.string.add_new_server),
-                        savedServers = settings.servers,
-                        activeServerId = activeServerId,
-                        onSelectSavedServer = viewModel::setActiveServer,
-                        onDeleteSavedServer = viewModel::removeServer,
-                        onAddServer = viewModel::addServer,
                     )
                 }
                 composable("servers") {

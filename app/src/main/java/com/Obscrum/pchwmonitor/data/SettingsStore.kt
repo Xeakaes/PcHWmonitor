@@ -187,13 +187,6 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     }
 
     // Server list methods
-    suspend fun setServers(servers: List<ServerConfig>) {
-        dataStore.edit { prefs ->
-            prefs[keyServersJson] = json.encodeToString(servers)
-            prefs.mirrorLegacy(resolveActive(prefs, servers))
-        }
-    }
-
     suspend fun setActiveServerId(id: String?) {
         dataStore.edit { prefs ->
             if (id == null) prefs.remove(keyActiveServerId) else prefs[keyActiveServerId] = id
@@ -243,17 +236,6 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    suspend fun updateServerHostname(id: String, hostname: String) {
-        dataStore.edit { prefs ->
-            val current = decodeServers(prefs)
-            val updated = current.map {
-                if (it.id == id) it.copy(hostname = hostname.takeIf { h -> h.isNotBlank() }) else it
-            }
-            prefs[keyServersJson] = json.encodeToString(updated)
-            prefs.mirrorLegacy(resolveActive(prefs, updated))
-        }
-    }
-
     suspend fun updateServerConnection(
         id: String,
         name: String,
@@ -289,32 +271,4 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             if (active?.id == id) prefs.mirrorLegacy(active)
         }
     }.map { }
-
-    /**
-     * Atomically update all connection-related settings in a single DataStore edit.
-     * This prevents partial updates from triggering syncControllers() with stale values.
-     */
-    suspend fun saveConnectionAndPreferences(
-        ip: String, port: Int, token: String?, hostname: String?,
-        theme: ThemeMode, language: String?, chartWindowSeconds: Int,
-    ) {
-        dataStore.edit { prefs ->
-            prefs[keyIp] = ip
-            prefs[keyPort] = port
-            if (token.isNullOrBlank()) prefs.remove(keyAuthToken) else prefs[keyAuthToken] = token
-            if (hostname.isNullOrBlank()) prefs.remove(keyHostname) else prefs[keyHostname] = hostname
-            prefs[keyTheme] = theme.name
-            if (language == null) prefs.remove(keyLanguage) else prefs[keyLanguage] = language
-            prefs[keyChartWindow] = chartWindowSeconds
-            // Also update the active server in the servers list
-            val activeId = prefs[keyActiveServerId]?.takeIf { it.isNotBlank() }
-            if (activeId != null) {
-                val current = decodeServers(prefs)
-                val updated = current.map {
-                    if (it.id == activeId) it.copy(ip = ip, port = port, token = token, hostname = hostname?.takeIf { h -> h.isNotBlank() }) else it
-                }
-                prefs[keyServersJson] = json.encodeToString(updated)
-            }
-        }
-    }
 }

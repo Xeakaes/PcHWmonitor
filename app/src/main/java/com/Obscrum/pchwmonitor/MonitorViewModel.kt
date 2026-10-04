@@ -69,8 +69,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     private val _customBackgroundBitmap = MutableStateFlow<Bitmap?>(null)
     val customBackgroundBitmap: StateFlow<Bitmap?> = _customBackgroundBitmap.asStateFlow()
 
-    private val _glassmorphism = MutableStateFlow(false)
-    val glassmorphism: StateFlow<Boolean> = _glassmorphism.asStateFlow()
+    val glassmorphism: StateFlow<Boolean> = settingsStore.settings
+        .map { it.glassmorphismEnabled }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     // Cert trust dialog state
     private val _pendingCertHash = MutableStateFlow<String?>(null)
@@ -115,7 +116,6 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
                 // Load custom background if enabled
                 if (s.customBackgroundEnabled && s.customBackgroundUri != null) {
                     loadCustomBackground()
-                    _glassmorphism.value = s.glassmorphismEnabled
                 }
             }
         }
@@ -256,13 +256,9 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun disconnect() = _controllers.values.forEach { it.disconnect() }
 
-    fun saveSettings(ip: String, port: Int, authToken: String?, theme: ThemeMode, language: String?,
-                     chartWindowSeconds: Int, hostname: String? = null) {
+    fun savePreferences(theme: ThemeMode, language: String?, chartWindowSeconds: Int, themePaletteId: String) {
         viewModelScope.launch {
-            settingsStore.saveConnectionAndPreferences(
-                ip = ip, port = port, token = authToken, hostname = hostname,
-                theme = theme, language = language, chartWindowSeconds = chartWindowSeconds,
-            )
+            settingsStore.savePreferences(theme, language, chartWindowSeconds, themePaletteId)
         }
     }
 
@@ -275,12 +271,24 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
     suspend fun setServerPort(port: Int) = settingsStore.setServerPort(port)
 
-    suspend fun setTheme(theme: ThemeMode) = settingsStore.setTheme(theme)
+    fun setTheme(theme: ThemeMode) {
+        viewModelScope.launch { settingsStore.setTheme(theme) }
+    }
 
-    suspend fun setLanguage(language: String?) = settingsStore.setLanguage(language)
+    fun setLanguage(language: String?) {
+        viewModelScope.launch { settingsStore.setLanguage(language) }
+    }
+
+    fun setChartWindowSeconds(seconds: Int) {
+        viewModelScope.launch { settingsStore.setChartWindowSeconds(seconds) }
+    }
 
     fun setThemePalette(id: String) {
         viewModelScope.launch { settingsStore.setThemePalette(id) }
+    }
+
+    fun setBackgroundConnectAll(enabled: Boolean) {
+        viewModelScope.launch { settingsStore.setBackgroundConnectAll(enabled) }
     }
 
     fun setDashboardLayout(layout: DashboardLayout) {
@@ -291,7 +299,6 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     fun setCustomBackgroundEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsStore.setCustomBackgroundEnabled(enabled)
-            _glassmorphism.value = enabled
             if (enabled) {
                 loadCustomBackground()
             } else {
@@ -301,7 +308,7 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setGlassmorphismEnabled(enabled: Boolean) {
-        _glassmorphism.value = enabled
+        viewModelScope.launch { settingsStore.setGlassmorphismEnabled(enabled) }
     }
 
     fun pickCustomBackground(uriString: String) {
