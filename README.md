@@ -186,7 +186,7 @@ This opens a browser. Log in to your Cloudflare account and authorize.
 **Step 3: Run the server with a named tunnel**
 
 ```bash
-PcHwMonitor.exe --tunnel pc-monitor
+PcHwMonitor.exe --tunnel pc-monitor --tunnel-hostname stats.example.com
 ```
 
 The server will:
@@ -457,7 +457,7 @@ Bu komut tarayıcıyı açar. Cloudflare hesabınıza giriş yapın ve yetkilend
 **Adım 3: Sunuyu named tunnel ile çalıştırın**
 
 ```bash
-PcHwMonitor.exe --tunnel pc-monitor
+PcHwMonitor.exe --tunnel pc-monitor --tunnel-hostname stats.example.com
 ```
 
 Sunucu şunları yapar:
