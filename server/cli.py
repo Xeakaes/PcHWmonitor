@@ -10,6 +10,7 @@ from pathlib import Path
 
 from app import _run_forever, build_app
 from tray import _run_with_tray
+from tunnel import TunnelManager
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("pchw.cli")
@@ -55,6 +56,7 @@ def main() -> None:
     parser.add_argument("--ssl-key", default=None, help="path to PEM private key file for WSS")
     parser.add_argument("--tunnel", default=None, nargs="?", const="quick",
                         help="start a Cloudflare Tunnel. Use 'quick' for temporary URL, or provide a tunnel name for persistent URL")
+    parser.add_argument("--tunnel-hostname", default=None, help="public hostname for a named tunnel (falls back to saved tunnel config)")
     args = parser.parse_args()
 
     # Always require auth: auto-generate if not provided
@@ -126,46 +128,27 @@ def main() -> None:
     else:
         logger.info("running with source=%s on 0.0.0.0:%d (auth required)", args.source, args.port)
 
-    # Cloudflare Tunnel
-    tunnel_process = None
-    tunnel_url = None
-    if args.tunnel is not None:
-        cloudflared = _find_cloudflared()
-        if cloudflared is None:
-            logger.error("cloudflared.exe not found — cannot start tunnel")
+    # Cloudflare Tunnel — one shared manager (also handed to the tray)
+    manager = TunnelManager(
+        on_state=lambda s: logger.info("tunnel state: %s", s.value),
+        on_url=lambda u: print(f"  TUNNEL: {u}"),
+    )
+    if args.tunnel == "quick":
+        ok = manager.start_quick(args.port)
+    elif args.tunnel is not None:
+        hostname = args.tunnel_hostname or manager.get_config().hostname
+        if not hostname:
+            logger.error("named tunnel needs a hostname (--tunnel-hostname or saved config)")
             sys.exit(1)
-        if args.tunnel == "quick":
-            cmd = [str(cloudflared), "tunnel", "--url", f"http://localhost:{args.port}"]
-        else:
-            cmd = [str(cloudflared), "tunnel", "run", args.tunnel]
-        logger.info("starting cloudflare tunnel: %s", " ".join(cmd))
-        tunnel_process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
-        # Read output to find the tunnel URL
-        import threading
-        def _read_tunnel_output(proc):
-            nonlocal tunnel_url
-            for line in proc.stdout:
-                line = line.strip()
-                logger.info("cloudflared: %s", line)
-                if "trycloudflare.com" in line or "https://" in line:
-                    # Extract URL from line
-                    for word in line.split():
-                        if word.startswith("https://"):
-                            tunnel_url = word.rstrip(",/.;")
-                            break
-        reader = threading.Thread(target=_read_tunnel_output, args=(tunnel_process,), daemon=True)
-        reader.start()
-        # Give it a moment to connect
-        import time
-        time.sleep(3)
+        ok = manager.start_named(args.tunnel, hostname, args.port)
+    else:
+        ok = True
+    if not ok:
+        logger.error("tunnel failed: %s", manager.last_error)
+        sys.exit(1)
 
     if getattr(sys, "frozen", False) and not args.simulate:
-        _run_with_tray(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key)
+        _run_with_tray(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key, tunnel_manager=manager)
     else:
         scheme = "wss" if ssl_cert else "ws"
         print(f"\n{'='*50}")
@@ -173,43 +156,14 @@ def main() -> None:
         print(f"  Enter this in the Android app's Access Key field")
         if ssl_cert:
             print(f"  SSL: enabled ({scheme}://)")
-        if tunnel_url:
-            print(f"  TUNNEL: {tunnel_url}")
+        if manager.url:
+            print(f"  TUNNEL: {manager.url}")
         elif args.tunnel is not None:
             print(f"  TUNNEL: starting... check tray icon or logs")
         print(f"{'='*50}\n")
         asyncio.run(_run_forever(app, args.port, ssl_cert=ssl_cert, ssl_key=ssl_key))
 
-    # Cleanup tunnel
-    if tunnel_process is not None:
-        tunnel_process.terminate()
-        tunnel_process.wait(timeout=5)
-
-
-def _find_cloudflared():
-    """Find cloudflared.exe - check multiple locations."""
-    candidates = []
-    if getattr(sys, "frozen", False):
-        base = Path(sys.executable).parent
-        meipass = Path(sys._MEIPASS)
-        candidates = [
-            meipass / "cloudflared.exe",
-            meipass / "vendor" / "cloudflared.exe",
-            base / "cloudflared.exe",
-            base / "vendor" / "cloudflared.exe",
-        ]
-    else:
-        base = Path(__file__).resolve().parent
-        candidates = [
-            base / "cloudflared.exe",
-            base / "vendor" / "cloudflared.exe",
-            base.parent / "cloudflared.exe",
-            base.parent / "vendor" / "cloudflared.exe",
-        ]
-    for c in candidates:
-        if c.exists():
-            return c
-    return None
+    manager.stop()
 
 
 if __name__ == "__main__":
