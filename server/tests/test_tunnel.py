@@ -586,6 +586,239 @@ def test_cert_path_defaults_lazily(tmp_path):
     assert mgr.cert_path == Path.home() / ".cloudflared" / "cert.pem"
 
 
+SLOW_LIST_FAILING_CREATE = (
+    'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+    "    time.sleep(6)\n"
+    '    print("ID                                   NAME     CREATED")\n'
+    '    print("------------------------------------ -------- ----------")\n'
+    'elif sys.argv[1:3] == ["tunnel", "create"]:\n'
+    '    print("Account is out of credit")\n'
+    "    sys.exit(1)\n"
+    "else:\n"
+    "    time.sleep(60)\n"
+)
+
+SLOW_LIST_CREATE_OK = (
+    'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+    "    time.sleep(6)\n"
+    '    print("ID                                   NAME     CREATED")\n'
+    '    print("------------------------------------ -------- ----------")\n'
+    '    print("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee pc       2026-01-01")\n'
+    'elif sys.argv[1:3] == ["tunnel", "create"]:\n'
+    '    print("Created tunnel pc id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")\n'
+    'elif sys.argv[1:3] == ["tunnel", "route"]:\n'
+    '    print("Updated pc.example.com route")\n'
+    "else:\n"
+    "    time.sleep(60)\n"
+)
+
+
+def _bootstrapping_mgr(tmp_path, body: str, bootstrap_timeout: float = 5.0):
+    shim = logged_shim(tmp_path, body)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    return TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        cert_path=cert,
+        bootstrap_timeout=bootstrap_timeout,
+    )
+
+
+def test_starts_refused_while_bootstrap_in_progress(tmp_path):
+    mgr = _bootstrapping_mgr(tmp_path, SLOW_LIST_FAILING_CREATE, bootstrap_timeout=5.0)
+    results = {}
+
+    def run_start():
+        results["named"] = mgr.start_named("pc", "pc.example.com", 8765)
+
+    thread = threading.Thread(target=run_start, daemon=True)
+    thread.start()
+
+    deadline = time.monotonic() + 5
+    while mgr.state is not TunnelState.STARTING and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert mgr.state is TunnelState.STARTING
+
+    assert mgr.start_quick(9999) is False
+    assert mgr.state is TunnelState.STARTING
+    assert mgr.start_named("pc", "pc.example.com", 9999) is False
+    assert mgr.state is TunnelState.STARTING
+    assert mgr.is_running is False
+
+    thread.join(timeout=15)
+    assert not thread.is_alive()
+    assert results["named"] is False
+    assert mgr.state is TunnelState.ERROR
+
+    calls = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert "tunnel --url" not in calls
+    assert "tunnel run" not in calls
+
+
+def test_stop_during_bootstrap_cancels_start(tmp_path):
+    mgr = _bootstrapping_mgr(tmp_path, SLOW_LIST_CREATE_OK, bootstrap_timeout=5.0)
+    results = {}
+
+    def run_start():
+        results["named"] = mgr.start_named("pc", "pc.example.com", 8765)
+
+    thread = threading.Thread(target=run_start, daemon=True)
+    thread.start()
+
+    deadline = time.monotonic() + 5
+    while mgr.state is not TunnelState.STARTING and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert mgr.state is TunnelState.STARTING
+    # Stop only once the bootstrap subprocess is actually in flight, so the
+    # cancellation path after a completed step (not the entry guard) is covered.
+    wait_for_calls(tmp_path, "tunnel list", timeout=6)
+
+    mgr.stop()
+    assert mgr.state is TunnelState.OFF
+
+    thread.join(timeout=15)
+    assert not thread.is_alive()
+    assert results["named"] is False
+    assert mgr.state is TunnelState.OFF
+    assert mgr.is_running is False
+
+    calls = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert "tunnel list" in calls
+    assert "tunnel create" not in calls
+    assert "tunnel run" not in calls
+    assert "tunnel --url" not in calls
+
+
+def test_save_tunnel_config_atomic_replace_and_last_wins(tmp_path, monkeypatch):
+    import json
+    import os as os_mod
+
+    cfg_dir = tmp_path / "cfg"
+    replace_calls = []
+    real_replace = os_mod.replace
+
+    def spy(src, dst):
+        replace_calls.append((Path(src), Path(dst)))
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(os_mod, "replace", spy)
+
+    save_tunnel_config(cfg_dir, TunnelConfig("id-1", "pc", "one.example.com", False))
+    atomic = [c for c in replace_calls if Path(c[1]).name == "tunnel.json"]
+    assert atomic, "save_tunnel_config must publish via os.replace"
+    src, dst = atomic[0]
+    assert src.parent == cfg_dir
+    assert src.name.endswith(".tmp")
+    assert not list(cfg_dir.glob("*.tmp"))
+    assert load_tunnel_config(cfg_dir) == TunnelConfig(
+        "id-1", "pc", "one.example.com", False
+    )
+
+    save_tunnel_config(cfg_dir, TunnelConfig("id-2", "pc", "two.example.com", True))
+    assert not list(cfg_dir.glob("*.tmp"))
+    assert load_tunnel_config(cfg_dir) == TunnelConfig(
+        "id-2", "pc", "two.example.com", True
+    )
+
+    errors = []
+
+    def worker(i: int) -> None:
+        try:
+            save_tunnel_config(
+                cfg_dir,
+                TunnelConfig(f"tid-{i}", "pc", f"h{i}.example.com", bool(i % 2)),
+            )
+        except Exception as exc:  # pragma: no cover - failure path
+            errors.append(exc)
+
+    threads = [threading.Thread(target=worker, args=(i,)) for i in range(20)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(timeout=10)
+    assert not errors
+    assert not list(cfg_dir.glob("*.tmp"))
+    data = json.loads((cfg_dir / "tunnel.json").read_text(encoding="utf-8"))
+    assert data["tunnel_name"] == "pc"
+    assert str(data["tunnel_id"]).startswith("tid-")
+
+
+def test_create_already_exists_relists_and_recovers(tmp_path):
+    counter = tmp_path / "list_count"
+    body = (
+        'if sys.argv[1:3] == ["tunnel", "list"]:\n'
+        "    n = 0\n"
+        "    try:\n"
+        f"        n = int(open({str(counter)!r}).read())\n"
+        "    except Exception:\n"
+        "        pass\n"
+        f"    with open({str(counter)!r}, 'w') as fh:\n"
+        "        fh.write(str(n + 1))\n"
+        '    print("ID                                   NAME     CREATED")\n'
+        '    print("------------------------------------ -------- ----------")\n'
+        "    if n > 0:\n"
+        '        print("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee pc       2026-01-01")\n'
+        'elif sys.argv[1:3] == ["tunnel", "create"]:\n'
+        "    print('tunnel with name \"pc\" already exists', file=sys.stderr)\n"
+        "    sys.exit(1)\n"
+        'elif sys.argv[1:3] == ["tunnel", "route"]:\n'
+        '    print("Updated pc.example.com route")\n'
+        "else:\n"
+        "    time.sleep(60)\n"
+    )
+    shim = logged_shim(tmp_path, body)
+    cert = tmp_path / "cert.pem"
+    cert.write_text("cert", encoding="utf-8")
+    cfg_dir = tmp_path / "cfg"
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=cfg_dir,
+        cert_path=cert,
+    )
+
+    assert mgr.start_named("pc", "pc.example.com", 8765) is True
+    assert mgr.state is TunnelState.RUNNING
+    cfg = load_tunnel_config(cfg_dir)
+    assert cfg.tunnel_id == "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+    calls = wait_for_calls(tmp_path, "tunnel run --config")
+    assert calls.count("tunnel list") == 2
+    assert calls.count("tunnel create") == 1
+
+    mgr.stop()
+
+
+def test_docs_url_printed_before_tunnel_url_does_not_latch(tmp_path):
+    shim = write_shim(
+        tmp_path,
+        "import time\n"
+        "print('see https://developers.cloudflare.com/docs first', flush=True)\n"
+        "time.sleep(0.2)\n"
+        "print('https://fast-red-xyz.trycloudflare.com', flush=True)\n"
+        "time.sleep(60)\n",
+    )
+    url_event = threading.Event()
+    urls = []
+
+    def on_url(url: str) -> None:
+        urls.append(url)
+        url_event.set()
+
+    mgr = TunnelManager(
+        cloudflared_finder=lambda: shim,
+        config_dir=tmp_path / "cfg",
+        on_url=on_url,
+    )
+
+    assert mgr.start_quick(8765) is True
+    assert url_event.wait(timeout=5)
+    assert urls == ["https://fast-red-xyz.trycloudflare.com"]
+    time.sleep(0.5)
+    assert mgr.url == "https://fast-red-xyz.trycloudflare.com"
+
+    mgr.stop()
+
+
 def test_ctor_and_added_listeners_both_fire(tmp_path):
     shim = write_shim(
         tmp_path,
