@@ -36,6 +36,11 @@ object PaletteDefinitions {
         "material_you" -> Color(0xFF6750A4)
         else -> schemeFor(id, dark = false).primary
     }
+
+    fun swatchAccent(id: String): Color? = when (id) {
+        "material_you" -> null
+        else -> schemeFor(id, dark = false).tertiary
+    }
 }
 
 val DarkColorScheme = darkColorScheme(

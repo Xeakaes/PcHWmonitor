@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -73,6 +74,33 @@ class PaletteTest {
         val seen = mutableSetOf<Color>()
         for (id in PaletteDefinitions.idsForApi(31)) {
             assertTrue("duplicate swatch for $id", seen.add(PaletteDefinitions.swatchColor(id)))
+        }
+    }
+
+    @Test
+    fun swatchAccentUsesLightTertiary() {
+        assertEquals(
+            PaletteDefinitions.schemeFor("default", dark = false).tertiary,
+            PaletteDefinitions.swatchAccent("default"),
+        )
+        assertEquals(Color(0xFF7A4A2C), PaletteDefinitions.swatchAccent("ember"))
+        assertEquals(PaletteDefinitions.swatchAccent("default"), PaletteDefinitions.swatchAccent("bogus"))
+    }
+
+    @Test
+    fun swatchAccentMaterialYouIsNull() {
+        assertNull(PaletteDefinitions.swatchAccent("material_you"))
+    }
+
+    @Test
+    fun swatchAccentEveryStaticPaletteDiffersFromPrimary() {
+        for (id in PaletteDefinitions.idsForApi(31)) {
+            if (id == "material_you") continue
+            assertNotEquals(
+                "accent equals primary for $id",
+                PaletteDefinitions.swatchColor(id),
+                PaletteDefinitions.swatchAccent(id),
+            )
         }
     }
 }

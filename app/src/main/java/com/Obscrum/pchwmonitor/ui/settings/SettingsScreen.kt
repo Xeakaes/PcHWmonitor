@@ -2,7 +2,7 @@ package com.Obscrum.pchwmonitor.ui.settings
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -230,10 +230,20 @@ fun SettingsScreen(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .clip(CircleShape)
-                            .background(PaletteDefinitions.swatchColor(id)),
+                            .clip(CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
+                        Canvas(modifier = Modifier.matchParentSize()) {
+                            drawCircle(color = PaletteDefinitions.swatchColor(id))
+                            PaletteDefinitions.swatchAccent(id)?.let { accent ->
+                                drawArc(
+                                    color = accent,
+                                    startAngle = 315f,
+                                    sweepAngle = 180f,
+                                    useCenter = true,
+                                )
+                            }
+                        }
                         if (selected) {
                             Icon(
                                 imageVector = Icons.Default.Check,
