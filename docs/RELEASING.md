@@ -43,8 +43,15 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs \
 
 ## 3. Build the Windows EXE
 
-On Windows, from the project root (needs Python + the LHM DLLs, see
-`build_exe.bat`; FPS needs `server/presentmon/PresentMon64.exe`):
+CI builds it: pushing the `v*` tag triggers the `EXE build` workflow
+(windows-latest), which fetches pinned upstream binaries (LibreHardwareMonitor,
+PresentMon, cloudflared — no secrets involved), runs `build_exe.bat`, smoke-tests
+`dist\PcHwMonitor.exe` in `--simulate` mode and attaches the exe to the release
+automatically. Check the workflow run before publishing.
+
+A local Windows build still works the same way (needs Python + the LHM DLLs,
+see `build_exe.bat`; FPS needs `server/presentmon/PresentMon64.exe`;
+cloudflared.exe is downloaded into `server\vendor\` automatically if missing):
 
 ```bat
 build_exe.bat
@@ -66,10 +73,11 @@ the right token, and close the tray app.
 git tag vX.Y && git push origin vX.Y
 ```
 
-The tag push opens the GitHub release with generated notes. Attach manually:
+The tag push opens the GitHub release (generated notes — replace them with a
+curated changelog if you like) and the EXE workflow attaches `PcHwMonitor.exe`
+automatically. Attach the signed APK by hand (API upload or the release page):
 
 - `PcHwMonitor-vX.Y.apk` (signed APK from step 2)
-- `PcHwMonitor.exe` (from step 3)
 
 Finally, download both assets back from the release page and re-run the
 signature/health checks on them — what is published must be verified as
