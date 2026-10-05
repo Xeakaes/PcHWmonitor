@@ -145,7 +145,6 @@
     <string name="servers_empty_title">Nog geen servers</string>
     <string name="servers_empty_desc">Scan een QR-code van de pc-app om je eerste server toe te voegen.</string>
     <string name="servers_empty_action">Handmatig toevoegen</string>
-    <string name="dashboard_empty_title">Geen servers geconfigureerd</string>
     <string name="dashboard_empty_desc">Voeg een server toe om je pc te monitoren.</string>
     <string name="dashboard_empty_action">Server toevoegen</string>
     <string name="back">Terug</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">Verbinding</string>
     <string name="manage_servers">Beheren</string>
     <string name="background_connect_all_label">Op de achtergrond met alle servers verbinden</string>
-    <string name="background_connect_all_desc">Houdt elke opgeslagen server verbonden, niet alleen de actieve</string>
+    <string name="background_connect_all_desc">Blijf op de achtergrond verbonden met alle opgeslagen servers. Verbruikt meer batterij.</string>
     <string name="err_empty_ip">Serveradres is verplicht</string>
     <string name="err_invalid_port">De poort moet een getal tussen 1 en 65535 zijn</string>
     <string name="err_duplicate_name">Er bestaat al een server met deze naam</string>

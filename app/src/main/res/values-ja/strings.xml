@@ -145,7 +145,6 @@
     <string name="servers_empty_title">サーバーがまだありません</string>
     <string name="servers_empty_desc">PC アプリの QR コードをスキャンして最初のサーバーを追加してください。</string>
     <string name="servers_empty_action">手動で追加</string>
-    <string name="dashboard_empty_title">サーバーが設定されていません</string>
     <string name="dashboard_empty_desc">サーバーを追加して PC の監視を開始しましょう。</string>
     <string name="dashboard_empty_action">サーバーを追加</string>
     <string name="back">戻る</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">接続</string>
     <string name="manage_servers">管理</string>
     <string name="background_connect_all_label">すべてのサーバーをバックグラウンドで接続する</string>
-    <string name="background_connect_all_desc">アクティブなサーバーだけでなく、保存されたすべてのサーバーの接続を維持します</string>
+    <string name="background_connect_all_desc">バックグラウンドで保存済みのすべてのサーバーに接続したままにする。バッテリーの消費が増えます。</string>
     <string name="err_empty_ip">サーバーアドレスを入力してください</string>
     <string name="err_invalid_port">ポートは 1 から 65535 までの数字である必要があります</string>
     <string name="err_duplicate_name">この名前のサーバーは既に存在します</string>

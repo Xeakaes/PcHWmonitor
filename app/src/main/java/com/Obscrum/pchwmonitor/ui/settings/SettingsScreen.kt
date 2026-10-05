@@ -2,6 +2,11 @@ package com.Obscrum.pchwmonitor.ui.settings
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,18 +14,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,9 +43,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.Obscrum.pchwmonitor.R
@@ -41,6 +59,7 @@ import com.Obscrum.pchwmonitor.data.ServerConfig
 import com.Obscrum.pchwmonitor.data.ThemeMode
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.ui.components.ConnectionBar
+import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.util.PATREON_URL
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,17 +182,24 @@ fun SettingsScreen(
             fontWeight = FontWeight.SemiBold,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        listOf(
-            ThemeMode.SYSTEM to labelThemeSystem,
-            ThemeMode.LIGHT to labelThemeLight,
-            ThemeMode.DARK to labelThemeDark,
-        ).forEach { (mode, label) ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            listOf(
+                ThemeMode.SYSTEM to labelThemeSystem,
+                ThemeMode.LIGHT to labelThemeLight,
+                ThemeMode.DARK to labelThemeDark,
+            ).forEachIndexed { index, (mode, label) ->
+                SegmentedButton(
                     selected = settings.theme == mode,
                     onClick = { onThemeChange(mode) },
-                )
-                Text(text = label, style = MaterialTheme.typography.bodyMedium)
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = 3),
+                ) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -184,10 +210,48 @@ fun SettingsScreen(
             fontWeight = FontWeight.SemiBold,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        paletteLabels.forEach { (id, label) ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = paletteId == id, onClick = { onPaletteChange(id) })
-                Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            paletteLabels.forEach { (id, label) ->
+                val selected = paletteId == id
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .semantics { contentDescription = label }
+                        .clip(CircleShape)
+                        .clickable { onPaletteChange(id) }
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(PaletteDefinitions.swatchColor(id)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (selected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                            )
+                        }
+                    }
+                    if (selected) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(20.dp))

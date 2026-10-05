@@ -31,6 +31,11 @@ object PaletteDefinitions {
             else -> if (dark) DarkColorScheme else LightColorScheme
         }
     }
+
+    fun swatchColor(id: String): Color = when (id) {
+        "material_you" -> Color(0xFF6750A4)
+        else -> schemeFor(id, dark = false).primary
+    }
 }
 
 val DarkColorScheme = darkColorScheme(

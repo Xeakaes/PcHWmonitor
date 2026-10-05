@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PaletteTest {
@@ -44,5 +45,34 @@ class PaletteTest {
             PaletteDefinitions.schemeFor("default", dark = true),
             PaletteDefinitions.schemeFor("bogus", dark = true),
         )
+    }
+
+    @Test
+    fun swatchColorUsesLightPrimary() {
+        assertEquals(Color(0xFF2563EB), PaletteDefinitions.swatchColor("default"))
+        assertEquals(Color(0xFF1E6FC2), PaletteDefinitions.swatchColor("ocean"))
+    }
+
+    @Test
+    fun swatchColorMaterialYouIsDistinctFromDefault() {
+        val materialYou = PaletteDefinitions.swatchColor("material_you")
+        assertEquals(Color(0xFF6750A4), materialYou)
+        assertNotEquals(PaletteDefinitions.swatchColor("default"), materialYou)
+    }
+
+    @Test
+    fun swatchColorUnknownFallsBackToDefault() {
+        assertEquals(
+            PaletteDefinitions.swatchColor("default"),
+            PaletteDefinitions.swatchColor("bogus"),
+        )
+    }
+
+    @Test
+    fun swatchColorEveryPaletteIsDistinct() {
+        val seen = mutableSetOf<Color>()
+        for (id in PaletteDefinitions.idsForApi(31)) {
+            assertTrue("duplicate swatch for $id", seen.add(PaletteDefinitions.swatchColor(id)))
+        }
     }
 }

@@ -137,7 +137,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                                 contentAlignment = Alignment.Center,
                             ) {
                                 EmptyStateCta(
-                                    title = stringResource(R.string.dashboard_empty_title),
+                                    title = stringResource(R.string.servers_empty_title),
                                     description = stringResource(R.string.dashboard_empty_desc),
                                     actionLabel = stringResource(R.string.dashboard_empty_action),
                                     onAction = { navController.navigate("servers") },

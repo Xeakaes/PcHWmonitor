@@ -145,7 +145,6 @@
     <string name="servers_empty_title">Brak serwerów</string>
     <string name="servers_empty_desc">Zeskanuj kod QR z aplikacji PC, aby dodać pierwszy serwer.</string>
     <string name="servers_empty_action">Dodaj ręcznie</string>
-    <string name="dashboard_empty_title">Brak skonfigurowanych serwerów</string>
     <string name="dashboard_empty_desc">Dodaj serwer, aby rozpocząć monitorowanie komputera.</string>
     <string name="dashboard_empty_action">Dodaj serwer</string>
     <string name="back">Wstecz</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">Połączenie</string>
     <string name="manage_servers">Zarządzaj</string>
     <string name="background_connect_all_label">Łącz ze wszystkimi serwerami w tle</string>
-    <string name="background_connect_all_desc">Utrzymuje połączenie z każdym zapisanym serwerem, nie tylko z aktywnym</string>
+    <string name="background_connect_all_desc">Utrzymuje w tle połączenie ze wszystkimi zapisanymi serwerami. Zużywa więcej baterii.</string>
     <string name="err_empty_ip">Adres serwera jest wymagany</string>
     <string name="err_invalid_port">Port musi być liczbą od 1 do 65535</string>
     <string name="err_duplicate_name">Serwer o tej nazwie już istnieje</string>

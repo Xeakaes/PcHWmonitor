@@ -145,7 +145,6 @@
     <string name="servers_empty_title">Серверов пока нет</string>
     <string name="servers_empty_desc">Отсканируйте QR-код из ПК-приложения, чтобы добавить первый сервер.</string>
     <string name="servers_empty_action">Добавить вручную</string>
-    <string name="dashboard_empty_title">Серверы не настроены</string>
     <string name="dashboard_empty_desc">Добавьте сервер, чтобы начать мониторинг вашего ПК.</string>
     <string name="dashboard_empty_action">Добавить сервер</string>
     <string name="back">Назад</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">Подключение</string>
     <string name="manage_servers">Управлять</string>
     <string name="background_connect_all_label">Подключаться ко всем серверам в фоновом режиме</string>
-    <string name="background_connect_all_desc">Поддерживает соединение со всеми сохранёнными серверами, а не только с активным</string>
+    <string name="background_connect_all_desc">Оставайтесь на связи со всеми сохранёнными серверами в фоне. Расходует больше заряда.</string>
     <string name="err_empty_ip">Укажите адрес сервера</string>
     <string name="err_invalid_port">Порт должен быть числом от 1 до 65535</string>
     <string name="err_duplicate_name">Сервер с таким именем уже существует</string>

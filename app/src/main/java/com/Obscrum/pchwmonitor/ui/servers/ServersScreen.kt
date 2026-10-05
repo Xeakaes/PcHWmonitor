@@ -83,13 +83,15 @@ fun ServersScreen(
                 }
             },
         )
-        ConnectionBar(
-            state = connectionState ?: ConnectionState.DISCONNECTED,
-            serverName = activeServer?.name?.ifBlank { defaultServerName },
-            labelConnecting = stringResource(R.string.connecting),
-            labelConnected = stringResource(R.string.connected),
-            labelDisconnected = stringResource(R.string.disconnected),
-        )
+        if (servers.isNotEmpty()) {
+            ConnectionBar(
+                state = connectionState ?: ConnectionState.DISCONNECTED,
+                serverName = activeServer?.name?.ifBlank { defaultServerName },
+                labelConnecting = stringResource(R.string.connecting),
+                labelConnected = stringResource(R.string.connected),
+                labelDisconnected = stringResource(R.string.disconnected),
+            )
+        }
         if (errorMessage != null) {
             Text(
                 text = errorMessage,

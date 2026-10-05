@@ -145,7 +145,6 @@
     <string name="servers_empty_title">Henüz sunucu yok</string>
     <string name="servers_empty_desc">İlk sunucunu eklemek için PC uygulamasındaki QR kodu tara.</string>
     <string name="servers_empty_action">Elle ekle</string>
-    <string name="dashboard_empty_title">Yapılandırılmış sunucu yok</string>
     <string name="dashboard_empty_desc">Bilgisayarını izlemeye başlamak için bir sunucu ekle.</string>
     <string name="dashboard_empty_action">Sunucu ekle</string>
     <string name="back">Geri</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">Bağlantı</string>
     <string name="manage_servers">Yönet</string>
     <string name="background_connect_all_label">Arka planda tüm sunuculara bağlan</string>
-    <string name="background_connect_all_desc">Yalnızca etkin sunucu yerine kayıtlı her sunucunun bağlı kalmasını sağlar</string>
+    <string name="background_connect_all_desc">Kayıtlı tüm sunuculara arka planda bağlı kal. Pili daha çok kullanır.</string>
     <string name="err_empty_ip">Sunucu adresi gerekli</string>
     <string name="err_invalid_port">Port 1 ile 65535 arasında bir sayı olmalıdır</string>
     <string name="err_duplicate_name">Bu adda bir sunucu zaten var</string>

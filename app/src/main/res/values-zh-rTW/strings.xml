@@ -145,7 +145,6 @@
     <string name="servers_empty_title">尚無伺服器</string>
     <string name="servers_empty_desc">掃描 PC 應用程式中的 QR 碼，以新增第一個伺服器。</string>
     <string name="servers_empty_action">手動新增</string>
-    <string name="dashboard_empty_title">未設定伺服器</string>
     <string name="dashboard_empty_desc">新增伺服器以開始監控你的電腦。</string>
     <string name="dashboard_empty_action">新增伺服器</string>
     <string name="back">返回</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">連線</string>
     <string name="manage_servers">管理</string>
     <string name="background_connect_all_label">在背景下連線至所有伺服器</string>
-    <string name="background_connect_all_desc">保持所有已儲存的伺服器連線，而非僅限使用中的伺服器</string>
+    <string name="background_connect_all_desc">在背景與所有已儲存的伺服器保持連線。耗電較多。</string>
     <string name="err_empty_ip">請輸入伺服器位址</string>
     <string name="err_invalid_port">連接埠必須是 1 到 65535 之間的數字</string>
     <string name="err_duplicate_name">已存在相同名稱的伺服器</string>

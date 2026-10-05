@@ -145,7 +145,6 @@
     <string name="servers_empty_title">还没有服务器</string>
     <string name="servers_empty_desc">扫描 PC 应用中的二维码以添加第一个服务器。</string>
     <string name="servers_empty_action">手动添加</string>
-    <string name="dashboard_empty_title">未配置服务器</string>
     <string name="dashboard_empty_desc">添加服务器以开始监控你的电脑。</string>
     <string name="dashboard_empty_action">添加服务器</string>
     <string name="back">返回</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">连接</string>
     <string name="manage_servers">管理</string>
     <string name="background_connect_all_label">在后台连接所有服务器</string>
-    <string name="background_connect_all_desc">保持所有已保存的服务器处于连接状态，而不仅是当前服务器</string>
+    <string name="background_connect_all_desc">在后台与所有已保存的服务器保持连接。耗电更多。</string>
     <string name="err_empty_ip">请输入服务器地址</string>
     <string name="err_invalid_port">端口必须是 1 到 65535 之间的数字</string>
     <string name="err_duplicate_name">已存在同名服务器</string>

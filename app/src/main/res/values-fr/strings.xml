@@ -145,7 +145,6 @@
     <string name="servers_empty_title">Aucun serveur pour le moment</string>
     <string name="servers_empty_desc">Scannez un code QR depuis l\'application PC pour ajouter votre premier serveur.</string>
     <string name="servers_empty_action">Ajouter manuellement</string>
-    <string name="dashboard_empty_title">Aucun serveur configuré</string>
     <string name="dashboard_empty_desc">Ajoutez un serveur pour commencer à surveiller votre PC.</string>
     <string name="dashboard_empty_action">Ajouter un serveur</string>
     <string name="back">Retour</string>
@@ -156,7 +155,7 @@
     <string name="connection_card_title">Connexion</string>
     <string name="manage_servers">Gérer</string>
     <string name="background_connect_all_label">Connecter tous les serveurs en arrière-plan</string>
-    <string name="background_connect_all_desc">Maintient chaque serveur enregistré connecté, et pas seulement celui qui est actif</string>
+    <string name="background_connect_all_desc">Reste connecté en arrière-plan à tous les serveurs enregistrés. Consomme plus de batterie.</string>
     <string name="err_empty_ip">L\'adresse du serveur est requise</string>
     <string name="err_invalid_port">Le port doit être un nombre entre 1 et 65535</string>
     <string name="err_duplicate_name">Un serveur portant ce nom existe déjà</string>
