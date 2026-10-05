@@ -157,4 +157,30 @@ class ServerEditViewModelTest {
         assertEquals("New PC", handle.store.settings.first().servers.single().name)
         handle.close()
     }
+
+    @Test
+    fun hostnamePresent_setsUseTlsTrue_onAdd() = runTest {
+        val handle = store(tmpDir())
+        val vm = ServerEditViewModel(handle.store, serverId = null)
+        vm.port.first { it == "8765" }
+        vm.name.value = "Tunnel PC"
+        vm.ip.value = ""
+        vm.hostname.value = " pc.example.com "
+        assertTrue(vm.save())
+        val saved = handle.store.settings.first().servers.single()
+        assertEquals("pc.example.com", saved.hostname)
+        assertTrue(saved.useTls)
+        handle.close()
+    }
+
+    @Test
+    fun hostnameBlank_setsUseTlsFalse_onAdd() = runTest {
+        val handle = store(tmpDir())
+        val vm = ServerEditViewModel(handle.store, serverId = null)
+        vm.port.first { it == "8765" }
+        vm.ip.value = "10.0.0.5"
+        assertTrue(vm.save())
+        assertFalse(handle.store.settings.first().servers.single().useTls)
+        handle.close()
+    }
 }

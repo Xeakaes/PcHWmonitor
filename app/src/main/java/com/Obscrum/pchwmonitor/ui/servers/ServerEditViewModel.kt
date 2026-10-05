@@ -86,6 +86,7 @@ class ServerEditViewModel(
                     port = portNumberOrBlocked,
                     token = trimmedToken.ifBlank { null },
                     hostname = trimmedHostname.ifBlank { null },
+                    useTls = trimmedHostname.isNotBlank(),
                 ),
             )
         } else {
