@@ -30,6 +30,7 @@
 
 ### Server-Side
 
+- [ ] **Linux server support (v1.7)**: Native Linux sensor source via psutil (CPU/RAM/temps/fans, optional NVML GPU), `source=auto` Linux fallback instead of lhm-lib/http, one-file Linux build script with cloudflared-linux embed, optional tray (pystray/AppIndicator), README quickstart. FPS stays Windows-only (PresentMon/ETW). Server core, XDG config path, cloudflared finder and CI smoke already pass on Ubuntu
 - [ ] **Better simulation mode**: Enhance `--simulate` mode with more realistic hardware profiles
 - [ ] **FPS improvements**: Add `--fps-process` auto-detection for common games
 - [ ] **Disk I/O improvements**: Add read/write latency metrics, SMART data support
@@ -68,7 +69,7 @@
 
 ### Long-term Vision (v2.0)
 
-- [ ] **Cross-platform host**: Linux and macOS support for the server
+- [ ] **Cross-platform host**: macOS support for the server (Linux ships in v1.7)
 - [ ] **Browser-based config**: Web interface for PC server configuration
 - [ ] **Cloud sync**: Optional encrypted sync of historical data
 - [ ] **Plugin system**: Extensible sensor/plugin architecture

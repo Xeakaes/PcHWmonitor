@@ -23,6 +23,7 @@
 
 ### Sunucu
 
+- [ ] **Linux sunucu desteği (v1.7)**: psutil tabanlı native Linux sensör kaynağı (CPU/RAM/sıcaklık/fan, opsiyonel NVML GPU), `source=auto` Linux fallback, Linux tek-dosya build scripti + cloudflared-linux embed, opsiyonel tray (pystray/AppIndicator), README Linux quickstart. FPS Windows'a özel kalır (PresentMon/ETW). Sunucu çekirdeği, XDG config path, cloudflared finder ve CI smoke Ubuntu'da zaten yeşil
 - [ ] Better simulation mode: `--simulate` için daha gerçekçi donanım profilleri
 - [ ] FPS improvements: `--fps-process` otomatik oyun algılama
 - [ ] Disk I/O improvements: okuma/yazma gecikmesi metrikleri, SMART verisi
@@ -61,7 +62,7 @@
 
 ### Uzun Vadeli (v2.0)
 
-- [ ] Cross-platform host: Linux ve macOS sunucu desteği
+- [ ] Cross-platform host: macOS sunucu desteği (Linux v1.7'de geliyor)
 - [ ] Browser-based config: PC sunucusu için web yapılandırma arayüzü
 - [ ] Cloud sync: opsiyonel şifreli geçmiş senkronizasyonu
 - [ ] Plugin system: genişletilebilir sensör/plugin mimarisi
