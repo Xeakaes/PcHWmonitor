@@ -5,7 +5,17 @@ set PY=server\.venv\Scripts\python.exe
 if not defined LHMDIR set LHMDIR=C:\Users\msi\LibreHardwareMonitor
 set VENDOR=server\vendor
 set PRESENTMON=server\presentmon\PresentMon64.exe
+if not defined CLOUDFLARED_VER set CLOUDFLARED_VER=2026.9.3
 if not exist "%VENDOR%" mkdir "%VENDOR%"
+REM embed cloudflared.exe so the tunnel works without a side-by-side binary
+if not exist "%VENDOR%\cloudflared.exe" (
+    echo Downloading cloudflared %CLOUDFLARED_VER% into %VENDOR%...
+    curl -fsSL -o "%VENDOR%\cloudflared.exe" "https://github.com/cloudflare/cloudflared/releases/download/%CLOUDFLARED_VER%/cloudflared-windows-amd64.exe"
+    if errorlevel 1 (
+        echo WARNING: cloudflared download failed - tunnel disabled in this build
+        if exist "%VENDOR%\cloudflared.exe" del /q "%VENDOR%\cloudflared.exe"
+    )
+)
 if exist "%LHMDIR%\*.dll" (
     copy /y "%LHMDIR%\*.dll" "%VENDOR%" >nul
 ) else (

@@ -1,0 +1,97 @@
+name: EXE build
+
+# Builds the Windows EXE on CI. No secrets involved: upstream binaries
+# (LibreHardwareMonitor, PresentMon, cloudflared) are fetched at build time
+# from their official releases at pinned versions, so no large binaries live
+# in the repo. On a v* tag the exe is attached to the release shell that the
+# Release workflow opens (the signed APK is still attached by hand — the
+# keystore never leaves the maintainer's machine).
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LHM_VERSION: "0.9.6"
+  PRESENTMON_VERSION: "2.5.1"
+  CLOUDFLARED_VERSION: "2026.9.3"
+
+jobs:
+  exe:
+    name: Build PcHwMonitor.exe
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@8549b9f8f590ad24eab7482f36f6e1e24d34597b # v6.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Create venv and install dependencies
+        shell: pwsh
+        run: |
+          python -m venv server\.venv
+          server\.venv\Scripts\python -m pip install --upgrade pip
+          server\.venv\Scripts\python -m pip install -r server\requirements.txt pyinstaller pythonnet
+
+      - name: Fetch LibreHardwareMonitor ${{ env.LHM_VERSION }}
+        shell: pwsh
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP "LibreHardwareMonitor.zip"
+          Invoke-WebRequest -Uri "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/download/v$env:LHM_VERSION/LibreHardwareMonitor.zip" -OutFile $zip
+          $dest = Join-Path $env:RUNNER_TEMP "lhm"
+          Expand-Archive -Path $zip -DestinationPath $dest -Force
+          if (-not (Test-Path (Join-Path $dest "LibreHardwareMonitorLib.dll"))) { throw "LibreHardwareMonitorLib.dll missing from LHM zip" }
+          "LHMDIR=$dest" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Fetch PresentMon ${{ env.PRESENTMON_VERSION }}
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/GameTechDev/PresentMon/releases/download/v$env:PRESENTMON_VERSION/PresentMon-$env:PRESENTMON_VERSION-x64.exe" -OutFile server\presentmon\PresentMon64.exe
+
+      - name: Build EXE
+        shell: cmd
+        run: build_exe.bat
+
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "dist\PcHwMonitor.exe")) { throw "dist\PcHwMonitor.exe not produced" }
+          $p = Start-Process -FilePath "dist\PcHwMonitor.exe" -ArgumentList "--simulate","--port","8765","--token","ci-smoke" -PassThru
+          $ok = $false
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            try {
+              $r = Invoke-RestMethod -Uri "http://127.0.0.1:8765/health" -TimeoutSec 3
+              if ($r.ok) { $ok = $true; break }
+            } catch {}
+          }
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          Get-Process PcHwMonitor -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          if (-not $ok) { throw "health check failed" }
+          Write-Host "health OK"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: PcHwMonitor-${{ github.ref_name }}
+          path: dist\PcHwMonitor.exe
+          if-no-files-found: error
+
+      - name: Attach exe to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+        with:
+          files: dist\PcHwMonitor.exe
