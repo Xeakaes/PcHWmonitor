@@ -99,7 +99,7 @@ The Android app only talks to the server; it never touches LibreHardwareMonitor 
 
 1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature). The console prints an **access token**, and the tray menu can display it again (Info) or show a **QR code** (Show QR).
 2. On your phone, open the **Settings** tab and tap **Fill via QR** to scan the code — IP, port and token fill automatically; or enter them manually (IP e.g. `192.168.1.50`, port `8765`) and press **Connect**.
-3. The EXE sits in the system tray (next to the clock); its menu offers **Show QR**, **Copy connection info** and **Info**, and **Exit** shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
+3. The EXE sits in the system tray (next to the clock); its menu offers **Show QR**, **Copy connection info**, **Info**, a tunnel submenu (start/stop a quick or named tunnel, copy/show the URL, Cloudflare login, auto-start) and **Exit**, which shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
 
 To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
 
@@ -137,7 +137,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 48 server tests
+.venv/bin/python -m pytest tests -v        # 72 server tests
 ```
 
 #### Android Setup
@@ -147,7 +147,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Tests: `./gradlew :app:testDebugUnitTest` (79 unit tests)
+Tests: `./gradlew :app:testDebugUnitTest` (125 unit tests)
 
 ### 5b. Remote Access via Cloudflare Tunnel
 
@@ -183,15 +183,7 @@ cloudflared tunnel login
 
 This opens a browser. Log in to your Cloudflare account and authorize.
 
-**Step 3: Create a tunnel**
-
-```bash
-cloudflared tunnel create pc-monitor
-```
-
-This gives you a tunnel ID (e.g. `a1b2c3d4-...`).
-
-**Step 4: Run the server with tunnel**
+**Step 3: Run the server with a named tunnel**
 
 ```bash
 PcHwMonitor.exe --tunnel pc-monitor
@@ -199,28 +191,47 @@ PcHwMonitor.exe --tunnel pc-monitor
 
 The server will:
 1. Start the WebSocket server on port 8765
-2. Start `cloudflared` as a child process
-3. Print the tunnel URL in the console
+2. Create the tunnel (id, ingress config and DNS route) automatically on first run — no manual `cloudflared tunnel create`
+3. Start `cloudflared` as a child process and print the tunnel URL in the console
 
-**Step 5: Connect from the app**
+Flags:
+
+- `--tunnel quick` — temporary trycloudflare URL, no login or domain needed
+- `--tunnel <name>` — named tunnel with a persistent URL (requires `cloudflared tunnel login` first; the cert lives at `~/.cloudflared/cert.pem`)
+- `--tunnel-hostname <host>` — public hostname for the named tunnel; falls back to the hostname saved in the config
+
+Tunnel state (tunnel id, hostname, auto-start flag) persists in `%APPDATA%\PcHwMonitor\tunnel.json` on Windows or `~/.config/pchwmonitor/tunnel.json` elsewhere, so a named tunnel keeps the same URL across restarts.
+
+**Step 4: Connect from the app**
 
 In the Android app's Settings:
 1. Add a new server
-2. Enter the tunnel URL as the IP (e.g. `abc123.trycloudflare.com`)
-3. Enter `443` as the port
-4. Enable TLS (the tunnel uses HTTPS/WSS)
-5. Enter your access token
-6. Tap **Connect**
+2. Scan the tray QR code (**Show QR**), or paste the hostname into the **Cloudflare Tunnel URL** field — the app sets TLS automatically for hostnames
+3. Enter your access token
+4. Tap **Connect**
+
+#### Tunnel menu in the tray
+
+The tray's tunnel submenu manages tunnels without a console:
+
+- **Start Quick Tunnel** — temporary URL, no Cloudflare account needed
+- **Start Named Tunnel...** — prompts for the tunnel name and the public hostname (the saved hostname is reused when it matches)
+- **Stop Tunnel**
+- **Copy Tunnel URL** / **Show Tunnel URL**
+- **Cloudflare Login** — runs `cloudflared tunnel login` for you
+- **Auto-start named tunnel** — reconnects the last named tunnel in the background every time the tray starts
+
+Named tunnels started from the menu get their ingress and DNS route set up automatically and persist across restarts.
 
 #### Quick Tunnel (no account required)
 
 For a temporary tunnel without any Cloudflare account:
 
 ```bash
-cloudflared tunnel --url http://localhost:8765
+python server/cli.py --tunnel quick --port 8080
 ```
 
-This generates a random URL that expires when you stop the process. Good for testing, not for daily use.
+This generates a random trycloudflare URL that expires when you stop the process. Good for testing, not for daily use.
 
 #### Troubleshooting
 
@@ -228,7 +239,7 @@ This generates a random URL that expires when you stop the process. Good for tes
 |---|---|
 | Tunnel URL not appearing | Make sure `cloudflared.exe` is in the same folder as `PcHwMonitor.exe` |
 | Connection refused | Check that the server is running on port 8765 before starting the tunnel |
-| SSL errors | The tunnel uses its own certificate; enable TLS in the app and trust the cert |
+| SSL errors | The tunnel uses its own certificate; the app turns TLS on for hostnames — trust the cert dialog on first connect |
 
 ### 6. WebSocket Protocol
 
@@ -359,7 +370,7 @@ Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması
 
 1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir). Konsol bir **erişim anahtarı** yazdırır; tepsi menüsünden tekrar görebilirsin (Info) veya **QR kod** görüntüleyebilirsin (Show QR).
 2. Telefonda **Ayarlar** sekmesini aç, **QR ile doldur**'a dokunup kodu okut — IP, port ve token otomatik dolar; ya da elle gir (IP örn. `192.168.1.50`, port `8765`) ve **Bağlan**'a bas.
-3. EXE sistem tepsisinde (saatin yanı) simge olarak durur; menüsünde **Show QR**, **Copy connection info** ve **Info** bulunur, **Exit** ile sunucu kapanır. İşlem yokken telefonda "Bağlantı yok" görünür.
+3. EXE sistem tepsisinde (saatin yanı) simge olarak durur; menüsünde **Show QR**, **Copy connection info**, **Info**, tunnel alt menüsü (quick veya named tunnel başlat/durdur, URL kopyala/göster, Cloudflare girişi, otomatik başlatma) ve sunucuyu kapatan **Exit** bulunur. İşlem yokken telefonda "Bağlantı yok" görünür.
 
 Yeniden derlemek için Windows'ta proje kökünde `build_exe.bat` (pythonnet + pyinstaller gerektirir; DLL'leri `server\vendor` içine kopyalar ve paketler). Paketli modda hata logu `dist\pchw.log` dosyasına yazılır.
 
@@ -397,7 +408,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # welcome + 3 status mesajı doğrular
-.venv/bin/python -m pytest tests -v        # 48 sunucu testi
+.venv/bin/python -m pytest tests -v        # 72 sunucu testi
 ```
 
 #### Android Kurulumu
@@ -407,7 +418,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Testler: `./gradlew :app:testDebugUnitTest` (79 birim testi)
+Testler: `./gradlew :app:testDebugUnitTest` (125 birim testi)
 
 ### 5b. Cloudflare Tunnel ile Uzaktan Erişim
 
@@ -443,15 +454,7 @@ cloudflared tunnel login
 
 Bu komut tarayıcıyı açar. Cloudflare hesabınıza giriş yapın ve yetkilendirin.
 
-**Adım 3: Tunnel oluşturun**
-
-```bash
-cloudflared tunnel create pc-monitor
-```
-
-Bu size bir tunnel ID verir (örn. `a1b2c3d4-...`).
-
-**Adım 4: Tunnel ile sunucuyu çalıştırın**
+**Adım 3: Sunuyu named tunnel ile çalıştırın**
 
 ```bash
 PcHwMonitor.exe --tunnel pc-monitor
@@ -459,28 +462,47 @@ PcHwMonitor.exe --tunnel pc-monitor
 
 Sunucu şunları yapar:
 1. 8765 portunda WebSocket sunucusunu başlatır
-2. `cloudflared`'ı alt süreç olarak başlatır
-3. Tunnel URL'sini konsola yazdırır
+2. Tunnel'ı (id, ingress yapılandırması ve DNS rotasını) ilk çalıştırmada otomatik oluşturur — manuel `cloudflared tunnel create` gerekmez
+3. `cloudflared`'ı alt süreç olarak başlatır ve tunnel URL'sini konsola yazdırır
 
-**Adım 5: Uygulamadan bağlanın**
+Seçenekler:
+
+- `--tunnel quick` — geçici trycloudflare URL'si, giriş veya alan adı gerekmez
+- `--tunnel <name>` — kalıcı URL'li named tunnel (önce `cloudflared tunnel login` gerekir; sertifika `~/.cloudflared/cert.pem` yolundadır)
+- `--tunnel-hostname <host>` — named tunnel için genel hostname; kayıtlı config hostname'ine düşer
+
+Tunnel durumu (tunnel id, hostname, otomatik başlatma bayrağı) Windows'ta `%APPDATA%\PcHwMonitor\tunnel.json`, diğer yerlerde `~/.config/pchwmonitor/tunnel.json` dosyasında saklanır; böylece named tunnel yeniden başlatmalarda aynı URL'yi korur.
+
+**Adım 4: Uygulamadan bağlanın**
 
 Android uygulamasının Ayarlar sekmesinde:
 1. Yeni sunucu ekleyin
-2. IP olarak tunnel URL'sini girin (örn. `abc123.trycloudflare.com`)
-3. Port olarak `443` girin
-4. TLS'i etkinleştirin (tunnel HTTPS/WSS kullanır)
-5. Erişim anahtarınızı girin
-6. **Bağlan**'a dokunun
+2. Tepsi QR kodunu (**Show QR**) okutun veya hostname'i **Cloudflare Tunnel URL** alanına yapıştırın — uygulama hostname'ler için TLS'i otomatik açar
+3. Erişim anahtarınızı girin
+4. **Bağlan**'a dokunun
+
+#### Tepsideki tunnel menüsü
+
+Tepsi ikonunun tunnel alt menüsü tunnel'ları konsolsuz yönetir:
+
+- **Start Quick Tunnel** — geçici URL, Cloudflare hesabı gerekmez
+- **Start Named Tunnel...** — tunnel adı ve genel hostname'ini sorar (kayıtlı hostname aynı tunnel adıyla eşleşirse yeniden kullanılır)
+- **Stop Tunnel**
+- **Copy Tunnel URL** / **Show Tunnel URL**
+- **Cloudflare Login** — `cloudflared tunnel login` komutunu sizin yerinize çalıştırır
+- **Auto-start named tunnel** — tepsi her açıldığında son named tunnel'ı arka planda yeniden bağlar
+
+Menüden başlatılan named tunnel'ların ingress ve DNS rotası otomatik kurulur ve yeniden başlatmalarda kalıcıdır.
 
 #### Quick Tunnel (hesap gerekmez)
 
-Geçici, Cloudflare hesabı gerektirmeyen tunnel için:
+Cloudflare hesabı gerektirmeyen geçici bir tunnel için:
 
 ```bash
-cloudflared tunnel --url http://localhost:8765
+python server/cli.py --tunnel quick --port 8080
 ```
 
-Bu rastgele bir URL oluşturur ve süreci durdurduğunuzda sona erer. Test için idealdir, günlük kullanım için değil.
+Bu, süreci durdurduğunuzda sona eren rastgele bir trycloudflare URL'si oluşturur. Test için idealdir, günlük kullanım için değil.
 
 #### Sorun Giderme
 
@@ -488,7 +510,7 @@ Bu rastgele bir URL oluşturur ve süreci durdurduğunuzda sona erer. Test için
 |---|---|
 | Tunnel URL'si görünmüyor | `cloudflared.exe`'nin `PcHwMonitor.exe` ile aynı klasörde olduğundan emin olun |
 | Bağlantı reddedildi | Tunnel'ı başlatmadan önce sunucunun 8765 portunda çalıştığından emin olun |
-| SSL hataları | Tunnel kendi sertifikasını kullanır; uygulamada TLS'i etkinleştirin ve sertifikayı onaylayın |
+| SSL hataları | Tunnel kendi sertifikasını kullanır; uygulama hostname'ler için TLS'i otomatik açar — ilk bağlantıda sertifika diyaloğunu onaylayın |
 
 ### 6. WebSocket Protokolü
 
