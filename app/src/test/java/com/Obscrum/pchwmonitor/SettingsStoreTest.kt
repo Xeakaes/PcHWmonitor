@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.ServerConfig
@@ -296,6 +297,38 @@ class SettingsStoreTest {
         val handle = store(tmpDir())
         handle.store.setBackgroundConnectAll(true)
         assertTrue(handle.store.settings.first().backgroundConnectAll)
+        handle.close()
+    }
+
+    @Test
+    fun legacyKeysPresent_migratesAndWritesBackExactlyOnce() = runTest {
+        val dir = tmpDir()
+        val first = store(dir)
+        first.dataStore.edit {
+            it[stringPreferencesKey("server_ip")] = "192.168.1.50"
+            it[intPreferencesKey("server_port")] = 9010
+            it[stringPreferencesKey("auth_token")] = "legacytok"
+        }
+        val s1 = first.store.settings.first()
+        assertEquals(1, s1.servers.size)
+        assertEquals("192.168.1.50", s1.servers.single().ip)
+        assertEquals(9010, s1.servers.single().port)
+        assertEquals("legacytok", s1.servers.single().token)
+        val s2 = first.store.settings.first()          // second emission: write-back must be stable
+        assertEquals(s1.servers, s2.servers)
+        first.close()
+        val second = store(dir)                         // fresh DataStore read = persisted write-back
+        assertEquals("192.168.1.50", second.store.settings.first().servers.single().ip)
+        second.close()
+    }
+
+    @Test
+    fun noLegacyKeys_doesNotWriteBack() = runTest {
+        val handle = store(tmpDir())
+        handle.store.settings.first()
+        val raw = handle.dataStore.data.first()[stringPreferencesKey("servers_json")]
+        assertNull(raw)                                  // untouched — no migration write
+        assertTrue(handle.store.settings.first().servers.isEmpty())
         handle.close()
     }
 }
