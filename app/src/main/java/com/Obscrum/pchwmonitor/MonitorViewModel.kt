@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class MonitorViewModel(app: Application) : AndroidViewModel(app) {
+class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val settingsStore: SettingsStore = SettingsStore(app.settingsDataStore)
     val settings: StateFlow<AppSettings> = settingsStore.settings
@@ -115,6 +115,11 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
                 // Load custom background if enabled
                 if (s.customBackgroundEnabled && s.customBackgroundUri != null) {
                     loadCustomBackground()
+                }
+                if (s.backgroundConnectAll) {
+                    runCatching { MonitorNotificationService.start(app) }
+                } else {
+                    MonitorNotificationService.stop(app)
                 }
             }
         }
@@ -195,8 +200,18 @@ class MonitorViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
         val ctrl = _controllers[activeId] ?: return
-        activeCollectJobs += viewModelScope.launch { ctrl.status.collect { _activeStatus.value = it } }
-        activeCollectJobs += viewModelScope.launch { ctrl.connection.collect { _activeConnection.value = it } }
+        activeCollectJobs += viewModelScope.launch {
+            ctrl.status.collect {
+                _activeStatus.value = it
+                MonitorNotificationService.updateStatus(it)
+            }
+        }
+        activeCollectJobs += viewModelScope.launch {
+            ctrl.connection.collect {
+                _activeConnection.value = it
+                it?.let { state -> MonitorNotificationService.updateConnectionState(state) }
+            }
+        }
         activeCollectJobs += viewModelScope.launch { ctrl.lastError.collect { _lastError.value = it } }
         activeCollectJobs += viewModelScope.launch {
             ctrl.certHash.collect { hash ->
