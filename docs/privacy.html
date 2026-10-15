@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — PC HW Monitor</title>
+<meta name="description" content="Privacy Policy for PC HW Monitor: no accounts, no ads, no analytics, no developer-operated servers. Your data stays on your devices." />
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://pchwmonitor.app/privacy" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232a2b3a'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%239fa2b9'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%235e6077'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%235e6077'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%239fa2b9'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --canvas: #07080a;
+  --surface: #0d0d0d;
+  --hairline: #242728;
+  --ink: #f4f4f6;
+  --body: #cdcdcd;
+  --mute: #9c9c9d;
+  --on-dark: #ffffff;
+  --accent-blue: #57c1ff;
+  --rounded-md: 8px;
+  --rounded-lg: 10px;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--canvas);
+  color: var(--body);
+  font-family: var(--font-inter);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 64px 24px; }
+h1 { color: var(--ink); font-size: 36px; font-weight: 600; line-height: 1.15; margin-bottom: 8px; }
+h2 { color: var(--on-dark); font-size: 20px; font-weight: 500; margin: 40px 0 12px; }
+.meta { color: var(--mute); font-size: 13px; margin-bottom: 40px; }
+p { margin-bottom: 14px; }
+ul { margin: 0 0 14px 20px; }
+li { margin-bottom: 8px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rounded-lg);
+  padding: 24px;
+  margin: 24px 0;
+}
+.back { display: inline-block; margin-bottom: 24px; font-size: 14px; color: var(--mute); }
+.back:hover { color: var(--on-dark); }
+strong { color: var(--on-dark); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="https://pchwmonitor.app/">&larr; pchwmonitor.app</a>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective date: October 15, 2026 &middot; Applies to the PC HW Monitor Android app (com.Obscrum.pchwmonitor)</p>
+
+  <div class="card">
+    <p><strong>The short version:</strong> PC HW Monitor has no accounts, no ads, no analytics and no developer-operated servers. Your hardware data and settings stay on your own devices. The app talks only to the PC server <em>you</em> set up.</p>
+  </div>
+
+  <h2>1. Data we do not collect</h2>
+  <p>The developer does not collect, transmit, sell or have access to any personal data. There is no registration, no login, no crash reporting, no tracking and no advertising SDK in the app.</p>
+
+  <h2>2. Data stored on your device</h2>
+  <ul>
+    <li><strong>Connection settings</strong> — server addresses, ports, access tokens and server names you enter are stored locally on your phone (encrypted Android storage / local database). They are never sent anywhere except to the server you configured.</li>
+    <li><strong>Hardware history</strong> — the last hour of received hardware metrics is kept in a local database on your phone and is deleted automatically as it ages out.</li>
+    <li><strong>Theme &amp; layout settings</strong> — palettes, card layout and similar preferences are stored locally.</li>
+  </ul>
+
+  <h2>3. How data moves</h2>
+  <ul>
+    <li><strong>Local network:</strong> the app connects directly to the PC HW Monitor server on your own network (WebSocket, optionally encrypted with TLS). Data flows between your phone and your PC only.</li>
+    <li><strong>Optional Cloudflare Tunnel:</strong> if <em>you</em> enable a Cloudflare Tunnel on the server, traffic passes through Cloudflare's edge network to reach your PC from outside your network. That is governed by <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noreferrer">Cloudflare's Privacy Policy</a>; the app developer never sees this traffic.</li>
+    <li>The app makes no other network requests. QR import reads an image you select; network discovery stays inside your local network.</li>
+  </ul>
+
+  <h2>4. Permissions explained</h2>
+  <ul>
+    <li><strong>Internet / network state / Wi-Fi multicast</strong> — connect to your server and discover it on the local network.</li>
+    <li><strong>Foreground service &amp; notifications</strong> — show live hardware stats in a persistent notification while connected (can be dismissed by disconnecting).</li>
+  </ul>
+
+  <h2>5. Third parties</h2>
+  <p>The app contains no third-party tracking or advertising. External links (e.g. Patreon, Cloudflare documentation) open outside the app and are subject to those sites' own policies.</p>
+
+  <h2>6. Children</h2>
+  <p>The app is a general-purpose utility and is not directed at children under 13. Since no data is collected from anyone, including children, no parental consent mechanism exists.</p>
+
+  <h2>7. Changes &amp; contact</h2>
+  <p>If this policy changes, the updated version will be published at this URL with a new effective date. Questions? Open an issue at the <a href="https://github.com/Xeakaes/PcHWmonitor/issues" target="_blank" rel="noreferrer">GitHub repository</a> — the source of the app and this policy is public under the AGPL-3.0 license.</p>
+</div>
+</body>
+</html>
