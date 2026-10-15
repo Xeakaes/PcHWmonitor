@@ -3,7 +3,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from adapters.simulator import Simulator  # noqa: E402
+from adapters.simulator import GPU_PROFILES, Simulator  # noqa: E402
+
+
+def test_simulator_gpu_profile_is_realistic():
+    for seed in range(12):
+        msg = Simulator(seed=seed).sample()
+        profile = next(p for p in GPU_PROFILES if p["name"] == msg.gpu.name)
+        assert msg.gpu.vramTotalMb == profile["vram_total_mb"], f"seed={seed} {msg.gpu.name}"
+        assert abs(msg.gpu.memClockMhz - profile["mem_clock_mhz"]) <= 50, f"seed={seed} {msg.gpu.name}"
 
 
 def test_simulator_values_in_ranges_and_change():

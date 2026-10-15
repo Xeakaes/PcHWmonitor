@@ -6,7 +6,11 @@ import time
 from schema import CpuInfo, DiskInfo, FanInfo, FpsInfo, GpuInfo, NetInfo, PcInfo, RamInfo, StatusMessage
 
 CPU_NAMES = ["Intel Core i7-13700K", "AMD Ryzen 7 7800X3D", "Intel Core i5-13600K"]
-GPU_NAMES = ["NVIDIA GeForce RTX 4070", "NVIDIA GeForce RTX 3060 Ti", "AMD Radeon RX 7800 XT"]
+GPU_PROFILES = [
+    {"name": "NVIDIA GeForce RTX 4070", "vram_total_mb": 12288.0, "mem_clock_mhz": 10501.0},
+    {"name": "NVIDIA GeForce RTX 3060 Ti", "vram_total_mb": 8192.0, "mem_clock_mhz": 7001.0},
+    {"name": "AMD Radeon RX 7800 XT", "vram_total_mb": 16384.0, "mem_clock_mhz": 2438.0},
+]
 
 
 class Simulator:
@@ -16,7 +20,7 @@ class Simulator:
         self._start = time.time()
         self.pc_name = platform.node() or "SIM-PC"
         self._cpu_name = self._rng.choice(CPU_NAMES)
-        self._gpu_name = self._rng.choice(GPU_NAMES)
+        self._gpu = self._rng.choice(GPU_PROFILES)
 
     def sample(self) -> StatusMessage:
         t = time.time() - self._start
@@ -30,7 +34,7 @@ class Simulator:
         gpu_temp = clamp(35 + gpu_usage * 0.42 + r.uniform(-1.5, 1.5), 25, 100)
         hotspot = clamp(gpu_temp + 10 + r.uniform(-1, 3), 30, 105)
 
-        vram_total = 12288.0
+        vram_total = self._gpu["vram_total_mb"]
         vram_used = vram_total * (0.25 + 0.6 * (gpu_usage / 100.0)) + r.uniform(-200, 200)
         vram_used = clamp(vram_used, 0, vram_total)
 
@@ -43,14 +47,14 @@ class Simulator:
             loads=[round(clamp(cpu_usage + r.uniform(-25, 25), 0, 100), 1) for _ in range(8)],
         )
         gpu = GpuInfo(
-            name=self._gpu_name,
+            name=self._gpu["name"],
             usagePct=round(gpu_usage, 1),
             tempC=round(gpu_temp, 1),
             hotspotC=round(hotspot, 1),
             vramUsedMb=round(vram_used, 0),
             vramTotalMb=vram_total,
             coreClockMhz=round(clamp(400 + (gpu_usage / 100.0) * 2300 + r.uniform(-60, 60), 300, 2900), 0),
-            memClockMhz=round(r.choice([10000.0, 10500.0, 11250.0, 14000.0]) + r.uniform(-30, 30), 0),
+            memClockMhz=round(self._gpu["mem_clock_mhz"] + r.uniform(-30, 30), 0),
             powerW=round(clamp(15 + gpu_usage * 1.9 + r.uniform(-8, 8), 5, 220), 1),
         )
         igpu = GpuInfo(
