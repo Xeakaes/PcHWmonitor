@@ -1,9 +1,12 @@
 package com.Obscrum.pchwmonitor
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.viewModelScope
@@ -40,16 +43,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.File
+
+private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class MonitorViewModel(app: Application) : AndroidViewModel(app) {
 
-    val settingsStore: SettingsStore = SettingsStore(
-        PreferenceDataStoreFactory.create(
-            scope = viewModelScope,
-            produceFile = { File(app.filesDir, "settings.preferences_pb") },
-        ),
-    )
+    val settingsStore: SettingsStore = SettingsStore(app.settingsDataStore)
     val settings: StateFlow<AppSettings> = settingsStore.settings
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
     val chartWindowSeconds: StateFlow<Int> = settingsStore.settings
