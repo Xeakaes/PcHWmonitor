@@ -1,18 +1,21 @@
-<p>PC HW Monitor, bilgisayarının anlık donanım istatistiklerini yerel Wi-Fi üzerinden telefonunda gösterir.</p>
+<p>PC HW Monitor, bilgisayarının anlık donanım istatistiklerini telefonunda gösterir — yerel Wi-Fi üzerinden veya isteğe bağlı Cloudflare Tunnel ile her yerden.</p>
 
 <b>Özellikler</b><br/><br/>
 <ul>
 <li>Sıcaklık, kullanım, saat hızı, güç, VRAM/RAM ve çekirdek yükleriyle CPU, GPU, iGPU ve RAM kartları</li>
+<li>Disk, ağ, fan ve FPS kartları (FPS gömülü PresentMon ile)</li>
 <li>Canlı grafikler ve 1 saatlik geçmiş (cihazda yerel olarak saklanır)</li>
-<li>Açık ve koyu tema</li>
-<li>Yatay mod: tüm kartlar tek ekranda kaydırmasız kompakt 2x2 ızgarada</li>
+<li>Açık/koyu varyantlı 9 renk paleti, dashboard düzenleme modu, yatay mod</li>
+<li>Çoklu PC desteği: birden fazla bilgisayara bağlan, sekmelerle geçiş yap</li>
+<li>İsteğe bağlı TLS/SSL (wss://) ve güvenli uzaktan erişim için Cloudflare Tunnel</li>
+<li>QR ile hızlı bağlanma, ağ taraması, canlı istatistikli kalıcı bildirim</li>
 <li>Ayarlar'dan seçilebilen 14 dil</li>
 </ul><br/>
 
 <b>Nasıl çalışır</b><br/><br/>
-<p>PC'nde kurulum gerektirmeyen tek dosyalık Windows sunucusunu çalıştır. Sunucu, donanım verilerini LibreHardwareMonitor'dan okur ve saniyede bir WebSocket üzerinden uygulamaya gönderir. Uygulama yalnızca yerel Wi-Fi ağında sunucuyla konuşur; verilerin ağından dışarı çıkmaz.</p>
+<p>PC'nde kurulum gerektirmeyen tek dosyalık Windows sunucusunu çalıştır. Sunucu, donanım verilerini LibreHardwareMonitor'dan okur ve saniyede bir WebSocket üzerinden uygulamaya gönderir. Varsayılan olarak uygulama yalnızca yerel Wi-Fi ağında sunucuyla konuşur; isteğe bağlı Cloudflare Tunnel'ı açmadıkça verilerin ağdan dışarı çıkmaz.</p>
 <p>PC donanımın yok mu? Sunucuyu --simulate ile başlatarak gerçekçi sahte veri üretebilirsin.</p><br/>
 
 <b>Lisans</b><br/><br/>
-<p>AGPL-3.0. Windows sunucusu LibreHardwareMonitor (AGPL-3.0) paketler.</p>
+<p>AGPL-3.0. Windows sunucusu LibreHardwareMonitor (AGPL-3.0), cloudflared (Apache-2.0) ve PresentMon (MIT) paketler.</p>
 <p>Bu uygulama işine yaradıysa geliştirmeyi Patreon üzerinden destekleyebilirsin: <a href="https://www.patreon.com/cw/Obscrum">Patreon</a>.</p>

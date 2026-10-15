@@ -1,18 +1,21 @@
-<p>PC HW Monitor shows your PC's real-time hardware statistics on your phone over local Wi-Fi.</p>
+<p>PC HW Monitor shows your PC's real-time hardware statistics on your phone — over local Wi-Fi, or anywhere via an optional Cloudflare Tunnel.</p>
 
 <b>Features</b><br/><br/>
 <ul>
 <li>CPU, GPU, iGPU and RAM cards with temperatures, usage, clock speeds, power, VRAM/RAM and per-core loads</li>
+<li>Disk, network, fan and FPS cards (FPS via embedded PresentMon)</li>
 <li>Live charts and 1-hour history (stored locally on the device)</li>
-<li>Light and dark theme</li>
-<li>Landscape mode: all cards in a compact scroll-free 2x2 grid on one screen</li>
+<li>9 color palettes with light and dark variants, dashboard edit mode, landscape mode</li>
+<li>Multi-PC support: connect to several PCs and switch via dashboard tabs</li>
+<li>Optional TLS/SSL (wss://) and Cloudflare Tunnel for secure remote access</li>
+<li>QR quick connect, network scan, persistent notification with live stats</li>
 <li>14 languages, selectable in Settings</li>
 </ul><br/>
 
 <b>How it works</b><br/><br/>
-<p>Run the bundled single-file Windows server (no installation needed) on your PC. It reads hardware data from LibreHardwareMonitor and streams it over WebSocket to the app once per second. The app only talks to the server over your local Wi-Fi; no data leaves your network.</p>
+<p>Run the bundled single-file Windows server (no installation needed) on your PC. It reads hardware data from LibreHardwareMonitor and streams it over WebSocket to the app once per second. By default the app only talks to the server over your local Wi-Fi; no data leaves your network unless you enable the optional Cloudflare Tunnel.</p>
 <p>No PC hardware available? Start the server with --simulate to generate realistic fake data.</p><br/>
 
 <b>License</b><br/><br/>
-<p>AGPL-3.0. The Windows server bundles LibreHardwareMonitor (AGPL-3.0).</p>
+<p>AGPL-3.0. The Windows server bundles LibreHardwareMonitor (AGPL-3.0), cloudflared (Apache-2.0) and PresentMon (MIT).</p>
 <p>If this app is useful to you, consider supporting development on Patreon: <a href="https://www.patreon.com/cw/Obscrum">Patreon</a>.</p>

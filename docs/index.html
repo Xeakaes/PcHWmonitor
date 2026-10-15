@@ -4,13 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PC HW Monitor — Your PC on your phone</title>
-<meta name="description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM and more streamed over local Wi-Fi." />
+<meta name="description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM streamed over local Wi-Fi — or anywhere via Cloudflare Tunnel." />
 <meta name="keywords" content="pc hw monitor, android hardware dashboard, remote pc monitoring, open source telemetry">
 <meta name="robots" content="index, follow">
 <meta name="googlebot" content="index, follow">
 <meta name="google-site-verification" content="DN_JodShVPapdB1r7m7HzUvDP_grr1r2i_oGJKR6k_E" />
 <meta property="og:title" content="PC HW Monitor — PC hardware stats on your phone" />
-<meta property="og:description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM and more streamed over local Wi-Fi." />
+<meta property="og:description" content="Turn your Android phone into a PC hardware monitor. Real-time CPU, GPU, RAM streamed over local Wi-Fi — or anywhere via Cloudflare Tunnel." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta property="og:image" content="https://pchwmonitor.app/og-image.png" />
@@ -546,7 +546,7 @@ section { padding: var(--spacing-section) 0; }
           <span class="num keycap">02</span>
           <div class="feature-row-content">
             <h3 class="heading-md">Themes & Palettes</h3>
-            <p class="body-md">Personalize your dashboard with system-aware Light and Dark modes. Choose from 5 distinct color palettes (Default, Ocean, Ember, Forest, Black & Gold) to match your setup perfectly.</p>
+            <p class="body-md">Personalize your dashboard with system-aware Light and Dark modes. Choose from 9 distinct color palettes (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) to match your setup perfectly.</p>
             
             <!-- Mini Theme Gallery -->
             <div class="theme-gallery">
@@ -565,7 +565,15 @@ section { padding: var(--spacing-section) 0; }
           <span class="num keycap">03</span>
           <div class="feature-row-content">
             <h3 class="heading-md">Zero-install Windows EXE</h3>
-            <p class="body-md">Operates as a single executable file with no bulky installers. Just run it and connect. Includes a safe `--simulate` mode for testing.</p>
+            <p class="body-md">Operates as a single executable file with no bulky installers. Cloudflared, LibreHardwareMonitor and PresentMon are embedded, so tunnels and FPS work out of the box. Includes a safe `--simulate` mode for testing.</p>
+          </div>
+        </div>
+
+        <div class="feature-row">
+          <span class="num keycap">04</span>
+          <div class="feature-row-content">
+            <h3 class="heading-md">Remote access & encryption</h3>
+            <p class="body-md">Optional Cloudflare Tunnel gives your PC a persistent URL — check your stats from anywhere, no port forwarding or static IP needed. Multi-PC support with dashboard tabs, plus optional TLS/SSL (wss://) with a self-signed certificate dialog.</p>
           </div>
         </div>
       </div>
@@ -634,12 +642,9 @@ section { padding: var(--spacing-section) 0; }
   </div>
   <div class="footer-bottom">
     <span>AGPL-3.0 © Xeakaes — PC HW Monitor</span>
-    <span>Bundles AGPL-3.0 LibreHardwareMonitor DLL</span>
+    <span>Bundles LibreHardwareMonitor (AGPL-3.0), cloudflared (Apache-2.0), PresentMon (MIT)</span>
   </div>
 </footer>
-
-</body>
-</html>
 
 </body>
 </html>

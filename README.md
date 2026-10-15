@@ -36,7 +36,9 @@
 
 <sup><strong>License:</strong> [AGPL-3.0](LICENSE) — the Windows EXE bundles
 [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor)
-(`LibreHardwareMonitorLib.dll`), also AGPL-3.0.
+(`LibreHardwareMonitorLib.dll`), also AGPL-3.0, plus
+[cloudflared](https://github.com/cloudflare/cloudflared) (Apache-2.0) and
+[PresentMon](https://github.com/GameTechDev/PresentMon) (MIT).
 <strong>Support:</strong> [Patreon](https://www.patreon.com/cw/Obscrum)</sup>
 
 <a id="english"></a>
@@ -48,7 +50,8 @@
    - CPU / GPU / iGPU / RAM cards — temperatures, usage, clock speeds, power, VRAM/RAM, core loads
    - Disk, Network, Fan, and FPS cards — disk usage & throughput, net up/down, fan RPM, game FPS with 1% low
    - Live charts, configurable chart window (30s / 60s / 300s), 1-hour history (Room DB), custom logo
-   - **9 color palettes** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — light/dark variants, applies instantly from Settings
+   - **9 color palettes** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — light/dark variants, two-tone swatch picker, applies instantly from Settings
+   - **Simplified settings**: two-tone palette swatches (primary/accent split), segmented theme picker, and a battery hint for background connect
    - **Dashboard edit mode**: reorder cards, hide/unhide cards, pin cards to the first screen, and toggle each card between half/full width
    - **Landscape mode: compact scroll-free grid on one screen**, with the nav bar auto-hiding and reappearing on tap; tablets get a wider multi-column layout
    - **Custom Background**: set any image as app background; Material You palette auto-extracted via Palette API for full theme override
@@ -58,7 +61,7 @@
    - **Notification**: persistent notification shows active server's hardware stats; title reflects the active PC name
    - 14 languages (selectable in Settings)
 - **Flexible connection setup**: enter the IP + port + access token manually, tap **Scan network** to find the server automatically, or tap **Fill via QR** — the server tray displays a QR code that fills everything on the phone with a single scan
-- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil`; packaged FPS support uses an embedded `PresentMon64.exe` (see Building the EXE).
+- **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. The EXE also embeds `cloudflared` (tunnels work out of the box) and `PresentMon64.exe` for FPS. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil` (see Building the EXE).
 - **Server SSL/TLS**: optional `--ssl-cert`/`--ssl-key` flags for encrypted connections; `--ssl-cert auto` generates a self-signed certificate automatically
 
 ### 2. Screenshots
@@ -70,8 +73,8 @@
 
 ### 3. Download
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also on [F-Droid](https://f-droid.org/) (MR !44635, CI passing).
-- **Windows:** `PcHwMonitor.exe` — single-file server, built with `build_exe.bat` (see Getting Started).
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also coming to [F-Droid](https://f-droid.org/) (MR !44635, CI green including `fdroid build`, awaiting merge).
+- **Windows:** `PcHwMonitor.exe` — single-file server. Release builds are produced by CI on every tag (cloudflared, LibreHardwareMonitor and PresentMon embedded); rebuild locally with `build_exe.bat` (see Getting Started).
 
 ### 4. Architecture
 
@@ -103,7 +106,7 @@ The Android app only talks to the server; it never touches LibreHardwareMonitor 
 
 To rebuild, run `build_exe.bat` at the project root on Windows (needs pythonnet + pyinstaller; it copies the DLLs into `server\vendor` and bundles them). In packaged mode, errors are logged to `dist\pchw.log`.
 
-`psutil` (used for Disk and Network sensors) is listed in `server/requirements.txt`. Packaged FPS support additionally requires `server/presentmon/PresentMon64.exe`; `build_exe.bat` copies it into `dist/` when present and disables FPS otherwise.
+`psutil` (used for Disk and Network sensors) is listed in `server/requirements.txt`. Packaged FPS support additionally requires `server/presentmon/PresentMon64.exe`; `build_exe.bat` bundles it into the EXE when present and disables FPS otherwise. `cloudflared.exe` is downloaded into `server\vendor` automatically at build time when missing.
 
 #### Server Setup (development)
 
@@ -116,7 +119,7 @@ python -m venv .venv
 .venv\Scripts\python main.py
 ```
 
-Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>`
+Options: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>` · `--token <key>` · `--ssl-cert <file|auto>` · `--ssl-key <file>` · `--tunnel <quick|name>` · `--tunnel-hostname <host>`
 
 - `--source auto` (default): uses the embedded DLL if present (`lib`), falls back to the LHM web server.
 - `--source lib`: reads `LibreHardwareMonitorLib.dll` in-process (DLL path can be set via the `LHMDIR` env var).
@@ -137,7 +140,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 72 server tests
+.venv/bin/python -m pytest tests -v        # 77 server tests
 ```
 
 #### Android Setup
@@ -147,7 +150,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Tests: `./gradlew :app:testDebugUnitTest` (125 unit tests)
+Tests: `./gradlew :app:testDebugUnitTest` (128 unit tests)
 
 ### 5b. Remote Access via Cloudflare Tunnel
 
@@ -173,7 +176,7 @@ By default, PC HW Monitor works on your local Wi-Fi network only. If you want to
 
 **Step 1: Install cloudflared**
 
-Download from https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/ and place `cloudflared.exe` next to `PcHwMonitor.exe`.
+Nothing to do on v1.6.1+ — the EXE embeds `cloudflared` automatically (downloaded at build time). For manual setups or older builds, download it from https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/ and place `cloudflared.exe` next to `PcHwMonitor.exe`.
 
 **Step 2: Authenticate with Cloudflare**
 
@@ -237,7 +240,7 @@ This generates a random trycloudflare URL that expires when you stop the process
 
 | Problem | Solution |
 |---|---|
-| Tunnel URL not appearing | Make sure `cloudflared.exe` is in the same folder as `PcHwMonitor.exe` |
+| Tunnel URL not appearing | v1.6.1+ embeds cloudflared automatically; on older builds make sure `cloudflared.exe` is in the same folder as `PcHwMonitor.exe` |
 | Connection refused | Check that the server is running on port 8765 before starting the tunnel |
 | SSL errors | The tunnel uses its own certificate; the app turns TLS on for hostnames — trust the cert dialog on first connect |
 
@@ -316,7 +319,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
 
 [GNU AGPL v3](LICENSE) (GNU Affero General Public License, version 3).
 
-- The Windows EXE bundles [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`), also AGPL-3.0. When distributing the EXE, the corresponding source and license must be made available (see section 13 of the AGPL).
+- The Windows EXE bundles [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`), also AGPL-3.0. When distributing the EXE, the corresponding source and license must be made available (see section 13 of the AGPL). It also bundles [cloudflared](https://github.com/cloudflare/cloudflared) (Apache-2.0) and [PresentMon](https://github.com/GameTechDev/PresentMon) (MIT).
 - The Android app and server source code are licensed under AGPL-3.0.
 
 ---
@@ -331,12 +334,13 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
    - CPU / GPU / iGPU / RAM kartları — sıcaklık, kullanım, saat hızları, güç, VRAM/RAM, çekirdek yükleri
    - Disk, Ağ, Fan ve FPS kartları — disk kullanımı ve aktarım, ağ gönderim/alan, fan RPM, oyun FPS'yi ve 1% düşük değeri (1% low)
    - Canlı grafikler, grafik penceresi (30s / 60s / 300s), 1 saatlik geçmiş (Room DB), özel logo
-   - **9 renk paleti** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — açık/koyu varyantlarla, ayarlardan anında uygulanır
+   - **9 renk paleti** (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic) — açık/koyu varyantlarla, iki renkli daire seçiciyle, ayarlardan anında uygulanır
+   - **Sadeleştirilmiş ayarlar**: iki renkli palet daireleri (primary/accent ayrımı), segmentli tema seçici ve arka plan bağlantısı için pil ipucu
    - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
    - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
    - 14 dil (ayarlardan seçilebilir)
 - **Esnek bağlantı kurulumu**: IP + port + erişim anahtarını elle girin, **Ağı tara** ile sunucuyu otomatik bulun veya **QR ile doldur**'a dokunun — sunucu tepsisindeki QR kodu tek okutmayla her şeyi telefona doldurur
-- **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur; paketli FPS desteği gömülü `PresentMon64.exe`'e dayanır (bunu `build_exe.bat` inşa eder).
+- **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. EXE ayrıca `cloudflared` (tunnel'lar kutudan çıkar çıkmaz çalışır) ve FPS için `PresentMon64.exe` paketler. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur (bkz. Derleme).
 
 ### 2. Ekran Görüntüleri
 
@@ -347,8 +351,8 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons.
 
 ### 3. İndirme
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) üzerinde (MR !44635, CI başarılı).
-- **Windows:** `PcHwMonitor.exe` — tek dosyalık sunucu; `build_exe.bat` ile derlenir (bkz. Başlarken).
+- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) üzerinde yakında (MR !44635, `fdroid build` dahil CI yeşil, merge bekleniyor).
+- **Windows:** `PcHwMonitor.exe` — tek dosyalık sunucu. Release sürümleri her tag'da CI tarafından üretilir (cloudflared, LibreHardwareMonitor ve PresentMon gömülü); lokalde `build_exe.bat` ile yeniden derleyebilirsin (bkz. Başlarken).
 
 ### 4. Mimari
 
@@ -374,7 +378,7 @@ Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması
 
 Yeniden derlemek için Windows'ta proje kökünde `build_exe.bat` (pythonnet + pyinstaller gerektirir; DLL'leri `server\vendor` içine kopyalar ve paketler). Paketli modda hata logu `dist\pchw.log` dosyasına yazılır.
 
-`psutil` (Disk ve Ağ sensörleri için) `server/requirements.txt`'de listelenir. Paketli FPS desteği ayrıca `server/presentmon/PresentMon64.exe` gerektirir; `build_exe.bat` bulursa `dist/` içine kopyalar, yoksa FPS devre dışı kalır.
+`psutil` (Disk ve Ağ sensörleri için) `server/requirements.txt`'de listelenir. Paketli FPS desteği ayrıca `server/presentmon/PresentMon64.exe` gerektirir; `build_exe.bat` bulursa EXE'ye paketler, yoksa FPS devre dışı kalır. `cloudflared.exe` derleme sırasında eksikse otomatik olarak `server\vendor` içine indirilir.
 
 #### Sunucu Kurulumu (geliştirme)
 
@@ -387,7 +391,7 @@ python -m venv .venv
 .venv\Scripts\python main.py
 ```
 
-Seçenekler: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>`
+Seçenekler: `--port <8765>` · `--source <auto|http|lib>` · `--lhm-url <http://127.0.0.1:8085/data.json>` · `--interval <ms>` · `--simulate` · `--fps-process <name>` · `--token <anahtar>` · `--ssl-cert <dosya|auto>` · `--ssl-key <dosya>` · `--tunnel <quick|name>` · `--tunnel-hostname <host>`
 
 - `--source auto` (varsayılan): gömülü DLL varsa `lib`, yoksa LHM web sunucusuna düşer.
 - `--source lib`: `LibreHardwareMonitorLib.dll`'yi süreç içinde okur (DLL yolu `LHMDIR` env değişkeniyle verilebilir).
@@ -408,7 +412,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # welcome + 3 status mesajı doğrular
-.venv/bin/python -m pytest tests -v        # 72 sunucu testi
+.venv/bin/python -m pytest tests -v        # 77 sunucu testi
 ```
 
 #### Android Kurulumu
@@ -418,7 +422,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Testler: `./gradlew :app:testDebugUnitTest` (125 birim testi)
+Testler: `./gradlew :app:testDebugUnitTest` (128 birim testi)
 
 ### 5b. Cloudflare Tunnel ile Uzaktan Erişim
 
@@ -444,7 +448,7 @@ Varsayılan olarak PC HW Monitor yalnızca yerel Wi-Fi ağında çalışır. PC'
 
 **Adım 1: cloudflared'ı yükleyin**
 
-https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/ adresinden indirin ve `cloudflared.exe`'yi `PcHwMonitor.exe`'nin yanına koyun.
+v1.6.1+ için bir şey yapmanıza gerek yok — EXE `cloudflared`'ı otomatik paketler (derleme sırasında indirilir). Manuel kurulumlar veya eski sürümler için https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/ adresinden indirip `cloudflared.exe`'yi `PcHwMonitor.exe`'nin yanına koyun.
 
 **Adım 2: Cloudflare ile kimlik doğrulama**
 
@@ -508,7 +512,7 @@ Bu, süreci durdurduğunuzda sona eren rastgele bir trycloudflare URL'si oluştu
 
 | Sorun | Çözüm |
 |---|---|
-| Tunnel URL'si görünmüyor | `cloudflared.exe`'nin `PcHwMonitor.exe` ile aynı klasörde olduğundan emin olun |
+| Tunnel URL'si görünmüyor | v1.6.1+ cloudflared'ı otomatik paketler; eski sürümlerde `cloudflared.exe`'nin `PcHwMonitor.exe` ile aynı klasörde olduğundan emin olun |
 | Bağlantı reddedildi | Tunnel'ı başlatmadan önce sunucunun 8765 portunda çalıştığından emin olun |
 | SSL hataları | Tunnel kendi sertifikasını kullanır; uygulama hostname'ler için TLS'i otomatik açar — ilk bağlantıda sertifika diyaloğunu onaylayın |
 
@@ -587,5 +591,5 @@ Evet, AGPL-3.0 lisanslı. Geliştirme Patreon destekçileri sayesinde sürüyor.
 
 [GNU AGPL v3](LICENSE) (GNU Affero General Public License, sürüm 3).
 
-- Windows EXE, yine AGPL-3.0 olan [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`) dosyasını paketler. EXE dağıtımında karşılık gelen kaynak kod ve lisansın sunulması gerekir (AGPL madde 13).
+- Windows EXE, yine AGPL-3.0 olan [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (`LibreHardwareMonitorLib.dll`) dosyasını paketler. EXE dağıtımında karşılık gelen kaynak kod ve lisansın sunulması gerekir (AGPL madde 13). Ayrıca [cloudflared](https://github.com/cloudflare/cloudflared) (Apache-2.0) ve [PresentMon](https://github.com/GameTechDev/PresentMon) (MIT) paketlenir.
 - Android uygulaması ve sunucu kaynak kodu AGPL-3.0 ile lisanslıdır.
