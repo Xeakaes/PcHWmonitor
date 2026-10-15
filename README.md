@@ -39,7 +39,7 @@
 (`LibreHardwareMonitorLib.dll`), also AGPL-3.0, plus
 [cloudflared](https://github.com/cloudflare/cloudflared) (Apache-2.0) and
 [PresentMon](https://github.com/GameTechDev/PresentMon) (MIT).
-<strong>Support:</strong> [Patreon](https://www.patreon.com/cw/Obscrum)</sup>
+<strong>Support:</strong> [Patreon](https://www.patreon.com/cw/Obscrum) · [Buy Me a Coffee](https://buymeacoffee.com/Obscrum)</sup>
 
 <a id="english"></a>
 ## English
@@ -313,7 +313,7 @@ Optional. v1.6 adds TLS/SSL support — run the server with `--ssl-cert auto` fo
 14 languages, selectable in Settings.
 
 **Is it free?**
-Yes, AGPL-3.0. Development is supported by Patreon patrons.
+Yes, AGPL-3.0. Development is supported by Patreon patrons and Buy Me a Coffee supporters.
 
 ### 9. License
 
@@ -585,7 +585,7 @@ Opsiyonel. v1.6 TLS/SSL desteği ekledi — sunucuyu `--ssl-cert auto` ile çal�
 Ayarlardan seçilebilen 14 dil.
 
 **Ücretsiz mi?**
-Evet, AGPL-3.0 lisanslı. Geliştirme Patreon destekçileri sayesinde sürüyor.
+Evet, AGPL-3.0 lisanslı. Geliştirme Patreon destekçileri ve Buy Me a Coffee katkılarıyla sürüyor.
 
 ### 9. Lisans
 

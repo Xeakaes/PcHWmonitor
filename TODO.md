@@ -32,6 +32,7 @@
 
 ### Android
 
+- [ ] Uygulama içi destek linki: Settings/About'a Buy Me a Coffee (`buymeacoffee.com/Obscrum`) + Patreon girişi
 - [ ] Home screen widget: hızlı istatistik widget'ı
 - [ ] Offline mode: son bilinen veriyi önbellekle, sunucusuz çalış
 - [ ] Background updates: uygulama arka plandayken bağlantıyı sürdür
