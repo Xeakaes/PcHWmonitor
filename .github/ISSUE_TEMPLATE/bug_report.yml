@@ -57,7 +57,7 @@ body:
     id: server-version
     attributes:
       label: Server version
-      description: Check the file name of the downloaded PcHwMonitor.exe (e.g. PcHwMonitor-1.6.1.exe).
+      description: The release tag on the GitHub Releases page you downloaded it from (e.g. v1.6.2).
       placeholder: "e.g. 1.6.1"
     validations:
       required: true
