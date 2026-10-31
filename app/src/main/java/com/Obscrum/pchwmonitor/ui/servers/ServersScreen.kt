@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -58,6 +60,7 @@ fun ServersScreen(
     onQrPayload: (QrPayload.Result) -> Unit,
     onAddManual: () -> Unit,
     errorMessage: String? = null,
+    onShowSetupHelp: () -> Unit = {},
 ) {
     var pendingDeleteId by remember { mutableStateOf<String?>(null) }
     val pendingDelete = servers.find { it.id == pendingDeleteId }
@@ -79,6 +82,18 @@ fun ServersScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
+                    )
+                }
+            },
+            actions = {
+                IconButton(
+                    onClick = onShowSetupHelp,
+                    modifier = Modifier.size(48.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+                        contentDescription = stringResource(R.string.setup_help_description),
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             },

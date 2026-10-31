@@ -325,6 +325,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     val activeConnection by viewModel.activeConnection.collectAsState()
                     val context = LocalContext.current
                     val errorMessage = viewModel.lastError.collectAsState().value?.let { context.resolveError(it) }
+                    var setupHelpVisible by rememberSaveable { mutableStateOf(false) }
                     ServersScreen(
                         servers = servers,
                         activeServerId = activeServerId,
@@ -336,7 +337,13 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         onQrPayload = viewModel::connectViaQr,
                         onAddManual = { navController.navigate("server_edit") },
                         errorMessage = errorMessage,
+                        onShowSetupHelp = { setupHelpVisible = true },
                     )
+                    if (setupHelpVisible) {
+                        ServerSetupInfoDialog(
+                            onDismiss = { setupHelpVisible = false },
+                        )
+                    }
                 }
                 composable(
                     route = "server_edit?serverId={serverId}",
