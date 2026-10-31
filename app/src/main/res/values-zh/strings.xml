@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1%% 低帧: %1$.0f</string>
     <string name="unknown_device">未知设备</string>
+    <string name="setup_info_title">连接到电脑</string>
+    <string name="setup_info_step1">从发布页面下载服务器（PcHwMonitor.exe，约 50 MB）</string>
+    <string name="setup_info_step2">运行它。无需安装</string>
+    <string name="setup_info_step3">确保手机和电脑连接同一 Wi-Fi，然后点按“扫描二维码”</string>
+    <string name="setup_info_smartscreen">如果 Windows 显示 SmartScreen 警告：更多信息，然后仍要运行</string>
+    <string name="setup_info_open_page">打开下载页面</string>
+    <string name="setup_info_copy_link">复制链接</string>
+    <string name="setup_info_got_it">知道了</string>
+    <string name="setup_info_copied">链接已复制</string>
+    <string name="setup_help_description">设置帮助</string>
 </resources>

@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1 %% baixo: %1$.0f</string>
     <string name="unknown_device">Dispositivo desconhecido</string>
+    <string name="setup_info_title">Ligue-se ao seu PC</string>
+    <string name="setup_info_step1">Descarregue o servidor (PcHwMonitor.exe, ~50 MB) na página de lançamentos</string>
+    <string name="setup_info_step2">Execute-o. Não é necessária instalação</string>
+    <string name="setup_info_step3">Mantenha o telemóvel e o PC na mesma rede Wi-Fi e toque em \"Ler código QR\"</string>
+    <string name="setup_info_smartscreen">Se o Windows mostrar um aviso SmartScreen: Mais informações, depois Executar assim mesmo</string>
+    <string name="setup_info_open_page">Abrir página de transferência</string>
+    <string name="setup_info_copy_link">Copiar ligação</string>
+    <string name="setup_info_got_it">Entendido</string>
+    <string name="setup_info_copied">Ligação copiada</string>
+    <string name="setup_help_description">Ajuda da configuração</string>
 </resources>

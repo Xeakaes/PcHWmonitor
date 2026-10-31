@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1%%ロー: %1$.0f</string>
     <string name="unknown_device">不明なデバイス</string>
+    <string name="setup_info_title">PCに接続</string>
+    <string name="setup_info_step1">リリースページからサーバー (PcHwMonitor.exe、約 50 MB) をダウンロード</string>
+    <string name="setup_info_step2">実行してください。インストールは不要です</string>
+    <string name="setup_info_step3">スマートフォンとPCを同じWi-Fiに接続し、「QRコードをスキャン」をタップ</string>
+    <string name="setup_info_smartscreen">WindowsにSmartScreenの警告が表示された場合: 「詳細情報」をクリックし、「実行する」を選択</string>
+    <string name="setup_info_open_page">ダウンロードページを開く</string>
+    <string name="setup_info_copy_link">リンクをコピー</string>
+    <string name="setup_info_got_it">わかりました</string>
+    <string name="setup_info_copied">リンクをコピーしました</string>
+    <string name="setup_help_description">セットアップのヘルプ</string>
 </resources>

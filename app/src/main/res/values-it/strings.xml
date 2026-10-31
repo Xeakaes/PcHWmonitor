@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1 %% basso: %1$.0f</string>
     <string name="unknown_device">Dispositivo sconosciuto</string>
+    <string name="setup_info_title">Collegati al tuo PC</string>
+    <string name="setup_info_step1">Scarica il server (PcHwMonitor.exe, ~50 MB) dalla pagina delle release</string>
+    <string name="setup_info_step2">Eseguilo. Non serve installare nulla</string>
+    <string name="setup_info_step3">Mantieni telefono e PC sulla stessa rete Wi-Fi, poi tocca \"Scansiona codice QR\"</string>
+    <string name="setup_info_smartscreen">Se Windows mostra un avviso SmartScreen: Più informazioni, poi Esegui comunque</string>
+    <string name="setup_info_open_page">Apri pagina di download</string>
+    <string name="setup_info_copy_link">Copia link</string>
+    <string name="setup_info_got_it">Ho capito</string>
+    <string name="setup_info_copied">Link copiato</string>
+    <string name="setup_help_description">Guida alla configurazione</string>
 </resources>

@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1 %% laag: %1$.0f</string>
     <string name="unknown_device">Onbekend apparaat</string>
+    <string name="setup_info_title">Verbind met je pc</string>
+    <string name="setup_info_step1">Download de server (PcHwMonitor.exe, ~50 MB) van de releasepagina</string>
+    <string name="setup_info_step2">Start deze. Er is geen installatie nodig</string>
+    <string name="setup_info_step3">Houd telefoon en pc op hetzelfde wifi-netwerk en tik op \"QR-code scannen\"</string>
+    <string name="setup_info_smartscreen">Als Windows een SmartScreen-waarschuwing toont: Meer info, daarna Toch uitvoeren</string>
+    <string name="setup_info_open_page">Downloadpagina openen</string>
+    <string name="setup_info_copy_link">Link kopiëren</string>
+    <string name="setup_info_got_it">Begrepen</string>
+    <string name="setup_info_copied">Link gekopieerd</string>
+    <string name="setup_help_description">Setup-hulp</string>
 </resources>
