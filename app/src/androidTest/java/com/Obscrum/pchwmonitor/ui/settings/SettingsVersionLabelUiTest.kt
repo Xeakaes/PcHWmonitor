@@ -56,6 +56,7 @@ class SettingsVersionLabelUiTest {
                     labelSupport = "Support",
                     labelSupportDescription = "Support the project",
                     labelSupportPatreon = "Patreon",
+                    labelSupportBuyMeACoffee = "Buy me a coffee",
                 )
             }
         }

@@ -31,6 +31,7 @@
     <string name="support">支持</string>
     <string name="support_description">這個應用程式是免費開源的。如果對你有用，可以在 Patreon 上支持開發。</string>
     <string name="support_patreon">在 Patreon 上支持</string>
+    <string name="support_buy_me_a_coffee">請我喝杯咖啡</string>
     <string name="no_data">暫無資料 — 請在設定頁連接到電腦伺服器</string>
     <string name="last_hour">最近一小時</string>
     <string name="min">最低</string>

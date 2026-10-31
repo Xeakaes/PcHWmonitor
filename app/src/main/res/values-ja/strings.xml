@@ -31,6 +31,7 @@
     <string name="support">支援</string>
     <string name="support_description">このアプリは無料のオープンソースです。役に立つと思ったら、Patreonで開発を支援できます。</string>
     <string name="support_patreon">Patreonで支援する</string>
+    <string name="support_buy_me_a_coffee">コーヒーをおごってください</string>
     <string name="no_data">データがありません — 設定タブから PC サーバーに接続してください</string>
     <string name="last_hour">直近 1 時間</string>
     <string name="min">最小</string>

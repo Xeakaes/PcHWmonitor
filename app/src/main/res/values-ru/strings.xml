@@ -31,6 +31,7 @@
     <string name="support">Поддержка</string>
     <string name="support_description">Это приложение бесплатное и с открытым исходным кодом. Если оно полезно для вас, вы можете поддержать разработку на Patreon.</string>
     <string name="support_patreon">Поддержать на Patreon</string>
+    <string name="support_buy_me_a_coffee">Поставь мне кофе</string>
     <string name="no_data">Нет данных — подключитесь к серверу ПК во вкладке Настройки</string>
     <string name="last_hour">Последний час</string>
     <string name="min">Мин</string>

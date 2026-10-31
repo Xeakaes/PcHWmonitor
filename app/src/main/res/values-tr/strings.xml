@@ -31,6 +31,7 @@
     <string name="support">Destek</string>
     <string name="support_description">Bu uygulama ücretsiz ve açık kaynak. İşine yaradıysa geliştirmeyi Patreon üzerinden destekleyebilirsin.</string>
     <string name="support_patreon">Patreon\'da destekle</string>
+    <string name="support_buy_me_a_coffee">Bana bir kahve ısmarla</string>
     <string name="no_data">Veri yok — Ayarlar sekmesinden PC sunucusuna bağlanın</string>
     <string name="last_hour">Son 1 saat</string>
     <string name="min">En düşük</string>

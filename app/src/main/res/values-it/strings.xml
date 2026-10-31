@@ -31,6 +31,7 @@
     <string name="support">Supporto</string>
     <string name="support_description">Questa app è gratuita e open source. Se ti è utile, puoi sostenere lo sviluppo su Patreon.</string>
     <string name="support_patreon">Sostieni su Patreon</string>
+    <string name="support_buy_me_a_coffee">Offrimi un caffè</string>
     <string name="no_data">Nessun dato — connettiti al server del tuo PC da Impostazioni</string>
     <string name="last_hour">Ultima ora</string>
     <string name="min">Min</string>

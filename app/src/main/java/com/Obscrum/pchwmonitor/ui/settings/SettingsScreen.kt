@@ -66,6 +66,7 @@ import com.Obscrum.pchwmonitor.data.ThemeMode
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.ui.components.ConnectionBar
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
+import com.Obscrum.pchwmonitor.util.BUY_ME_A_COFFEE_URL
 import com.Obscrum.pchwmonitor.util.PATREON_URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -102,6 +103,7 @@ fun SettingsScreen(
     labelSupport: String,
     labelSupportDescription: String,
     labelSupportPatreon: String,
+    labelSupportBuyMeACoffee: String,
     modifier: Modifier = Modifier,
     // Custom Background parameters
     labelCustomBackground: String = "Custom Background",
@@ -420,6 +422,18 @@ fun SettingsScreen(
             },
         ) {
             Text(labelSupportPatreon)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = {
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, BUY_ME_A_COFFEE_URL.toUri()))
+                } catch (_: android.content.ActivityNotFoundException) {
+                    // No browser available
+                }
+            },
+        ) {
+            Text(labelSupportBuyMeACoffee)
         }
         Spacer(modifier = Modifier.height(32.dp))
         Text(

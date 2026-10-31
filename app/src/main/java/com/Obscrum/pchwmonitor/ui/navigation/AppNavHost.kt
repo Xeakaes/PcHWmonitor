@@ -302,6 +302,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         labelSupport = stringResource(R.string.support),
                         labelSupportDescription = stringResource(R.string.support_description),
                         labelSupportPatreon = stringResource(R.string.support_patreon),
+                        labelSupportBuyMeACoffee = stringResource(R.string.support_buy_me_a_coffee),
                         // Custom Background parameters
                         labelCustomBackground = stringResource(R.string.custom_background),
                         labelCustomBackgroundDescription = stringResource(R.string.custom_background_description),
