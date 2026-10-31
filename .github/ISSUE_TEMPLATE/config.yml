@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup guide
+    url: https://xeakaes.github.io/PcHWmonitor/
+    about: How to download and run the Windows server, and connect the app.

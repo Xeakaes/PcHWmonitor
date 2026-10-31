@@ -1,0 +1,126 @@
+name: Bug report
+description: Something isn't working (connection, pairing, dashboard, crash...)
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! The more details you give, the faster I can fix it.
+        Most connection problems are fixed by checking the "Connection" section below.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen instead.
+      placeholder: "e.g. The app says 'Connecting...' forever and never shows my PC's stats."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do right before the problem appeared?
+      placeholder: |
+        1. Started the server on my PC
+        2. Opened the app and tapped "Scan QR code"
+        3. ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does the problem happen?
+      options:
+        - Connecting / pairing to the server
+        - Dashboard (stats not showing or wrong values)
+        - Settings / themes / languages
+        - Server (PC side) crash or error
+        - App crash
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Bottom of the Settings screen, or the Play Store page.
+      placeholder: "e.g. 1.6.1"
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: Server version
+      description: Check the file name of the downloaded PcHwMonitor.exe (e.g. PcHwMonitor-1.6.1.exe).
+      placeholder: "e.g. 1.6.1"
+    validations:
+      required: true
+
+  - type: input
+    id: phone
+    attributes:
+      label: Phone model and Android version
+      placeholder: "e.g. Pixel 7, Android 15"
+    validations:
+      required: true
+
+  - type: input
+    id: pc
+    attributes:
+      label: PC operating system
+      placeholder: "e.g. Windows 11 23H2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connection
+    attributes:
+      label: Connection type
+      options:
+        - Local network (same Wi-Fi)
+        - Cloudflare Tunnel (--tunnel)
+        - Manual IP address
+        - Not sure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: connection-checks
+    attributes:
+      label: Connection checklist (only if this is a connection problem)
+      options:
+        - label: Phone and PC are on the same Wi-Fi network
+        - label: The server is running on the PC (I can see it in the tray / window)
+        - label: Windows Firewall did not block the server (I allowed it when asked)
+        - label: I'm not using a VPN on the phone or the PC
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server log / error message
+      description: Paste the last lines of pchw.log (found next to PcHwMonitor.exe), or any error shown in the server window. Please remove anything private (IP addresses, tokens).
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag and drop images here (phone and/or server window).
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Other apps, security software, special network setup, etc.
+    validations:
+      required: false
