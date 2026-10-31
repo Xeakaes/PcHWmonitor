@@ -3,7 +3,9 @@ package com.Obscrum.pchwmonitor.ui.settings
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,14 +47,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.Obscrum.pchwmonitor.BuildConfig
 import com.Obscrum.pchwmonitor.R
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.ServerConfig
@@ -62,7 +68,7 @@ import com.Obscrum.pchwmonitor.ui.components.ConnectionBar
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.util.PATREON_URL
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
@@ -114,6 +120,7 @@ fun SettingsScreen(
     onCustomBackgroundRemove: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val activeServer = servers.find { it.id == activeServerId }
     val defaultServerName = stringResource(R.string.default_server_name)
 
@@ -415,5 +422,15 @@ fun SettingsScreen(
             Text(labelSupportPatreon)
         }
         Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "PC HW Monitor v${BuildConfig.VERSION_NAME}",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(onClick = {}, onLongClick = { clipboard.setText(AnnotatedString(BuildConfig.VERSION_NAME)) })
+                .padding(bottom = 8.dp),
+            textAlign = TextAlign.Center,
+        )
     }
 }
