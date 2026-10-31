@@ -323,6 +323,21 @@ class SettingsStoreTest {
     }
 
     @Test
+    fun setupInfoShownDefaultsToFalse() = runTest {
+        val handle = store(tmpDir())
+        assertFalse(handle.store.settings.first().setupInfoShown)
+        handle.close()
+    }
+
+    @Test
+    fun setSetupInfoShownPersists() = runTest {
+        val handle = store(tmpDir())
+        handle.store.setSetupInfoShown(true)
+        assertTrue(handle.store.settings.first().setupInfoShown)
+        handle.close()
+    }
+
+    @Test
     fun noLegacyKeys_doesNotWriteBack() = runTest {
         val handle = store(tmpDir())
         handle.store.settings.first()

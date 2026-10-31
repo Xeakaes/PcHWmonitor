@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
@@ -31,6 +32,7 @@ data class AppSettings(
     val glassmorphismEnabled: Boolean = false,
     val customBackgroundUri: String? = null,
     val backgroundConnectAll: Boolean = false,
+    val setupInfoShown: Boolean = false,
 )
 
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
@@ -49,6 +51,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyServersJson = stringPreferencesKey("servers_json")
     private val keyActiveServerId = stringPreferencesKey("active_server_id")
     private val keyBackgroundConnectAll = stringPreferencesKey("background_connect_all")
+    private val keySetupInfoShown = booleanPreferencesKey("setup_info_shown")
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -93,6 +96,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             glassmorphismEnabled = prefs[keyGlassmorphismEnabled] == "true",
             customBackgroundUri = prefs[keyCustomBackgroundUri]?.takeIf { it.isNotBlank() },
             backgroundConnectAll = prefs[keyBackgroundConnectAll] == "true",
+            setupInfoShown = prefs[keySetupInfoShown] ?: false,
         )
     }
 
@@ -175,6 +179,10 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setBackgroundConnectAll(value: Boolean) {
         dataStore.edit { it[keyBackgroundConnectAll] = value.toString() }
+    }
+
+    suspend fun setSetupInfoShown(shown: Boolean) {
+        dataStore.edit { it[keySetupInfoShown] = shown }
     }
 
     suspend fun savePreferences(theme: ThemeMode, language: String?, chartWindowSeconds: Int, themePaletteId: String) {
