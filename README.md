@@ -60,7 +60,7 @@
    - **TLS/SSL**: optional encrypted WebSocket connections (`wss://`) with self-signed cert trust dialog
    - **Notification**: persistent notification shows active server's hardware stats; title reflects the active PC name
    - 14 languages (selectable in Settings)
-- **Flexible connection setup**: enter the IP + port + access token manually, tap **Scan network** to find the server automatically, or tap **Fill via QR** — the server tray displays a QR code that fills everything on the phone with a single scan
+- **Flexible connection setup**: tap **Scan QR code** on the Servers screen — the server tray displays a QR code that fills IP, port and token on the phone with a single scan — or tap **Add manually** to enter the IP + port + access token yourself
 - **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. The EXE also embeds `cloudflared` (tunnels work out of the box) and `PresentMon64.exe` for FPS. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil` (see Building the EXE).
 - **Server SSL/TLS**: optional `--ssl-cert`/`--ssl-key` flags for encrypted connections; `--ssl-cert auto` generates a self-signed certificate automatically
 
@@ -100,7 +100,7 @@ The Android app only talks to the server; it never touches LibreHardwareMonitor 
 
 #### Windows EXE (recommended)
 
-1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature). The console prints an **access token**, and the tray menu can display it again (Info) or show a **QR code** (Show QR).
+1. Run `dist\PcHwMonitor.exe`, accept the UAC prompt (admin rights are needed for CPU temperature). If Windows shows a SmartScreen warning, click **More info**, then **Run anyway** — no installation is needed. The console prints an **access token**, and the tray menu can display it again (Info) or show a **QR code** (Show QR).
 2. On your phone, open the **Settings** tab and tap **Fill via QR** to scan the code — IP, port and token fill automatically; or enter them manually (IP e.g. `192.168.1.50`, port `8765`) and press **Connect**.
 3. The EXE sits in the system tray (next to the clock); its menu offers **Show QR**, **Copy connection info**, **Info**, a tunnel submenu (start/stop a quick or named tunnel, copy/show the URL, Cloudflare login, auto-start) and **Exit**, which shuts the server down. The phone shows "Bağlantı yok" (No connection) when it is offline.
 
@@ -150,7 +150,9 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Tests: `./gradlew :app:testDebugUnitTest` (128 unit tests)
+Tests: `./gradlew :app:testDebugUnitTest` (139 unit tests)
+
+**Something not working?** Report it on the [GitHub Issues](https://github.com/Xeakaes/PcHWmonitor/issues) page.
 
 ### 5b. Remote Access via Cloudflare Tunnel
 
@@ -339,7 +341,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons and Buy Me a Coffee s
    - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
    - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
    - 14 dil (ayarlardan seçilebilir)
-- **Esnek bağlantı kurulumu**: IP + port + erişim anahtarını elle girin, **Ağı tara** ile sunucuyu otomatik bulun veya **QR ile doldur**'a dokunun — sunucu tepsisindeki QR kodu tek okutmayla her şeyi telefona doldurur
+- **Esnek bağlantı kurulumu**: Sunucular ekranında **QR kodu tara**'ya dokunun — sunucu tepsisindeki QR kodu IP, port ve anahtarı tek okutmayla telefona doldurur — ya da **Elle ekle** ile IP + port + erişim anahtarını kendiniz girin
 - **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. EXE ayrıca `cloudflared` (tunnel'lar kutudan çıkar çıkmaz çalışır) ve FPS için `PresentMon64.exe` paketler. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur (bkz. Derleme).
 
 ### 2. Ekran Görüntüleri
@@ -372,7 +374,7 @@ Android yalnızca sunucuyla konuşur; LibreHardwareMonitor ile doğrudan teması
 
 #### Windows EXE (önerilen yol)
 
-1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir). Konsol bir **erişim anahtarı** yazdırır; tepsi menüsünden tekrar görebilirsin (Info) veya **QR kod** görüntüleyebilirsin (Show QR).
+1. `dist\PcHwMonitor.exe`'yi çalıştır, UAC istemini onayla (CPU sıcaklığı için yönetici gerekir). Windows bir SmartScreen uyarısı gösterirse: **Daha fazla bilgi**, ardından **Yine de çalıştır** — kurulum gerekmez. Konsol bir **erişim anahtarı** yazdırır; tepsi menüsünden tekrar görebilirsin (Info) veya **QR kod** görüntüleyebilirsin (Show QR).
 2. Telefonda **Ayarlar** sekmesini aç, **QR ile doldur**'a dokunup kodu okut — IP, port ve token otomatik dolar; ya da elle gir (IP örn. `192.168.1.50`, port `8765`) ve **Bağlan**'a bas.
 3. EXE sistem tepsisinde (saatin yanı) simge olarak durur; menüsünde **Show QR**, **Copy connection info**, **Info**, tunnel alt menüsü (quick veya named tunnel başlat/durdur, URL kopyala/göster, Cloudflare girişi, otomatik başlatma) ve sunucuyu kapatan **Exit** bulunur. İşlem yokken telefonda "Bağlantı yok" görünür.
 
@@ -422,7 +424,9 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Testler: `./gradlew :app:testDebugUnitTest` (128 birim testi)
+Testler: `./gradlew :app:testDebugUnitTest` (139 birim testi)
+
+**Sorun mu var?** [GitHub Issues](https://github.com/Xeakaes/PcHWmonitor/issues) sayfasından bildir.
 
 ### 5b. Cloudflare Tunnel ile Uzaktan Erişim
 
