@@ -179,4 +179,14 @@
     <string name="notif_line_fps">FPS: %1$.0f</string>
     <string name="notif_line_low1">1%% düşük: %1$.0f</string>
     <string name="unknown_device">Bilinmeyen cihaz</string>
+    <string name="setup_info_title">PC\'ye bağlan</string>
+    <string name="setup_info_step1">Sunucuyu (PcHwMonitor.exe, ~50 MB) indirme sayfasından indir</string>
+    <string name="setup_info_step2">Çalıştır. Kurulum gerekmez</string>
+    <string name="setup_info_step3">Telefon ve PC aynı Wi-Fi\'de olsun, sonra \"QR kodu tara\" düğmesine dokun</string>
+    <string name="setup_info_smartscreen">Windows SmartScreen uyarısı çıkarsa: Daha fazla bilgi, ardından Yine de çalıştır</string>
+    <string name="setup_info_open_page">İndirme sayfasını aç</string>
+    <string name="setup_info_copy_link">Bağlantıyı kopyala</string>
+    <string name="setup_info_got_it">Anladım</string>
+    <string name="setup_info_copied">Bağlantı kopyalandı</string>
+    <string name="setup_help_description">Kurulum yardımı</string>
 </resources>
