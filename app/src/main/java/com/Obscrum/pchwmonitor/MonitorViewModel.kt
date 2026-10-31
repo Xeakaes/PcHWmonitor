@@ -46,11 +46,16 @@ import kotlinx.coroutines.launch
 
 private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+data class SetupInfoState(val setupInfoShown: Boolean, val serverCount: Int)
+
 class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val settingsStore: SettingsStore = SettingsStore(app.settingsDataStore)
     val settings: StateFlow<AppSettings> = settingsStore.settings
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
+    val setupInfoState: StateFlow<SetupInfoState?> = settingsStore.settings
+        .map { SetupInfoState(it.setupInfoShown, it.servers.size) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
     val chartWindowSeconds: StateFlow<Int> = settingsStore.settings
         .map { it.chartWindowSeconds }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings().chartWindowSeconds)
@@ -280,6 +285,10 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setLanguage(language: String?) {
         viewModelScope.launch { settingsStore.setLanguage(language) }
+    }
+
+    fun markSetupInfoShown() {
+        viewModelScope.launch { settingsStore.setSetupInfoShown(true) }
     }
 
     fun setChartWindowSeconds(seconds: Int) {

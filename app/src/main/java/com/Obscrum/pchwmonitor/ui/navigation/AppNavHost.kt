@@ -51,11 +51,13 @@ import android.os.Build
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.Obscrum.pchwmonitor.MonitorViewModel
 import com.Obscrum.pchwmonitor.R
+import com.Obscrum.pchwmonitor.data.SetupInfo
 import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.ui.components.EmptyStateCta
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardScreen
 import com.Obscrum.pchwmonitor.ui.servers.ServerEditScreen
 import com.Obscrum.pchwmonitor.ui.servers.ServerEditViewModel
+import com.Obscrum.pchwmonitor.ui.servers.ServerSetupInfoDialog
 import com.Obscrum.pchwmonitor.ui.servers.ServersScreen
 import com.Obscrum.pchwmonitor.ui.theme.PaletteDefinitions
 import com.Obscrum.pchwmonitor.ui.history.HistoryMetric
@@ -404,6 +406,28 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                     Button(onClick = { viewModel.dismissCertDialog() }) {
                         Text(stringResource(R.string.cert_trust_cancel))
                     }
+                },
+            )
+        }
+        // First-launch setup info dialog (gated on DataStore load via nullable setupInfoState)
+        val setupInfoState by viewModel.setupInfoState.collectAsState()
+        var setupInfoVisible by rememberSaveable { mutableStateOf(false) }
+        LaunchedEffect(setupInfoState) {
+            val s = setupInfoState ?: return@LaunchedEffect   // still loading — do nothing
+            when {
+                s.serverCount > 0 -> {
+                    setupInfoVisible = false                  // loaded existing user: never show
+                    if (!s.setupInfoShown) viewModel.markSetupInfoShown()
+                }
+                SetupInfo.shouldShow(s.setupInfoShown, s.serverCount) -> setupInfoVisible = true
+                else -> setupInfoVisible = false              // flag already set
+            }
+        }
+        if (setupInfoVisible) {
+            ServerSetupInfoDialog(
+                onDismiss = {
+                    setupInfoVisible = false
+                    viewModel.markSetupInfoShown()
                 },
             )
         }
