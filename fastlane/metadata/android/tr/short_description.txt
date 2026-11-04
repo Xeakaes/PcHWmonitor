@@ -1,1 +1,1 @@
-Bilgisayarının CPU, GPU ve RAM verilerini yerel Wi-Fi'da telefonda göster.
+Windows PC'nin CPU, GPU ve RAM verilerini Wi-Fi'da telefonda göster.
