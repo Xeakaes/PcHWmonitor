@@ -179,6 +179,51 @@ class MonitorControllerTest {
     }
 
     @Test
+    fun connectAcceptsTailscaleAndNetbirdAddresses() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        for (host in listOf(
+            "100.64.0.1",
+            "100.127.255.254",
+            "pc.tailnet.ts.net",
+            "pc.netbird.cloud",
+        )) {
+            controller.connect(host, 8765)
+        }
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(4, client.urls.size)
+        assertNull(controller.lastError.value)
+    }
+
+    @Test
+    fun connectRejectsPublicCgnatNeighborsAndNonBoundaryHosts() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = CoroutineScope(dispatcher)
+        val client = FakeWsClient()
+        val controller = MonitorController(client, FakeHistoryStore(), scope)
+
+        controller.start()
+        for (host in listOf(
+            "100.63.255.255",
+            "100.128.0.1",
+            // Dot-boundary checks: end with "ts.net" but not ".ts.net".
+            "notats.net",
+            "pc.ts.net.attacker.com",
+        )) {
+            controller.connect(host, 8765)
+        }
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(client.urls.isEmpty())
+        assertEquals(AppError.AddressInvalid, controller.lastError.value)
+    }
+
+    @Test
     fun recordsHistoryWithIntervalThrottle() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = CoroutineScope(dispatcher)

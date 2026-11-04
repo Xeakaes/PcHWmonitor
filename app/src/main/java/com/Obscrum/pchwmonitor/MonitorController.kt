@@ -109,13 +109,16 @@ class MonitorController(
         private fun isAllowedHost(host: String): Boolean {
             // Allow known hostnames (Cloudflare tunnels, localhost, etc.)
             val lower = host.lowercase()
-            if (lower == "localhost" || lower.endsWith(".trycloudflare.com")) return true
+            if (lower == "localhost" || lower.endsWith(".trycloudflare.com") ||
+                lower.endsWith(".ts.net") || lower.endsWith(".netbird.cloud")
+            ) return true
             // Allow private IPs
             val parts = host.split('.').mapNotNull { it.toIntOrNull() }
             if (parts.size != 4 || parts.any { it !in 0..255 }) return false
             val a = parts[0]
             val b = parts[1]
-            return a == 10 || (a == 172 && b in 16..31) || (a == 192 && b == 168) || a == 127
+            return a == 10 || (a == 172 && b in 16..31) || (a == 192 && b == 168) || a == 127 ||
+                (a == 100 && b in 64..127)
         }
     }
 
