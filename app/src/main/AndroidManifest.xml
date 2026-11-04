@@ -32,6 +32,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity,DiscouragedApi"
+            tools:replace="android:screenOrientation" />
+
         <service
             android:name=".service.MonitorNotificationService"
             android:exported="false"
