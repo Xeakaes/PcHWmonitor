@@ -60,15 +60,15 @@
     <string name="language_zh">简体中文</string>
     <string name="language_zh_tw">繁體中文</string>
     <string name="language_ja">日本語</string>
-    <string name="chart_window">Chart window</string>
+    <string name="chart_window">Παράθυρο γραφημάτων</string>
     <string name="chart_window_30s">30 δευτ.</string>
     <string name="chart_window_60s">60 δευτ.</string>
     <string name="chart_window_300s">300 δευτ.</string>
     <string name="fps_card_title">FPS</string>
     <string name="fps_avg">Μ.Ο.</string>
-    <string name="fps_1pct_low" formatted="false">1% Low</string>
+    <string name="fps_1pct_low" formatted="false">Ελάχιστο 1%</string>
     <string name="fps_details_title">Λεπτομέρειες FPS</string>
-    <string name="fps_hint" formatted="false">1% low is the average of the worst 1% of frame times — it measures stutter.</string>
+    <string name="fps_hint" formatted="false">Το ελάχιστο 1% είναι ο μέσος όρος του 1% των μεγαλύτερων χρόνων απόδοσης καρέ — μετρά τις διακοπές στην ομαλή κίνηση.</string>
     <string name="fps_ok">OK</string>
     <string name="disk_card_title">Δίσκος</string>
     <string name="disk_read">Ανάγνωση</string>
@@ -109,7 +109,7 @@
     <string name="qr_scan">Συμπλήρωση μέσω QR</string>
     <string name="custom_background">Προσαρμοσμένο φόντο</string>
     <string name="custom_background_enable">Ενεργοποίηση προσαρμοσμένου φόντου</string>
-    <string name="custom_background_description">Set a background image and auto-extract theme colors</string>
+    <string name="custom_background_description">Ορίστε μια εικόνα φόντου για αυτόματη εξαγωγή χρωμάτων θέματος</string>
     <string name="custom_background_pick">Επιλογή εικόνας</string>
     <string name="custom_background_remove">Αφαίρεση φόντου</string>
     <string name="custom_background_blur">Κάρτες Glassmorphism</string>
@@ -134,9 +134,9 @@
     <string name="error_connect_failed">Η σύνδεση απέτυχε</string>
     <string name="error_socket_failure">Η σύνδεση χάθηκε</string>
     <string name="error_address_invalid">Η διεύθυνση διακομιστή πρέπει να είναι ιδιωτική IP ή γνωστό όνομα κεντρικύ υπολογιστή</string>
-    <string name="error_plaintext_token">Προειδοποίηση: το διακριτικό στάλθηκε σε απλό κείμενο (ws://). Ενεργοποιήστε το TLS για ασφαλή έλεγχο ταυτότητας.</string>
-    <string name="error_history_write_failed">History write failed</string>
-    <string name="error_data_unavailable">Data unavailable</string>
+    <string name="error_plaintext_token">Προειδοποίηση: το διακριτικό στάλθηκε χωρίς κρυπτογράφηση (ws://). Ενεργοποιήστε το TLS για ασφαλή έλεγχο ταυτότητας.</string>
+    <string name="error_history_write_failed">Αποτυχία εγγραφής ιστορικού</string>
+    <string name="error_data_unavailable">Μη διαθέσιμα δεδομένα</string>
     <string name="error_unknown_message_type">Άγνωστος τύπος μηνύματος: %s</string>
     <string name="error_raw">%s</string>
     <string name="servers_title">Διακομιστές</string>
@@ -188,7 +188,7 @@
     <string name="setup_info_smartscreen">Αν τα  Windows εμφανίσουν προειδοποίηση SmartScreen: επιλέξτε «Περισσότερες πληροφορίες» και έπειτα «Εκτέλεση ούτως ή άλλως»</string>
     <string name="setup_info_open_page">Άνοιγμα σελίδας λήψης</string>
     <string name="setup_info_copy_link">Αντιγραφή συνδέσμου</string>
-    <string name="setup_info_got_it">Got it</string>
+    <string name="setup_info_got_it">ΟΚ</string>
     <string name="setup_info_copied">Ο σύνδεσμος αντιγράφηκε</string>
     <string name="setup_help_description">Βοήθεια ρύθμισης</string>
 </resources>
