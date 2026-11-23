@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.Obscrum.pchwmonitor.data.ServerField
 import com.Obscrum.pchwmonitor.util.QrPayload
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +56,8 @@ fun ServerEditScreen(
     val token by viewModel.token.collectAsState()
     val hostname by viewModel.hostname.collectAsState()
     val issues by viewModel.issues.collectAsState()
+    val isSaving by viewModel.isSaving.collectAsState()
+    val scope = rememberCoroutineScope()
 
     val defaultServerName = stringResource(R.string.default_server_name)
     val unknownDevice = stringResource(R.string.unknown_device)
@@ -204,8 +208,11 @@ fun ServerEditScreen(
             ) {
                 Button(
                     onClick = {
-                        if (viewModel.save(defaultServerName)) onSaved()
+                        scope.launch {
+                            if (viewModel.save(defaultServerName)) onSaved()
+                        }
                     },
+                    enabled = !isSaving,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(text = stringResource(R.string.save))

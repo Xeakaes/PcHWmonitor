@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -182,5 +183,25 @@ class ServerEditViewModelTest {
         assertTrue(vm.save())
         assertFalse(handle.store.settings.first().servers.single().useTls)
         handle.close()
+    }
+
+    @Test
+    fun save_whileSaving_returnsFalse_andDoesNotDuplicate() = runTest(UnconfinedTestDispatcher()) {
+        val handle = store(tmpDir())
+        val vm = ServerEditViewModel(handle.store, serverId = null)
+        vm.ip.value = "10.0.0.9"; vm.port.value = "8765"; vm.name.value = "PC"
+        val first = launch { vm.save("PC") }
+        assertFalse(vm.save("PC"))
+        first.join()
+        assertEquals(1, handle.store.settings.first().servers.size)
+    }
+
+    @Test
+    fun save_resetsIsSaving_evenWhenValidationFails() = runTest {
+        val handle = store(tmpDir())
+        val vm = ServerEditViewModel(handle.store, serverId = null)
+        vm.port.value = "not-a-port"
+        assertFalse(vm.save())
+        assertFalse(vm.isSaving.value)
     }
 }

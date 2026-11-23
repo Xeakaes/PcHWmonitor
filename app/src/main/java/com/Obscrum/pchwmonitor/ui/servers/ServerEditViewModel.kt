@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class ServerEditViewModel(
@@ -30,6 +29,9 @@ class ServerEditViewModel(
 
     private val _issues = MutableStateFlow<List<FieldIssue>>(emptyList())
     val issues: StateFlow<List<FieldIssue>> = _issues.asStateFlow()
+
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
 
     val isNew: Boolean = serverId == null
 
@@ -59,48 +61,54 @@ class ServerEditViewModel(
         }
     }
 
-    fun save(defaultName: String = ""): Boolean = runBlocking {
-        val portNumber = port.value.toIntOrNull()
-        val effectiveName = name.value.trim().ifBlank { defaultName }
-        val trimmedIp = ip.value.trim()
-        val trimmedToken = token.value.trim()
-        val trimmedHostname = hostname.value.trim()
-        val validated = ServerValidator.validate(
-            ip = trimmedIp,
-            port = portNumber,
-            name = effectiveName,
-            hostname = trimmedHostname,
-            existingNames = store.settings.first().servers
-                .filter { it.id != serverId }
-                .map { it.name },
-        )
-        _issues.value = validated
-        if (validated.any { it.severity == IssueSeverity.ERROR }) return@runBlocking false
-        val portNumberOrBlocked = portNumber ?: return@runBlocking false
-        val result = if (isNew) {
-            store.addServer(
-                ServerConfig(
-                    id = UUID.randomUUID().toString(),
+    suspend fun save(defaultName: String = ""): Boolean {
+        if (_isSaving.value) return false
+        _isSaving.value = true
+        try {
+            val portNumber = port.value.toIntOrNull()
+            val effectiveName = name.value.trim().ifBlank { defaultName }
+            val trimmedIp = ip.value.trim()
+            val trimmedToken = token.value.trim()
+            val trimmedHostname = hostname.value.trim()
+            val validated = ServerValidator.validate(
+                ip = trimmedIp,
+                port = portNumber,
+                name = effectiveName,
+                hostname = trimmedHostname,
+                existingNames = store.settings.first().servers
+                    .filter { it.id != serverId }
+                    .map { it.name },
+            )
+            _issues.value = validated
+            if (validated.any { it.severity == IssueSeverity.ERROR }) return false
+            val portNumberOrBlocked = portNumber ?: return false
+            val result = if (isNew) {
+                store.addServer(
+                    ServerConfig(
+                        id = UUID.randomUUID().toString(),
+                        name = effectiveName,
+                        ip = trimmedIp,
+                        port = portNumberOrBlocked,
+                        token = trimmedToken.ifBlank { null },
+                        hostname = trimmedHostname.ifBlank { null },
+                        useTls = trimmedHostname.isNotBlank(),
+                    ),
+                )
+            } else {
+                store.updateServerConnection(
+                    id = serverId!!,
                     name = effectiveName,
                     ip = trimmedIp,
                     port = portNumberOrBlocked,
                     token = trimmedToken.ifBlank { null },
                     hostname = trimmedHostname.ifBlank { null },
-                    useTls = trimmedHostname.isNotBlank(),
-                ),
-            )
-        } else {
-            store.updateServerConnection(
-                id = serverId!!,
-                name = effectiveName,
-                ip = trimmedIp,
-                port = portNumberOrBlocked,
-                token = trimmedToken.ifBlank { null },
-                hostname = trimmedHostname.ifBlank { null },
-            )
+                )
+            }
+            if (result.isSuccess) name.value = effectiveName
+            return result.isSuccess
+        } finally {
+            _isSaving.value = false
         }
-        if (result.isSuccess) name.value = effectiveName
-        result.isSuccess
     }
 
     companion object {
