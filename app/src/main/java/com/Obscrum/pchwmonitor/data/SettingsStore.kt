@@ -33,6 +33,7 @@ data class AppSettings(
     val customBackgroundUri: String? = null,
     val backgroundConnectAll: Boolean = false,
     val setupInfoShown: Boolean = false,
+    val plaintextConsent: Boolean = false,
 )
 
 class SettingsStore(private val dataStore: DataStore<Preferences>) {
@@ -52,6 +53,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
     private val keyActiveServerId = stringPreferencesKey("active_server_id")
     private val keyBackgroundConnectAll = stringPreferencesKey("background_connect_all")
     private val keySetupInfoShown = booleanPreferencesKey("setup_info_shown")
+    private val keyPlaintextConsent = booleanPreferencesKey("plaintext_consent")
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -97,6 +99,7 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
             customBackgroundUri = prefs[keyCustomBackgroundUri]?.takeIf { it.isNotBlank() },
             backgroundConnectAll = prefs[keyBackgroundConnectAll] == "true",
             setupInfoShown = prefs[keySetupInfoShown] ?: false,
+            plaintextConsent = prefs[keyPlaintextConsent] ?: false,
         )
     }
 
@@ -183,6 +186,10 @@ class SettingsStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setSetupInfoShown(shown: Boolean) {
         dataStore.edit { it[keySetupInfoShown] = shown }
+    }
+
+    suspend fun setPlaintextConsent(value: Boolean) {
+        dataStore.edit { it[keyPlaintextConsent] = value }
     }
 
     suspend fun savePreferences(theme: ThemeMode, language: String?, chartWindowSeconds: Int, themePaletteId: String) {

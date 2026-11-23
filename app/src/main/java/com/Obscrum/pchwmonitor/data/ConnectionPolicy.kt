@@ -1,5 +1,7 @@
 package com.Obscrum.pchwmonitor.data
 
+import com.Obscrum.pchwmonitor.data.network.ConnectionState
+
 data class ConnectionKey(
     val servers: List<ServerConfig>,
     val activeServerId: String?,
@@ -67,3 +69,9 @@ fun planOnStop(current: Map<String, ServerConfig>, backgroundAll: Boolean): Conn
     } else {
         ConnectionPlan(connect = emptyMap(), disconnect = current.keys, dispose = emptySet())
     }
+
+fun requiresPlaintextConsent(cfg: ServerConfig, consentGranted: Boolean): Boolean =
+    !cfg.useTls && cfg.token != null && !consentGranted
+
+fun isInsecureConnection(state: ConnectionState, cfg: ServerConfig?): Boolean =
+    state == ConnectionState.CONNECTED && cfg?.useTls == false

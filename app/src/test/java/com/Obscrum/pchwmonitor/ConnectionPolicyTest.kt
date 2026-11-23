@@ -3,9 +3,12 @@ package com.Obscrum.pchwmonitor
 import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.ConnectionPlan
 import com.Obscrum.pchwmonitor.data.ServerConfig
+import com.Obscrum.pchwmonitor.data.network.ConnectionState
 import com.Obscrum.pchwmonitor.data.ThemeMode
+import com.Obscrum.pchwmonitor.data.isInsecureConnection
 import com.Obscrum.pchwmonitor.data.planConnections
 import com.Obscrum.pchwmonitor.data.planOnStop
+import com.Obscrum.pchwmonitor.data.requiresPlaintextConsent
 import com.Obscrum.pchwmonitor.data.toConnectionKey
 import com.Obscrum.pchwmonitor.ui.dashboard.DashboardLayout
 import org.junit.Assert.assertEquals
@@ -225,5 +228,26 @@ class ConnectionPolicyTest {
         assertEquals(emptyMap<String, ServerConfig>(), on.connect)
         assertEquals(emptySet<String>(), on.disconnect)
         assertEquals(emptySet<String>(), on.dispose)
+    }
+
+    @Test
+    fun requiresPlaintextConsent_onlyForPlaintextWithToken() {
+        val plain = ServerConfig(id = "a", name = "", ip = "1.2.3.4", port = 8765, token = "t") // useTls=false
+        val tls = plain.copy(useTls = true)
+        val noToken = plain.copy(token = null)
+        assertTrue(requiresPlaintextConsent(plain, consentGranted = false))
+        assertFalse(requiresPlaintextConsent(plain, consentGranted = true))
+        assertFalse(requiresPlaintextConsent(tls, consentGranted = false))
+        assertFalse(requiresPlaintextConsent(noToken, consentGranted = false))
+    }
+
+    @Test
+    fun isInsecureConnection_onlyConnectedPlainSockets() {
+        val plain = ServerConfig(id = "a", name = "", ip = "1.2.3.4", port = 8765, token = "t")
+        assertTrue(isInsecureConnection(ConnectionState.CONNECTED, plain))
+        assertFalse(isInsecureConnection(ConnectionState.CONNECTING, plain))
+        assertFalse(isInsecureConnection(ConnectionState.DISCONNECTED, plain))
+        assertFalse(isInsecureConnection(ConnectionState.CONNECTED, plain.copy(useTls = true)))
+        assertFalse(isInsecureConnection(ConnectionState.CONNECTED, null))
     }
 }

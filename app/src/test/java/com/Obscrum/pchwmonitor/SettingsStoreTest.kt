@@ -338,6 +338,15 @@ class SettingsStoreTest {
     }
 
     @Test
+    fun plaintextConsent_defaultsFalse_andPersists() = runTest {
+        val handle = store(tmpDir())
+        assertFalse(handle.store.settings.first().plaintextConsent)
+        handle.store.setPlaintextConsent(true)
+        assertTrue(handle.store.settings.first().plaintextConsent)
+        handle.close()
+    }
+
+    @Test
     fun noLegacyKeys_doesNotWriteBack() = runTest {
         val handle = store(tmpDir())
         handle.store.settings.first()
