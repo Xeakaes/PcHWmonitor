@@ -22,9 +22,24 @@
 - [x] 9 color palettes (Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic)
 - [x] Dashboard edit mode: reorder, hide, pin cards; toggle half/full width
 - [x] Landscape mode: compact scroll-free grid, auto-hiding nav bar
-- [x] F-Droid submission: MR !44635, CI passing, awaiting merge
+- [x] F-Droid submission: MR !44635 (CI green, merged 2026-11-04)
 - [x] Bug fixes: server switch race condition, temp file race, clipboard injection, WebSocket slow client, socket leak, Room DB migration v2
 - [x] Localization: 14 languages, all strings translated
+
+## Shipped — v1.6.3 (2026-11-04)
+
+- [x] CGNAT address allowlist: `100.64.0.0/10` (RFC 6598) accepted for RFC 6598 shared-space addresses
+- [x] Tailscale / NetBird hostnames: dot-boundary suffixes `.ts.net` / `.netbird.cloud` accepted by `MonitorController.isAllowedHost`
+- [x] Portrait QR scanner: manifest override for `com.journeyapps.barcodescanner.CaptureActivity`
+- [x] Store launches: F-Droid live (v1.6.3, versionCode 11) + Google Play production (2026-11-23, 100% rollout) + GitHub Releases
+- [x] Greek localization (community PR #2 by @theoasima) + `el` in the language picker → 15 languages
+
+## Next — v1.6.4
+
+- [ ] **[P1] Plaintext token flow**: don't send auth tokens over plain `ws://` without explicit user consent; keep the insecure-connection warning visible after connect
+- [ ] **[P2] UI-thread `runBlocking`**: `ServerEditViewModel.save()` → coroutine with `isSaving` state
+- [ ] **[P2] FPS time window**: frame-count cap (`deque(maxlen=1800)`) → timestamp-based real 30 s window with tests
+- [ ] **[P3] Hardware compatibility test matrix**: LHM fixture archive, missing/null sensor cases
 
 ## Vision — v1.7+
 
@@ -59,7 +74,7 @@
 ### Build & Distribution
 
 - [ ] **Multiple architecture support**: ARM64, x86_64 builds
-- [ ] **Automated testing**: Expand test coverage (currently 127 tests)
+- [ ] **Automated testing**: Expand test coverage (currently 141 Android + 78 server tests)
 
 ### Documentation
 

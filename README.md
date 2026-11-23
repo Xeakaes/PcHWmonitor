@@ -17,6 +17,12 @@
   <img src="https://androidweekly.net/issues/issue-739/badge"
        alt="Featured in androidweekly.net Issue #739">
 </a>
+<a href="https://play.google.com/store/apps/details?id=com.Obscrum.pchwmonitor" target="_blank">
+  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="60">
+</a>
+<a href="https://f-droid.org/packages/com.Obscrum.pchwmonitor/" target="_blank">
+  <img src="https://f-droid.org/assets/badges/get-it-on_en.png" alt="Get it on F-Droid" height="60">
+</a>
 
 <p>
   <img src="docs/images/hero_left.jpg" width="216" alt="PC HW Monitor RAM and Disk cards">
@@ -59,7 +65,7 @@
    - **Multi-PC support**: connect to multiple PCs simultaneously, switch between them via tabs on the dashboard
    - **TLS/SSL**: optional encrypted WebSocket connections (`wss://`) with self-signed cert trust dialog
    - **Notification**: persistent notification shows active server's hardware stats; title reflects the active PC name
-   - 14 languages (selectable in Settings)
+   - 15 languages (selectable in Settings)
 - **Flexible connection setup**: tap **Scan QR code** on the Servers screen — the server tray displays a QR code that fills IP, port and token on the phone with a single scan — or tap **Add manually** to enter the IP + port + access token yourself
 - **Windows EXE** (single file): zero-install hardware reading via an embedded `LibreHardwareMonitorLib.dll`; FastAPI + WebSocket streams data to your phone. The EXE also embeds `cloudflared` (tunnels work out of the box) and `PresentMon64.exe` for FPS. No PC hardware? `--simulate` mode generates realistic fake data. Disk/Network stats come from `psutil` (see Building the EXE).
 - **Server SSL/TLS**: optional `--ssl-cert`/`--ssl-key` flags for encrypted connections; `--ssl-cert auto` generates a self-signed certificate automatically
@@ -73,7 +79,7 @@
 
 ### 3. Download
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK. Also coming to [F-Droid](https://f-droid.org/) (MR !44635, CI green including `fdroid build`, awaiting merge).
+- **Android:** [Google Play](https://play.google.com/store/apps/details?id=com.Obscrum.pchwmonitor) · [F-Droid](https://f-droid.org/packages/com.Obscrum.pchwmonitor/) · [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — latest APK.
 - **Windows:** `PcHwMonitor.exe` — single-file server. Release builds are produced by CI on every tag (cloudflared, LibreHardwareMonitor and PresentMon embedded); rebuild locally with `build_exe.bat` (see Getting Started).
 
 ### 4. Architecture
@@ -140,7 +146,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # verifies welcome + 3 status messages
-.venv/bin/python -m pytest tests -v        # 77 server tests
+.venv/bin/python -m pytest tests -v        # 78 server tests
 ```
 
 #### Android Setup
@@ -150,7 +156,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Tests: `./gradlew :app:testDebugUnitTest` (139 unit tests)
+Tests: `./gradlew :app:testDebugUnitTest` (141 unit tests)
 
 **Something not working?** Report it on the [GitHub Issues](https://github.com/Xeakaes/PcHWmonitor/issues) page.
 
@@ -312,7 +318,7 @@ Yes. v1.6 adds multi-PC support — add multiple servers in Settings, then switc
 Optional. v1.6 adds TLS/SSL support — run the server with `--ssl-cert auto` for a self-signed certificate, or use a Cloudflare Tunnel which provides HTTPS automatically.
 
 **Which languages does the app support?**
-14 languages, selectable in Settings.
+15 languages, selectable in Settings.
 
 **Is it free?**
 Yes, AGPL-3.0. Development is supported by Patreon patrons and Buy Me a Coffee supporters.
@@ -340,7 +346,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons and Buy Me a Coffee s
    - **Sadeleştirilmiş ayarlar**: iki renkli palet daireleri (primary/accent ayrımı), segmentli tema seçici ve arka plan bağlantısı için pil ipucu
    - **Dashboard düzenleme modu**: kartları yeniden sırala, gizle/göster, ilk ekranda sabitle (pin) ve her kartı yarım/tam genişlik arasında değiştir
    - **Yatay modda (landscape) kompakt, kaydırmasız ızgara** — nav bar otomatik gizlenir, dokununca tekrar görünür; tabletlerde daha geniş çok sütunlu düzen
-   - 14 dil (ayarlardan seçilebilir)
+   - 15 dil (ayarlardan seçilebilir)
 - **Esnek bağlantı kurulumu**: Sunucular ekranında **QR kodu tara**'ya dokunun — sunucu tepsisindeki QR kodu IP, port ve anahtarı tek okutmayla telefona doldurur — ya da **Elle ekle** ile IP + port + erişim anahtarını kendiniz girin
 - **Windows EXE** (tek dosya): Gömülü `LibreHardwareMonitorLib.dll` ile sıfır kurulum veri okuma; FastAPI + WebSocket ile telefona yayın. EXE ayrıca `cloudflared` (tunnel'lar kutudan çıkar çıkmaz çalışır) ve FPS için `PresentMon64.exe` paketler. PC yoksa `--simulate` modu sahte ama gerçekçi veri üretir. Disk/Ağ sensörleri `psutil` ile okunur (bkz. Derleme).
 
@@ -353,7 +359,7 @@ Yes, AGPL-3.0. Development is supported by Patreon patrons and Buy Me a Coffee s
 
 ### 3. İndirme
 
-- **Android:** [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK. Ayrıca [F-Droid](https://f-droid.org/) üzerinde yakında (MR !44635, `fdroid build` dahil CI yeşil, merge bekleniyor).
+- **Android:** [Google Play](https://play.google.com/store/apps/details?id=com.Obscrum.pchwmonitor) · [F-Droid](https://f-droid.org/packages/com.Obscrum.pchwmonitor/) · [GitHub Releases](https://github.com/Xeakaes/PcHWmonitor/releases) — en güncel APK.
 - **Windows:** `PcHwMonitor.exe` — tek dosyalık sunucu. Release sürümleri her tag'da CI tarafından üretilir (cloudflared, LibreHardwareMonitor ve PresentMon gömülü); lokalde `build_exe.bat` ile yeniden derleyebilirsin (bkz. Başlarken).
 
 ### 4. Mimari
@@ -414,7 +420,7 @@ python3 -m venv .venv
 ```bash
 curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 .venv/bin/python smoke_test.py             # welcome + 3 status mesajı doğrular
-.venv/bin/python -m pytest tests -v        # 77 sunucu testi
+.venv/bin/python -m pytest tests -v        # 78 sunucu testi
 ```
 
 #### Android Kurulumu
@@ -424,7 +430,7 @@ curl http://localhost:8765/health          # {"ok":true,"source":"..."}
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Testler: `./gradlew :app:testDebugUnitTest` (139 birim testi)
+Testler: `./gradlew :app:testDebugUnitTest` (141 birim testi)
 
 **Sorun mu var?** [GitHub Issues](https://github.com/Xeakaes/PcHWmonitor/issues) sayfasından bildir.
 
@@ -586,7 +592,7 @@ Evet. v1.6 çoklu PC desteği ekledi — Ayarlar'da birden fazla sunucu ekleyin,
 Opsiyonel. v1.6 TLS/SSL desteği ekledi — sunucuyu `--ssl-cert auto` ile çalıştırarak self-signed sertifika kullanın veya otomatik HTTPS sağlayan Cloudflare Tunnel kullanın.
 
 **Uygulama kaç dil destekliyor?**
-Ayarlardan seçilebilen 14 dil.
+Ayarlardan seçilebilen 15 dil.
 
 **Ücretsiz mi?**
 Evet, AGPL-3.0 lisanslı. Geliştirme Patreon destekçileri ve Buy Me a Coffee katkılarıyla sürüyor.

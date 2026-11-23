@@ -1,69 +1,76 @@
 # TODO — PC HW Monitor
 
-## F-Droid
+## Distribution
 
-- [x] Fdroid MR !44635 — CI pipeline başarılı (2026-09-15), metadata base64 hatası düzeltildi, `Binaries` kaldırıldı (reproducible build karşılaştırması başarısız olacağı için)
-- [ ] Fdroid onayı gelince sürümü güncelleme MR'ı olarak gönder (v1.6 → güncel)
+- [x] F-Droid MR !44635 — CI pipeline green (2026-09-15), metadata base64 error fixed, `Binaries` removed (reproducible-build comparison would fail)
+- [x] F-Droid MR merged (2026-11-04) — v1.6.3 (versionCode 11) live on F-Droid
+- [x] Google Play production launch (2026-11-23) — 100% rollout, 177 countries + rest of world
+- [ ] Watch install tempo toward the 12-month goal: **5,000 total downloads by 2027-11-14** (Play lifetime + GitHub APK; F-Droid invisible = bonus). ~13/day pace; check monthly around the 14th
 
-## v1.6 — Shipped ✅
+## v1.6.3 — Shipped ✅ (2026-11-04)
 
-- [x] **Custom Background + Glassmorphism**: Kullanıcı galeriden resim seçer → tema renkleri otomatik çıkarılır, kartlar şaffaf + blur modu
-- [x] **Çoklu PC desteği**: Birden fazla PC'ye aynı anda bağlan, sekmeler arası geçiş
-- [x] **TLS/SSL güvenli bağlantı**: Şifreli WebSocket, self-signed sertifika onay dialogu
-- [x] **Cloudflare Tunnel**: `--tunnel quick` / `--tunnel <name>` ile kalıcı URL ile uzaktan erişim
-- [x] **Güvenlik katmanları**: HMAC timing-safe token karşılaştırması, cert trust dialog, bağlantı limitleri
-- [x] **9 renk paleti**: Default, Ocean, Ember, Forest, Black & Gold, Material You, Midnight, Sunset, Arctic
-- [x] **Dashboard düzenleme modu**: Kartları yeniden sırala, gizle/göster, ilk ekranda sabitle, yarım/tam genişlik
-- [x] **Yatay mod**: Kompakt ızgara, otomatik gizlenen nav bar
-- [x] **F-Droid gönderimi**: MR !44635, CI başarılı, onay bekleniyor
-- [x] **Bug fixes**: Sunucu geçiş yarış koşulu, temp dosya race condition, clipboard injection, WebSocket yavaş istemci, socket sızıntısı, Room DB migration v2
-- [x] **Yerelleştirme**: 14 dil, tüm string'ler çevrildi
+- [x] **CGNAT allowlist**: `100.64.0.0/10` (RFC 6598) accepted as a valid address
+- [x] **Tailscale / NetBird**: dot-boundary suffixes `.ts.net` / `.netbird.cloud` in `MonitorController.isAllowedHost`
+- [x] **Portrait QR scanner**: manifest override for `com.journeyapps.barcodescanner.CaptureActivity`
+- [x] **Stores**: F-Droid + GitHub + Google Play (production) all live
+- [x] **Greek localization**: PR #2 by @theoasima (all base keys, format specifiers match) + `el` added to the language picker → 15 languages
+
+## v1.6.4 — Next
+
+Findings from the technical review notes (verified against v1.6.3 source):
+
+- [ ] **[P1] Plaintext token flow**: `MonitorController` sets `AppError.PlaintextToken` when connecting without TLS, but the connection proceeds anyway and the warning is cleared on success (line 47). Decide default behavior: block token over plaintext unless the user explicitly consents; keep the security warning visible while the connection is insecure; add tests for TLS on/off × token present/absent
+- [ ] **[P2] `runBlocking` on the UI thread**: `ServerEditViewModel.save()` (line 62) blocks the main thread on DataStore I/O. Convert to `viewModelScope.launch` + suspend, add `isSaving` state, guard against double-tap duplicate saves
+- [ ] **[P2] FPS time window**: `server/adapters/fps.py` caps history at `deque(maxlen=1800)` frames — 30 s only at 60 FPS (7.5 s at 240 FPS). Store timestamps and select the last 30 s; add unit tests for 60/144/240 FPS, empty and irregular frame gaps
+- [ ] **[P3] Hardware compatibility tests**: fixture archive of varied LibreHardwareMonitor JSON outputs, Intel/AMD × NVIDIA/AMD/Intel matrix via volunteer reports, null/missing-sensor cases must not crash the app
+- [x] **[P3] README/docs refresh**: store badges (Play + F-Droid), live store links, test counts (141 Android / 78 server), 15 languages
+- [ ] **Deferred from 1.6.3**: reword `error_address_invalid` in `strings.xml` (14 locales)
 
 ## Backlog — v1.7+
 
-### Sunucu
+### Server
 
-- [ ] **Linux sunucu desteği (v1.7)**: psutil tabanlı native Linux sensör kaynağı (CPU/RAM/sıcaklık/fan, opsiyonel NVML GPU), `source=auto` Linux fallback, Linux tek-dosya build scripti + cloudflared-linux embed, opsiyonel tray (pystray/AppIndicator), README Linux quickstart. FPS Windows'a özel kalır (PresentMon/ETW). Sunucu çekirdeği, XDG config path, cloudflared finder ve CI smoke Ubuntu'da zaten yeşil
-- [ ] Better simulation mode: `--simulate` için daha gerçekçi donanım profilleri
-- [ ] FPS improvements: `--fps-process` otomatik oyun algılama
-- [ ] Disk I/O improvements: okuma/yazma gecikmesi metrikleri, SMART verisi
-- [ ] Network enhancements: bant genişliği geçmişi, arayüz bazlı istatistikler
-- [ ] Web API v2: geçmiş veri + push bildirimi endpoint'leri
+- [ ] **Linux server support (v1.7)**: psutil-based native Linux sensor source (CPU/RAM/temps/fans, optional NVML GPU), `source=auto` Linux fallback, one-file Linux build script + cloudflared-linux embed, optional tray (pystray/AppIndicator), README Linux quickstart. FPS stays Windows-only (PresentMon/ETW). Server core, XDG config path, cloudflared finder and CI smoke already pass on Ubuntu
+- [ ] Better simulation mode: more realistic hardware profiles for `--simulate`
+- [ ] FPS improvements: `--fps-process` auto game detection
+- [ ] Disk I/O improvements: read/write latency metrics, SMART data
+- [ ] Network enhancements: bandwidth history, per-interface statistics
+- [ ] Web API v2: historical data + push notification endpoints
 
 ### Android
 
-- [ ] Uygulama içi destek linki: Settings/About'a Buy Me a Coffee (`buymeacoffee.com/Obscrum`) + Patreon girişi
-- [ ] Home screen widget: hızlı istatistik widget'ı
-- [ ] Offline mode: son bilinen veriyi önbellekle, sunucusuz çalış
-- [ ] Background updates: uygulama arka plandayken bağlantıyı sürdür
-- [ ] Custom card layouts: kullanıcı tanımlı kart konumu/boyutu
-- [ ] Advanced chart options: logaritmik ölçek, karşılaştırmalı grafikler, sensör filtreleme
+- [ ] In-app support links: Buy Me a Coffee (`buymeacoffee.com/Obscrum`) + Patreon entry in Settings/About
+- [ ] Home screen widget: quick stats widget
+- [ ] Offline mode: cache last known stats, work without the server
+- [ ] Background updates: keep the connection alive while the app is backgrounded
+- [ ] Custom card layouts: user-defined card position/size
+- [ ] Advanced chart options: logarithmic scale, comparative charts, sensor filters
 
-### Bağlantı & Protokol
+### Connectivity & Protocol
 
-- [ ] WebRTC support: WebSocket'e alternatif düşük gecikme
-- [ ] QUIC protocol: deneysel taşıma katmanı
+- [ ] WebRTC support: low-latency alternative to WebSocket
+- [ ] QUIC protocol: experimental transport layer
 
 ### LibreHardwareMonitor
 
-- [ ] Sensor coverage: daha fazla sensör desteği (voltaj, güç fazları vb.)
-- [ ] DLL updates: gömülü LibreHardwareMonitorLib.dll güncellemesi
-- [ ] New sensor types: yeni donanım izleme özellikleri
+- [ ] Sensor coverage: more sensors (voltage, power phases, etc.)
+- [ ] DLL updates: refresh embedded LibreHardwareMonitorLib.dll
+- [ ] New sensor types: newer hardware monitoring features
 
-### Build & Dağıtım
+### Build & Distribution
 
-- [ ] Multiple architecture support: ARM64, x86_64 build'leri
-- [ ] Automated testing: test kapsamını genişlet (şu an 127 test)
+- [ ] Multiple architecture support: ARM64, x86_64 builds
+- [ ] Automated testing: expand coverage (currently 141 Android + 78 server tests)
 
-### Dokümantasyon
+### Documentation
 
-- [ ] Video tutorials: Windows ve Android kurulum videoları
-- [ ] API documentation: komple WebSocket protokol referansı
-- [ ] Troubleshooting guide: genişletilmiş SSS
+- [ ] Video tutorials: Windows and Android setup videos
+- [ ] API documentation: complete WebSocket protocol reference
+- [ ] Troubleshooting guide: expanded FAQ
 
-### Uzun Vadeli (v2.0)
+### Long-term (v2.0)
 
-- [ ] Cross-platform host: macOS sunucu desteği (Linux v1.7'de geliyor)
-- [ ] Browser-based config: PC sunucusu için web yapılandırma arayüzü
-- [ ] Cloud sync: opsiyonel şifreli geçmiş senkronizasyonu
-- [ ] Plugin system: genişletilebilir sensör/plugin mimarisi
+- [ ] Cross-platform host: macOS server support (Linux ships in v1.7)
+- [ ] Browser-based config: web configuration UI for the PC server
+- [ ] Cloud sync: optional encrypted history sync
+- [ ] Plugin system: extensible sensor/plugin architecture
