@@ -41,7 +41,9 @@ def compute_fps(entries: list[tuple[str, float, float]], now: float, interval_s:
     frames = [(ts, ms) for name, ts, ms in window if name == app]
     if len(frames) < 2:
         return None
-    recent = [f for f in frames if f[0] >= now - interval_s] or frames[-2:]
+    recent = [f for f in frames if f[0] >= now - interval_s]
+    if len(recent) < 2:
+        recent = frames[-2:]
     current = 1000.0 / (sum(ms for _, ms in recent) / len(recent))
     avg = 1000.0 / (sum(ms for _, ms in frames) / len(frames))
     p99 = _percentile([ms for _, ms in frames], 99.0)

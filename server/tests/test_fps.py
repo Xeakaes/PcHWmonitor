@@ -73,6 +73,19 @@ def test_irregular_frame_gaps_still_compute():
     assert info is not None and 1.5 <= info.avg <= 2.5
 
 
+def test_current_falls_back_to_last_two_when_interval_has_one_frame():
+    now = time.monotonic()
+    # exactly one frame inside the 2s interval; another older frame inside the 30s window
+    entries = [
+        ("game.exe", now - 10.0, 100.0),   # older, inside window, outside interval
+        ("game.exe", now - 1.0, 20.0),     # only frame inside 2s interval
+    ]
+    info = compute_fps(entries, now)
+    assert info is not None
+    # interval has 1 frame -> fall back to frames[-2:] (both frames), mean 60 ms -> 16.7 fps
+    assert info.current == 16.7
+
+
 class _FakeStdout:
     def __init__(self, lines):
         self._lines = lines
