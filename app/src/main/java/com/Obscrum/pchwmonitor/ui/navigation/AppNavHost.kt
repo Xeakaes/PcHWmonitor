@@ -279,6 +279,7 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                         languages = listOf(
                             null to stringResource(R.string.settings_language_system),
                             "en" to stringResource(R.string.language_en),
+                            "el" to stringResource(R.string.language_el),
                             "fr" to stringResource(R.string.language_fr),
                             "de" to stringResource(R.string.language_de),
                             "es" to stringResource(R.string.language_es),
