@@ -31,20 +31,46 @@ def test_parse_csv_line_missing_column_returns_none():
 
 
 def test_compute_fps_returns_none_for_few_entries():
-    assert compute_fps([("game.exe", 16.7)], time.time()) is None
+    assert compute_fps([("game.exe", time.monotonic(), 16.7)], time.monotonic()) is None
 
 
 def test_compute_fps_math():
-    now = time.time()
-    # 60 fps for the whole window: 16.6667 ms, but one slow frame of 200 ms
-    entries = [("game.exe", 16.7)] * 60 + [("game.exe", 200.0)] + [("game.exe", 16.7)] * 30
-    info = compute_fps(entries, now)
+    now = time.monotonic()
+    slow = [("game.exe", now - 4.0 + i / 60, 16.7) for i in range(60)]   # older, inside 30 s window
+    outlier = [("game.exe", now - 2.5, 200.0)]                           # in window, outside 2 s interval
+    recent = [("game.exe", now - 1.9 + i * (1.9 / 30), 16.7) for i in range(30)]
+    info = compute_fps(slow + outlier + recent, now)
     assert info is not None
     assert info.name == "game.exe"
-    assert 55 <= info.current <= 62          # mean ~16.7-17 ms window
+    assert 55 <= info.current <= 62          # only the last ~2 s (16.7 ms frames)
     assert 50 <= info.avg <= 62              # 1703/91 = 18.71 ms -> 53.5 fps
     assert info.onePercentLow < info.avg     # the 200 ms outlier drags p99 down
     assert info.onePercentLow >= 4.0         # 1000/200 = 5 fps floor
+
+
+def test_window_is_30s_regardless_of_frame_rate():
+    now = time.monotonic()
+    # 60 s of 240 fps frames (4.1667 ms): first 30 s are slow (50 ms) and must be excluded
+    entries = []
+    for i in range(14400):                      # 60 s at 240 fps
+        ts = now - 60 + i / 240
+        entries.append(("game.exe", ts, 50.0 if ts < now - 30 else 4.1667))
+    info = compute_fps(entries, now)
+    assert info is not None
+    assert info.avg > 200                       # only the fast half counts (~240 fps)
+
+
+def test_empty_window_returns_none():
+    now = time.monotonic()
+    entries = [("game.exe", now - 120 + i / 60, 16.7) for i in range(60)]  # all older than 30 s
+    assert compute_fps(entries, now) is None
+
+
+def test_irregular_frame_gaps_still_compute():
+    now = time.monotonic()
+    entries = [("game.exe", now - 10 + i * 0.5, 500.0) for i in range(20)]  # 2 fps, inside window
+    info = compute_fps(entries, now)
+    assert info is not None and 1.5 <= info.avg <= 2.5
 
 
 class _FakeStdout:

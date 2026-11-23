@@ -33,15 +33,18 @@ def _percentile(values: list[float], pct: float) -> float:
     return ordered[idx]
 
 
-def compute_fps(entries: list[tuple[str, float]], now: float, interval_s: float = 2.0, window_s: float = 30.0) -> FpsInfo | None:
-    if len(entries) < 2:
+def compute_fps(entries: list[tuple[str, float, float]], now: float, interval_s: float = 2.0, window_s: float = 30.0) -> FpsInfo | None:
+    window = [e for e in entries if e[1] >= now - window_s]
+    if not window:
         return None
-    app = entries[-1][0]
-    frames = [ms for name, ms in entries if name == app]
-    recent = frames[-max(2, int(interval_s / window_s * len(frames))):]
-    current = 1000.0 / (sum(recent) / len(recent))
-    avg = 1000.0 / (sum(frames) / len(frames))
-    p99 = _percentile(frames, 99.0)
+    app = window[-1][0]
+    frames = [(ts, ms) for name, ts, ms in window if name == app]
+    if len(frames) < 2:
+        return None
+    recent = [f for f in frames if f[0] >= now - interval_s] or frames[-2:]
+    current = 1000.0 / (sum(ms for _, ms in recent) / len(recent))
+    avg = 1000.0 / (sum(ms for _, ms in frames) / len(frames))
+    p99 = _percentile([ms for _, ms in frames], 99.0)
     return FpsInfo(name=app, current=round(current, 1), avg=round(avg, 1), onePercentLow=round(1000.0 / p99, 1))
 
 
@@ -51,7 +54,7 @@ class PresentMonFps:
         self._process_name = process_name
         self._interval_s = interval_s
         self._window_s = window_s
-        self._entries: deque[tuple[str, float]] = deque(maxlen=1800)
+        self._entries: deque[tuple[str, float, float]] = deque(maxlen=60000)
         self._proc: subprocess.Popen | None = None
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
@@ -89,14 +92,14 @@ class PresentMonFps:
                 continue
             parsed = parse_csv_line(header, line)
             if parsed is not None:
-                self._entries.append(parsed)
+                self._entries.append((parsed[0], time.monotonic(), parsed[1]))
         self._entries.clear()
         self._stop.set()
 
     def sample(self) -> FpsInfo | None:
         if not self._entries or self._stop.is_set():
             return None
-        return compute_fps(list(self._entries), time.time(), self._interval_s, self._window_s)
+        return compute_fps(list(self._entries), time.monotonic(), self._interval_s, self._window_s)
 
     def stop(self) -> None:
         proc, self._proc = self._proc, None
