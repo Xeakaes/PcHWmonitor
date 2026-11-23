@@ -21,7 +21,7 @@
   <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="60">
 </a>
 <a href="https://f-droid.org/packages/com.Obscrum.pchwmonitor/" target="_blank">
-  <img src="https://f-droid.org/assets/badges/get-it-on.png" alt="Get it on F-Droid" height="60">
+  <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">
 </a>
 
 <p>
