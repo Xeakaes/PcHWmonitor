@@ -7,18 +7,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -146,6 +150,23 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                                 )
                             }
                         } else {
+                            val insecure by viewModel.insecureConnection.collectAsState()
+                            if (insecure) {
+                                Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
+                                        Text(
+                                            text = stringResource(R.string.banner_unencrypted),
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
+                                }
+                            }
                             if (servers.size > 1) {
                                 ScrollableTabRow(
                                     selectedTabIndex = servers.indexOfFirst { it.id == activeServerId }.coerceAtLeast(0),
@@ -413,6 +434,25 @@ fun AppNavHost(viewModel: MonitorViewModel, modifier: Modifier = Modifier) {
                 },
                 dismissButton = {
                     Button(onClick = { viewModel.dismissCertDialog() }) {
+                        Text(stringResource(R.string.cert_trust_cancel))
+                    }
+                },
+            )
+        }
+        // Plaintext consent dialog
+        val pendingConsent by viewModel.pendingPlaintextConsent.collectAsState()
+        if (pendingConsent != null) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissPlaintextConsent() },
+                title = { Text(stringResource(R.string.plaintext_consent_title)) },
+                text = { Text(stringResource(R.string.plaintext_consent_message)) },
+                confirmButton = {
+                    Button(onClick = { viewModel.confirmPlaintextConsent() }) {
+                        Text(stringResource(R.string.plaintext_consent_confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { viewModel.dismissPlaintextConsent() }) {
                         Text(stringResource(R.string.cert_trust_cancel))
                     }
                 },

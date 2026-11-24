@@ -120,6 +120,10 @@
     <string name="cert_trust_confirm_message">Zaufać temu certyfikatowi przy przyszłych połączeniach?</string>
     <string name="cert_trust_action">Zaufaj</string>
     <string name="cert_trust_cancel">Anuluj</string>
+    <string name="plaintext_consent_title">Wysłać token przez niezaszyfrowane połączenie?</string>
+    <string name="plaintext_consent_message">Ten serwer używa ws://, więc Twój token dostępu zostanie wysłany jako jawny tekst w sieci. Kontynuuj tylko w zaufanej sieci albo skonfiguruj TLS na serwerze.</string>
+    <string name="plaintext_consent_confirm">Połącz mimo to</string>
+    <string name="banner_unencrypted">Nieszyfrowane połączenie</string>
     <string name="saved_servers">Zapisane serwery</string>
     <string name="select">Wybierz</string>
     <string name="delete_label">Usuń</string>

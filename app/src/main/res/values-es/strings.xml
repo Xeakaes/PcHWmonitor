@@ -120,6 +120,10 @@
     <string name="cert_trust_confirm_message">¿Confiar en este certificado para futuras conexiones?</string>
     <string name="cert_trust_action">Confiar</string>
     <string name="cert_trust_cancel">Cancelar</string>
+    <string name="plaintext_consent_title">¿Enviar el token por una conexión sin cifrar?</string>
+    <string name="plaintext_consent_message">Este servidor usa ws://, por lo que tu token de acceso se enviará en texto plano por la red. Continúa solo en una red de confianza o configura TLS en el servidor.</string>
+    <string name="plaintext_consent_confirm">Conectar de todos modos</string>
+    <string name="banner_unencrypted">Conexión sin cifrar</string>
     <string name="saved_servers">Servidores guardados</string>
     <string name="select">Seleccionar</string>
     <string name="delete_label">Eliminar</string>

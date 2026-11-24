@@ -120,6 +120,10 @@
     <string name="cert_trust_confirm_message">Να θεωρείται αξιόπιστο αυτό το πιστοποιητικό για μελλοντικές συνδέσεις;</string>
     <string name="cert_trust_action">Αξιόπιστο</string>
     <string name="cert_trust_cancel">Ακύρωση</string>
+    <string name="plaintext_consent_title">Αποστολή του token μέσω μη κρυπτογραφημένης σύνδεσης;</string>
+    <string name="plaintext_consent_message">Ο διακομιστής χρησιμοποιεί ws://, οπότε το token πρόσβασης θα σταλεί ως καθαρό κείμενο στο δίκτυο. Συνεχίστε μόνο σε αξιόπιστο δίκτυο ή ρυθμίστε TLS στον διακομιστή.</string>
+    <string name="plaintext_consent_confirm">Σύνδεση παρ\' όλα αυτά</string>
+    <string name="banner_unencrypted">Μη κρυπτογραφημένη σύνδεση</string>
     <string name="saved_servers">Αποθηκευμένοι διακομιστές</string>
     <string name="select">Επιλογή</string>
     <string name="delete_label">Διαγραφή</string>

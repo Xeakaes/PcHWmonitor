@@ -120,6 +120,10 @@
     <string name="cert_trust_confirm_message">Bu sertifikaya gelecek bağlantılar için güvensin mi?</string>
     <string name="cert_trust_action">Güven</string>
     <string name="cert_trust_cancel">İptal</string>
+    <string name="plaintext_consent_title">Şifresiz bağlantı üzerinden anahtar gönderilsin mi?</string>
+    <string name="plaintext_consent_message">Bu sunucu ws:// kullanıyor, erişim anahtarınız ağ üzerinden düz metin olarak gönderilecek. Yalnızca güvendiğiniz bir ağda devam edin ya da sunucuda TLS\'i etkinleştirin.</string>
+    <string name="plaintext_consent_confirm">Yine de bağlan</string>
+    <string name="banner_unencrypted">Şifresiz bağlantı</string>
     <string name="saved_servers">Kayıtlı Sunucular</string>
     <string name="select">Seç</string>
     <string name="delete_label">Sil</string>

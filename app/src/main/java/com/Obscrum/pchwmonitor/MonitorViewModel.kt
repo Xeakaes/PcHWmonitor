@@ -14,6 +14,8 @@ import com.Obscrum.pchwmonitor.data.AppSettings
 import com.Obscrum.pchwmonitor.data.AppError
 import com.Obscrum.pchwmonitor.data.ConnectionKey
 import com.Obscrum.pchwmonitor.data.ConnectionPlan
+import com.Obscrum.pchwmonitor.data.isInsecureConnection
+import com.Obscrum.pchwmonitor.data.requiresPlaintextConsent
 import com.Obscrum.pchwmonitor.data.ServerConfig
 import com.Obscrum.pchwmonitor.data.SettingsStore
 import com.Obscrum.pchwmonitor.data.ThemeMode
@@ -48,6 +50,8 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 
 data class SetupInfoState(val setupInfoShown: Boolean, val serverCount: Int)
 
+data class PendingPlaintextConsent(val serverId: String, val cfg: ServerConfig)
+
 class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val settingsStore: SettingsStore = SettingsStore(app.settingsDataStore)
@@ -80,6 +84,14 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
     // Cert trust dialog state
     private val _pendingCertHash = MutableStateFlow<String?>(null)
     val pendingCertHash: StateFlow<String?> = _pendingCertHash.asStateFlow()
+
+    // Plaintext consent dialog state
+    private val _pendingPlaintextConsent = MutableStateFlow<PendingPlaintextConsent?>(null)
+    val pendingPlaintextConsent: StateFlow<PendingPlaintextConsent?> = _pendingPlaintextConsent.asStateFlow()
+
+    // Insecure-connection banner state (reflects live connection state, not cleared on connect success)
+    private val _insecureConnection = MutableStateFlow(false)
+    val insecureConnection: StateFlow<Boolean> = _insecureConnection.asStateFlow()
 
     // Track collect jobs to cancel on server switch
     private val activeCollectJobs = mutableListOf<Job>()
@@ -157,6 +169,10 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
             connectedConfigs.remove(id)
         }
         plan.connect.forEach { (id, cfg) ->
+            if (requiresPlaintextConsent(cfg, settings.value.plaintextConsent)) {
+                _pendingPlaintextConsent.value = PendingPlaintextConsent(id, cfg)
+                return@forEach
+            }
             ensureController(id, cfg).connect(
                 cfg.ip,
                 cfg.port,
@@ -197,6 +213,7 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
         activeCollectJobs.forEach { it.cancel() }
         activeCollectJobs.clear()
         _pendingCertHash.value = null
+        _insecureConnection.value = false
         val activeId = _activeServerId.value
         if (activeId == null) {
             _activeStatus.value = null
@@ -214,7 +231,10 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
         activeCollectJobs += viewModelScope.launch {
             ctrl.connection.collect {
                 _activeConnection.value = it
-                it?.let { state -> MonitorNotificationService.updateConnectionState(state) }
+                it?.let { state ->
+                    MonitorNotificationService.updateConnectionState(state)
+                    _insecureConnection.value = isInsecureConnection(state, connectedConfigs[activeId])
+                }
             }
         }
         activeCollectJobs += viewModelScope.launch { ctrl.lastError.collect { _lastError.value = it } }
@@ -269,6 +289,20 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
             collectFromActiveController()
         }
     }
+
+    fun confirmPlaintextConsent() {
+        val pending = _pendingPlaintextConsent.value ?: return
+        _pendingPlaintextConsent.value = null
+        viewModelScope.launch {
+            settingsStore.setPlaintextConsent(true)
+            ensureController(pending.serverId, pending.cfg).connect(
+                pending.cfg.ip, pending.cfg.port, pending.cfg.token, pending.cfg.useTls, pending.cfg.hostname,
+            )
+            connectedConfigs[pending.serverId] = pending.cfg
+        }
+    }
+
+    fun dismissPlaintextConsent() { _pendingPlaintextConsent.value = null }
 
     fun dismissCertDialog() {
         _pendingCertHash.value = null

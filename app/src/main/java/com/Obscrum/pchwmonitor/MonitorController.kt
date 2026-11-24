@@ -78,9 +78,6 @@ class MonitorController(
             }
             ip
         }
-        if (!useTls && token != null) {
-            _lastError.value = AppError.PlaintextToken
-        }
         val scheme = if (useTls) "wss" else "ws"
         val url = if (!hostname.isNullOrBlank()) {
             "$scheme://$target/ws"
