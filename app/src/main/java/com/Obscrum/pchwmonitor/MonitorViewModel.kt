@@ -299,6 +299,7 @@ class MonitorViewModel(private val app: Application) : AndroidViewModel(app) {
                 pending.cfg.ip, pending.cfg.port, pending.cfg.token, pending.cfg.useTls, pending.cfg.hostname,
             )
             connectedConfigs[pending.serverId] = pending.cfg
+            collectFromActiveController()
         }
     }
 
